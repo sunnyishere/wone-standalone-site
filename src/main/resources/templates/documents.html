@@ -1,0 +1,479 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${pageTitle}"></title>
+    <meta name="description" th:content="${description} ?: ''"/>
+    <meta name="keywords" th:content="${pageKeyword} ?: ''">
+    <link rel="canonical"
+          th:if="${selectLabel != null and selectLabel != ''}"
+          th:href="${websitePath + pageName + '/' + selectLabel + '-' + (pageData?.pageNum ?: 1)}" />
+
+    <meta property="og:title" th:content="${title}" />
+    <meta property="og:description" th:content="${description}"/>
+    <meta property="og:url" th:content="${websitePath + pageName + '/' + selectLabel  + '-' + (pageData?.pageNum ?: 1)}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" th:content="en_US" />
+    <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="twitter:title" th:content="${title}"/>
+    <meta name="twitter:description" th:content="${description}"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <!--防某度-->
+    <th:block th:replace="head :: commonHead"></th:block>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='Documents')"></th:block>
+    <!-- 手机-->
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <!-- 侧边栏内容 -->
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height">占位边距</div>
+<div class="m-header-banner m-header-1"
+     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
+    <section class="am-container am-text-center wone-text">
+        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
+            <h2 th:text="${pageName}"></h2>
+            <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
+        </hgroup>
+    </section>
+</div>
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li>
+                <a th:href="'/' + ${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+            </li>
+            <li th:if="${selectValue != null and selectValue != ''}" class="am-active">
+                <a th:href="${selectLabel}" th:text="${selectValue}" th:title="${selectLabel}" aria-hidden="false" th:aria-label="${selectLabel}"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<div class="" style="">
+
+    <div class="am-container am-padding phone-clear-padding"
+         style="margin: 0px auto 20px !important;padding: 0 10px 0 30px !important;" th:if="${not #strings.isEmpty(pageDetailedText)}">
+        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 1px;border-radius: 12px;"
+             th:text="${pageDetailedText}">
+        </div>
+    </div>
+    <div class="am-container phone-clear-padding">
+
+        <div class="am-u-md-3 am-u-sm-12 ">
+            <ul class="am-list admin-sidebar-list" id="collapase-nav-1" style="background-color: #FFFFFF;">
+                <div class="am-padding am-text-lg am-text-bold">Filters</div>
+                <!-- Document king 面板 -->
+                <li class="am-panel am-padding-left">
+                    <!-- 面板标题添加展开图标切换 -->
+                    <a class="am-text-bold"
+                       data-am-collapse="{parent: '#collapase-nav-1', target: '#a1'}">
+                        Document king
+                        <i class="am-fr am-margin-right"
+                           th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![name], selectValue)}
+               ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
+                    </a>
+                    <!-- 子列表：根据是否包含选中项添加am-in类 -->
+                    <ul class="am-list am-collapse admin-sidebar-sub"
+                        id="a1"
+                        th:if="${not #lists.isEmpty(association)}"
+                        th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![name], selectValue)}
+            ? 'am-in' : ''">
+                        <li th:each="index : ${association}"
+                            th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="${index.name}"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim(index.name), ' ', '-') +
+                    '-' +
+                    index.id}">
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Language 面板 -->
+                <li class="am-panel am-padding-left">
+                    <a class="am-text-bold" data-am-collapse="{parent: '#collapase-nav-1', target: '#a2'}">
+                        Language
+                        <i class="am-fr am-margin-right"
+                           th:classappend="${#lists.contains({'Chinese','English','French'}, selectValue)}
+               ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
+                    </a>
+                    <!-- 子列表：根据是否包含选中项添加am-in类 -->
+                    <ul class="am-list am-collapse admin-sidebar-sub"
+                        id="a2"
+                        th:classappend="${#lists.contains({'Chinese','English','French'}, selectValue)} ? 'am-in' : ''">
+                        <li th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a title="Chinese" aria-hidden="false" aria-label="Chinese" th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="'Chinese'"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim('chinese'), ' ', '-') } +'-3686323'">
+                            </a>
+                        </li>
+                        <li th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a title="English" aria-hidden="false" aria-label="English" th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="'english'"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim('english'), ' ', '-') + '-3259826' }">
+                            </a>
+                        </li>
+                        <li th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a title="French" aria-hidden="false" aria-label="French" th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="'French'"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim('french'), ' ', '-') + '-443636'}">
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- Sort By 面板 -->
+                <li class="am-panel am-padding-left">
+                    <a class="am-text-bold" data-am-collapse="{parent: '#collapase-nav-1', target: '#a3'}">
+                        Sort By
+                        <i class="am-fr am-margin-right"
+                           th:classappend="${#lists.contains({'Oldest first','Newest first'}, selectValue)}
+               ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
+                    </a>
+                    <!-- 子列表：根据是否包含选中项添加am-in类 -->
+                    <ul class="am-list am-collapse admin-sidebar-sub"
+                        id="a3"
+                        th:classappend="${#lists.contains({'Oldest first','Newest first'}, selectValue)} ? 'am-in' : ''">
+                        <li th:style="${selectValue == 'Oldest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a title="Oldest first" aria-hidden="false" aria-label="Oldest first" th:style="${selectValue == 'Oldest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="'oldest-first'"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim('oldest-first'), ' ', '-') + '-883325'}">
+                            </a>
+                        </li>
+                        <li th:style="${selectValue == 'Newest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a title="Newest first" aria-hidden="false" aria-label="Newest first" th:style="${selectValue == 'Newest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="'Newest first'"
+                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim('newest-first'), ' ', '-') + '-632325'}">
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl" style="background:#FFFFFF;">
+            <div class="am-container phone-container-all phone-clear-padding am-padding-top"
+                 style="background-color: #FFFFFF;">
+                <div style="margin: 0px 10px 0 10px;">
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                         th:if="${not #lists.isEmpty(pageData.rows)}"
+                         th:each="item : ${pageData.rows}">
+                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div style="am-cf">
+                                    <div class="am-fl am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img th:src="${item.icon}" th:alt="${item.name}" class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                        </div>
+                                    </div>
+                                    <div class="" style="height: 100px;">
+                                        <div class="am-cf">
+                                            <div class="" style="width: 100%;">
+                                                <div th:if="${item.isShow} == 1" class="dd-clamp-text-1"
+                                                     style="color: #07C160;">
+                                                    <span class="p-icon-a-0012"></span>
+                                                    <span>Public.</span>
+                                                </div>
+                                                <div th:if="${item.isShow} == 0" class="dd-clamp-text-1"
+                                                     style="color: var(--theme-wone);">
+                                                    <span class="p-icon-a-0022"></span>
+                                                    <span>Restricted.</span>
+                                                </div>
+                                                <div class="dd-clamp-text-2 am-padding-top-sm am-text-bold"
+                                                     style="min-height: 5rem;" th:text="${item.name}">
+                                                </div>
+                                                <div class=" dd-clamp-text-1 am-text-sm">
+                                                    <span class="am-padding-right"
+                                                          style="color: #5C779F; " th:text="${item.eName}"></span>
+                                                    <span th:if="${item.locale} == 1">Chinese</span>
+                                                    <span th:if="${item.locale} == 2">English</span>
+                                                    <span th:if="${item.locale} == 3">French</span>
+                                                </div>
+                                            </div>
+                                            <!-- 文件/视频区域 -->
+                                            <div class="am-fr" th:if="${item.isShow} == 1"
+                                                 style="border: 1px solid var(--theme-wone);margin-top: 40px; border-radius: 100px; padding: 4px 8px 4px 20px; color: var(--theme-wone);
+                                                display: inline-flex; align-items: center; background-color: #FFFFFF">
+
+                                                <!-- 类型1：文件下载 -->
+                                                <div th:if="${item.type == 1 && item.isShow == 1}">
+                                                    <span th:text="${#strings.toUpperCase(item.fName)}"
+                                                          class="am-margin-right-sm"></span>
+                                                    <a th:title="${item.name}" aria-hidden="false" th:aria-label="${item.name}" th:href="${item.url}" download th:attr="download=${item.fName}"
+                                                       style="color: inherit;">
+                                                        <span class="p-icon-a-0031"></span>
+                                                    </a>
+                                                </div>
+
+                                                <!-- 类型2：视频播放 -->
+                                                <div th:if="${item.type == 2 && item.isShow == 1}"
+                                                     class="play-video-btn"
+                                                     th:attr="data-video-iframe=${#strings.escapeXml(item.url)}"
+                                                     style="cursor: pointer;">
+                                                    <span>MP4</span>
+                                                    <span class="p-icon-a-0051 am-padding-left-sm"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="am-fr"
+                                                 data-trigger="modal-1"
+                                                 data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                                 th:data-biz-id="'documents-'+${item.id}"
+                                                 th:if="${item.isShow} == 0"
+                                                 style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
+                                                <span>Consulting</span>
+                                                <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 数据为空时显示占位区块（背景色#afb4b7） -->
+                    <div th:unless="${not #lists.isEmpty(pageData.rows)}"
+                         style="background-color: #afb4b7; border-radius: 12px; min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+
+                        <div class="am-text-center am-text-white">
+                            <i class="am-icon-3x am-margin-bottom"></i>
+                            <h3 class="am-margin-bottom-sm"></h3>
+                            <p class="am-text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="am-container phone-clear-margin" style="margin: 0px 15px 15px 15px;padding-top: 30px;">
+                <!-- 分页组件 -->
+                <th:block th:replace="pagination :: pagination(
+                    totalPages=${pageData.totalPages},
+                    currentPage=${pageData.pageNum},
+                    requestUrl=${#strings.replace(#strings.trim(selectLabel), ' ', '-')})"></th:block>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 视频模态框结构 -->
+<div id="videoModal" style="display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background-color: rgba(0,0,0,0.8);
+      align-items: center; justify-content: center; z-index: 9999;">
+    <div style="position: relative; width: 80%; max-width: 800px; background: #000;
+         border-radius: 8px; padding: 10px;">
+        <button id="closeVideo" style="position: absolute; top: -30px; right: 0;
+                background: transparent; border: none; color: #fff; font-size: 24px;">
+            &times;
+        </button>
+        <div id="videoIframeContainer" style="width: 100%; height: 0; padding-bottom: 56.25%;
+             position: relative;">
+            <!-- 视频iframe将动态插入这里 -->
+        </div>
+    </div>
+</div>
+
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
+
+<!-- 弹窗-->
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<!-- PC端的右侧按钮 -->
+<th:block th:replace="right-menu :: right-menu(param1='Documents')"></th:block>
+
+<!-- app端显示的下载按钮 -->
+<th:block th:replace="phone-down :: phone-down"></th:block>
+
+<!-- 底部导航   -->
+<th:block th:replace="footer :: footer"></th:block>
+
+<style>
+    /* 视频模态框样式 */
+    .video-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .video-container {
+        position: relative;
+        width: 90%;
+        max-width: 1200px;
+        background-color: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .close-video {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 36px;
+        height: 36px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        z-index: 10;
+        transition: background-color 0.3s ease;
+    }
+
+    .close-video:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .video-iframe {
+        width: 100%;
+        aspect-ratio: 16/9;
+        border: none;
+    }
+
+    .play-btn-hover {
+        transition: all 0.3s ease;
+    }
+
+    .play-btn-hover:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(7, 193, 96, 0.4);
+    }
+
+    #videoIframeContainer {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9比例，56.25% = 9/16*100% */
+    }
+
+    #videoIframeContainer iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 6px;
+    }
+</style>
+
+</body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const videoModal = document.getElementById('videoModal');
+        const closeButton = document.getElementById('closeVideo');
+        const iframeContainer = document.getElementById('videoIframeContainer');
+
+        // 处理所有播放按钮（使用事件委托）
+        document.body.addEventListener('click', function (event) {
+            if (event.target.closest('.play-video-btn')) {
+                const playButton = event.target.closest('.play-video-btn');
+
+                // 获取转义后的iframe代码
+                let iframeCode = playButton.getAttribute('data-video-iframe');
+                if (!iframeCode) {
+                    alert('视频URL为空，请检查数据配置');
+                    return;
+                }
+
+                // 还原HTML实体
+                iframeCode = iframeCode
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .replace(/&quot;/g, '"')
+                    .replace(/&#39;/g, "'");
+
+                // 创建完整的iframe元素
+                iframeContainer.innerHTML = iframeCode;
+
+                // 设置iframe样式
+                const iframe = iframeContainer.querySelector('iframe');
+                if (iframe) {
+                    iframe.style.position = 'absolute';
+                    iframe.style.top = '0';
+                    iframe.style.left = '0';
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.borderRadius = '6px';
+                }
+
+                // 显示模态框
+                videoModal.style.display = 'flex';
+            }
+        });
+
+        // 关闭模态框
+        closeButton.addEventListener('click', function () {
+            videoModal.style.display = 'none';
+            iframeContainer.innerHTML = '';
+        });
+
+        // 点击背景关闭
+        videoModal.addEventListener('click', function (event) {
+            if (event.target === videoModal) {
+                videoModal.style.display = 'none';
+                iframeContainer.innerHTML = '';
+            }
+        });
+    });
+</script>
+</html>

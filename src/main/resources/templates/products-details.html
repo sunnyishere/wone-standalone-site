@@ -1,0 +1,781 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title th:text="${prod.name} + '-' + ${prodBrand.eName}"></title>
+    <meta name="description" th:content="${prod.description} ?: ''"/>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" th:href="${websitePath} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+           '' :
+           ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+            'detail/'+
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           '-'+${prod.id}"/>
+
+    <!-- Robots -->
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <!-- Open Graph -->
+    <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
+    <meta property="og:description" th:content="${prod.description}"/>
+    <meta property="og:url" th:content="${websitePath} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+           '' :
+           ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+            'detail/'+
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           '-'+${prod.id}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
+    <meta name="twitter:description" th:content="${prod.description}"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <!-- Product Metadata -->
+    <meta property="product:price:currency" content="USD"/>
+    <meta property="product:availability" content="instock"/>
+    <meta property="product:published_time" th:content="${prod.created}"/>
+    <meta property="product:modified_time" th:content="${prod.updated}"/>
+
+    <!-- Viewport & UX -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+
+    <!-- Common Head Fragment -->
+    <th:block th:replace="head :: commonHead"></th:block>
+
+    <!-- Structured Data (Schema.org) -->
+    <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
+    <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
+    <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}"></script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='Products-'+${prod.id})"></th:block>
+    <!-- 手机-->
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <!-- 侧边栏内容 -->
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+
+</header>
+<div class="header-height">占位边距</div>
+<div class="m-header-banner m-header-1"
+     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
+    <section class="am-container am-text-center wone-text">
+        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
+            <h2 th:text="${pageName}"></h2>
+            <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
+        </hgroup>
+    </section>
+</div>
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a th:href="'/'+${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}">Products</a></li>
+            <li th:if="${category1 != null}">
+                <a th:title="${category1.name}" aria-hidden="false" th:aria-label="${category1.name}" th:href="${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim(category1.name), ' ', '-') +
+                    '-' + category1.id}"
+                   th:text="${category1.name}">Sub Category</a>
+            </li>
+            <li th:if="${category2 != null}">
+                <a th:title="${category2.name}" aria-hidden="false" th:aria-label="${category2.name}" th:href="${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
+                    '/' :
+                    '/' +
+                    #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
+                    '/' +
+                    #strings.replace(#strings.trim(category2.name), ' ', '-') +
+                    '-' + category2.id}"
+                   th:text="${category2.name}">Sub Category</a>
+            </li>
+        </ol>
+    </div>
+</nav>
+
+<div style="background-color: #FFFFFF;">
+
+    <div class="am-container phone-clear-padding" style="padding: 0 3%;">
+
+        <div class="am-u-sm-12 am-u-md-7 am-u-lg-7 phone-clear-margin" style="padding: 0 15px;">
+            <div style="background-color: #FFFFFF;margin-bottom:5px;margin-top: 25px">
+                <div th:text="${prod.name}" class="dd-clamp-text-2 am-text-bold am-text-lg"
+                     style="min-height: 40px;max-height: 40px;">
+
+                </div>
+            </div>
+
+            <!-- 视频+图片 -->
+            <div class="m-partner">
+                <div data-am-widget="slider" class="am-slider am-slider-default-2"
+                     data-am-slider='{"animation":"slide","controlNav":"thumbnails"}'>
+                    <ul class="am-slides">
+                        <!-- 条件判断：如果 videoUrl 不为空则显示视频 -->
+                        <th:block th:if="${videoUrl != null and videoUrl != ''}">
+                            <li class="video-product" data-thumb="/images/play.png"
+                                style="border-radius: 0px;width: 100%;object-fit: contain;">
+                                <video class="video-box new-swiper" id="vid" controls preload loop muted playsinline
+                                       autoplay
+                                       style="height: 100%;width: 100%;border-radius: 0px;background-color: #000000;">
+                                    <source class="video-square"
+                                            th:src="${videoUrl}"
+                                            type="video/mp4"
+                                            style="background-color: #E9E9E9;">
+                                </video>
+                                <img class="new-swiper" id="pauseImage" src="https://oss.iwone.cn/standalone/images/play.png" alt="Stop Image"
+                                     style="display: none;object-fit: cover;height: 100%;width: 100%;">
+                            </li>
+                        </th:block>
+
+                        <!-- 循环遍历图片列表 -->
+                        <th:block th:each="image : ${imageList}">
+                            <li th:attr="data-thumb=${image}"
+                                style="border-radius: 0;max-height: 432px;width: 100%;object-fit: cover;">
+                                <img class="new-swiper" th:src="${image}" th:alt="${prod.name}"
+                                     style="background-color: #FFFFFF;">
+                            </li>
+                        </th:block>
+                    </ul>
+                </div>
+            </div>
+
+            <!--定位 -->
+            <div class="am-hide-sm-only">
+                <div class="am-container am-margin-top-lg phone-container-title phone-clear-padding"
+                     style="background-color: #FFFFFF;padding: 10px 0;">
+                    <div class="" style="border-bottom: 1px solid #E6E6E6;padding-bottom: 10px;">
+                        <div class="am-text-lg am-text-bold border-active">
+                            <a class="am-margin-right-lg" data-offset="240" href="#target1"
+                               onclick="scrollToTarget(event)">Attributes</a>
+                            <a class="am-margin-right-lg" data-offset="240" href="#target2"
+                               onclick="scrollToTarget(event)">Description</a>
+                            <a class="am-margin-right-lg" data-offset="240" href="#target4"
+                               onclick="scrollToTarget(event)">Documentation Resource Library</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 定位1 -->
+            <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg">
+                Key attributes
+            </div>
+
+            <div class="am-margin-bottom-sm" style="padding: 10px 0;">
+                <table class="am-table am-padding-top-sm">
+                    <tbody>
+                    <tr>
+                        <td style="background-color: #F9F9F9; width: 45%;">Brand</td>
+                        <td style="width: 55%;">
+                            <a  aria-hidden="false"
+                               th:aria-label="${brand.name}"
+                               th:title="${brand.name}"
+                               th:href="|/brand/${brand.name.trim().toLowerCase().replace(' ', '-')}-${brand.id}|"
+                               th:text="${brand.name}">Brand Name</a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${model != null}">
+                        <td style="background-color: #F9F9F9; width: 45%;">Model NO.</td>
+                        <td style="width: 55%;" th:text="${model.name}">Model Name</td>
+                    </tr>
+
+                    <tr th:each="specKey : ${specKeyList}">
+                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${specKey.name}">Spec Name</td>
+                        <td style="width: 55%;" th:text="${specKey.specValue?.name}">Spec Value</td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color: #F9F9F9; width: 45%;">Series</td>
+                        <td style="width: 55%;" th:text="${prod.series}">Series Name</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="dd-clamp-text-2 am-text-bold am-text-lg am-margin-bottom-lg">
+                Product descriptions from the supplier
+            </div>
+            <span id="target2" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px;">
+            Description
+            </span>
+            <div id="editor" class="am-margin-bottom"
+                 style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
+                <div style="width: 100%;overflow-x: auto" th:utext="${prod.detail}">
+                </div>
+            </div>
+
+            <!-- 文档资源库 -->
+            <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}">
+                <span id="target4" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
+                    Documentation Resource Library
+                </span>
+
+                <div class="am-margin-bottom-sm"
+                     style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
+                    <div th:each="item : ${faLibraryList}">
+                        <div style="background-color: #FFFFFF;height: 100%;margin: 10px 0 15px 0;border-radius: 12px;border: 1px solid #E9E9E9;">
+                            <div class="am-g dd-hover4 am-padding" style="width: 100%;height: 100%;">
+                                <div style="display: flex;justify-content: left;">
+                                    <div class="am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img th:src="${item.icon}" th:alt="${item.name}" class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 16px;">
+                                        </div>
+                                    </div>
+                                    <div class="PC-76">
+                                        <div th:if="${item.isShow == 1}" style="color: #07C160;">
+                                            <span class="p-icon-a-0012"></span>
+                                            <span>Public.</span>
+                                        </div>
+                                        <div th:if="${item.isShow == 0}" style="color: #F75755;">
+                                            <span class="p-icon-a-0022"></span>
+                                            <span>Restricted.</span>
+                                        </div>
+
+                                        <div class="dd-clamp-text-2 am-text-lg" th:text="${item.name}">文档名称</div>
+                                        <div style="display: flex;flex-wrap: wrap;">
+                                            <div class="am-text-left am-padding-top-sm am-padding-right-lg"
+                                                 style="color: #5C779F;">
+                                                <span th:text="${item.faAssoc?.name}">分类名称</span>
+                                            </div>
+                                            <div th:if="${item.locale == 1}"
+                                                 class="am-text-left am-padding-top-sm am-padding-right-lg"
+                                                 style="color: #767676;">
+                                                Chinese
+                                            </div>
+                                            <div th:if="${item.locale == 2}"
+                                                 class="am-text-left am-padding-top-sm am-padding-right-lg"
+                                                 style="color: #767676;">
+                                                English
+                                            </div>
+                                            <div th:if="${item.locale == 3}"
+                                                 class="am-text-left am-padding-top-sm am-padding-right-lg"
+                                                 style="color: #767676;">
+                                                French
+                                            </div>
+                                            <span th:if="${item.locale != 1 and item.locale != 2 and item.locale != 3}">Unknown Language</span>
+                                        </div>
+                                    </div>
+                                    <div class="PC-24">
+                                        <!-- 公开 + 文档 -->
+                                        <div class="am-show-lg-only" th:if="${item.isShow == 1 and item.type == 1}">
+                                            <a aria-hidden="false" th:aria-label="${item.faAssoc.name}"
+                                               th:title="${item.faAssoc.name}"
+                                               th:href="${item.fileDatalis.url}" th:download="${item.fileDatalis.name}"
+                                               style="border: none">
+                                                <div class="am-text-center"
+                                                     style="display: flex;justify-content: right;">
+                                                    <div style="margin-top: 30px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 100px;">
+                                                        <span th:text="${item.fileDatalis?.type ?: 'UNKNOWN'}">PDF</span>
+                                                        <span class="p-icon-a-0031 am-padding-left-sm"></span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <!-- 公开 + 视频 -->
+                                        <div class="am-show-lg-only"
+                                             th:if="${item.isShow == 1 and item.type == 2 and item.url != null}">
+                                            <div class="am-text-center" style="display: flex;justify-content: right;">
+                                                <div class="am-fr play-video-btn" id="playVideoBtn"
+                                                     th:data-video-iframe="${#strings.replace(#strings.replace(#strings.replace(item.url, '&', '&amp;'), '<', '&lt;'), '>', '&gt;')}"
+                                                     style="margin-top: 30px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 100px;">
+                                                    <span>MP4</span>
+                                                    <span class="p-icon-a-0051 am-padding-left-sm"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 受限 -->
+                                        <div class="am-show-lg-only" th:if="${item.isShow == 0}">
+                                            <div class="am-text-center" style="display: flex;justify-content: right;">
+                                                <div
+                                                     data-trigger="modal-1"
+                                                     data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                                     th:data-biz-id="'documents-'+${item.id}"
+                                                     style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
+                                                    <span>Consulting</span>
+                                                    <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 手机端按钮 -->
+                            <div class="am-hide-lg-only">
+                                <div th:if="${item.isShow == 1 and item.type == 1}"
+                                     style="width: 100%;display: inline-flex;justify-content: center;">
+                                    <a aria-hidden="false" th:aria-label="${item.faAssoc.name}"
+                                       th:title="${item.faAssoc.name}"
+                                       th:href="${item.fileDatalis.url}" th:download="${item.fileDatalis.name}"
+                                       style="border: none">
+                                        <div class="am-text-center"
+                                             style="margin-bottom: 10px;border: 1px solid var(--theme-wone);;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);;width: 120px;">
+                                            <span th:text="${item.fileDatalis?.type ?: 'UNKNOWN'}">PDF</span>
+                                            <span class="p-icon-a-0031 am-padding-left-sm"></span>
+                                        </div>
+                                    </a>
+                                </div>
+
+                                <!-- 手机端：公开 + 视频 -->
+                                <div th:if="${item.isShow == 1 and item.type == 2 and item.url != null}"
+                                     style="width: 100%;display: inline-flex;justify-content: center;">
+                                    <div class="am-text-center"
+                                         style="margin-bottom: 10px;border: 1px solid var(--theme-wone);;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);;width: 120px;">
+                                        <span>MP4</span>
+                                        <span class="p-icon-a-0051 am-padding-left-sm"></span>
+                                    </div>
+                                </div>
+
+                                <div th:if="${item.isShow == 0}"
+                                     style="width: 100%;display: inline-flex;justify-content: center;">
+                                    <div class="am-text-center"
+                                         data-trigger="modal-1"
+                                         data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                         th:data-biz-id="'documents-'+${item.id}"
+                                         style="margin-bottom: 10px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
+                                        <span>Consulting</span>
+                                        <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 证书 -->
+            <div th:if="${prCercateListt != null and #lists.size(prCercateList) > 0}">
+                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
+                    Certifications
+                </span>
+                <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0 0 0;">
+                    <div data-am-widget="slider" class="am-slider am-slider-default"
+                         data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":180,"itemMargin":5}'>
+                        <ul class="am-slides">
+                            <!-- 修复：将 th:if 合并到 li 上 -->
+                            <li class="dd-hover4"
+                                th:each="item : ${prCercateList}"
+                                th:if="${item.url != null}">
+                                <div style="background-color: #FFFFFF;padding: 10px 0;border-radius: 12px;">
+                                    <div class="phone-bottom" style="width: 165px;height: 234px;">
+                                        <img th:src="${item.url}" alt="" class="am-img-responsive"
+                                             style="object-fit: cover;width: 165px;height: 234px;border-radius: 0;border: 1px solid #E9E9E9;">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ部分 -->
+            <th:block th:if="${prodFaqList != null and not prodFaqList.isEmpty()}">
+                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
+                    FAQ
+                </span>
+                <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
+                    <div class="am-margin-bottom-lg" th:each="item : ${prodFaqList}">
+                        <div class="am-text-bold">
+                            Q: <span th:text="${item.title}"></span>
+                        </div>
+                        <div>
+                            <span id="editor" class="am-text-bold">A:</span>
+                            <span th:utext="${item.content}"></span>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+        <div class="sticky-bar am-u-sm-12 am-u-md-5 am-u-lg-5 phone-clear-margin" style="padding: 0 15px;">
+            <div style="background-color: #FFFFFF;margin-bottom:0;margin-top: 25px;border: 1px solid #E9E9E9;border-radius: 10px;padding: 20px;">
+                <!-- 价格区间展示 -->
+                <div style="border-bottom: 1px solid #E6E6E6;padding-bottom: 15px;">
+                    <div>
+                        <span class="am-text-xl am-text-bold" style="color: #F75755;"></span>
+                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;" th:text="${userPrice}"></span>
+                    </div>
+                    <div class="am-padding-top-sm">
+                        <!-- 条件判断：显示公式名称或默认文本 -->
+                        <th:block th:if="${formula != null}">
+                            <a class="device-aware-link dd-clamp-text-1"
+                               th:href="@{/electrical-calculator/{name}-{id}(name=${formula.name.replace(' ', '-')}, id=${formula.id})}"
+                               style="border-bottom: none;"
+                               th:title="${formula.name}"
+                               aria-hidden="false"
+                               th:aria-label="${formula.name}">
+                                <span class="p-icon-a-106" style="color: #07C160;"></span>
+                                <span class="am-text-bold">[[${formula.name}]]</span>
+                            </a>
+                        </th:block>
+                        <th:block th:unless="${formula != null}">
+                            <span class="p-icon-a-106" style="color: #07C160;"></span>
+                            <span class="am-text-bold">Pricing calculator</span>
+                        </th:block>
+                    </div>
+                </div>
+
+                <!-- 型号列表 -->
+                <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
+                    <div class="am-g">
+                        <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
+                            <span>Model</span>
+                        </div>
+                        <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
+                            <!-- 循环遍历型号列表 -->
+                            <th:block th:each="item, stat : ${modelList}">
+                                <th:block th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
+                                    <div th:style="${isActive
+                        ? 'border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
+                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
+                                        <a aria-hidden="false"
+                                           th:aria-label="${item.modelName}"
+                                           th:title="${item.modelName}"
+                                           th:href="|${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' : ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/')}${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-'))}-${item.prodId}-series${item.id}|"
+                                           th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
+                                            <div style="padding: 10px 20px;">
+                                                <span th:text="${item.modelName}"></span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </th:block>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 文档/文件列表 -->
+                <!-- 修复后的文档/文件列表区域 -->
+                <th:block th:if="${faLibraryList != null and faLibraryList != null and #lists.size(faLibraryList) > 0}">
+                    <th:block th:each="item : ${faLibraryList}">
+                        <!-- 判断 item 不为空 + fileDatalis 单对象不为空（无需循环，因正常部分是单对象） -->
+                        <th:block th:if="${item != null and item.fileDatalis != null}">
+                            <!-- 直接获取单对象的 url 和 name，无需循环 -->
+                            <th:block th:with="url = ${item.fileDatalis.url}, fileName = ${item.fileDatalis.name}">
+                                <th:block th:if="${url != null}">
+                                    <!-- 类型1：可下载文件（公开） -->
+                                    <th:block th:if="${item.isShow == 1 and item.type == 1}">
+                                        <a aria-hidden="false"
+                                           th:aria-label="${fileName}"
+                                           th:title="${fileName}"
+                                           th:href="${url}"
+                                           th:download="${fileName}"
+                                           style="border: none; text-decoration: none;">
+                                            <div class="am-text-center"
+                                                 style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">
+                                                <div style="margin: 0 10px; border: 1px solid var(--theme-wone); background-color: #FFFFFF; border-radius: 100px; padding: 4px 8px; color: var(--theme-wone); min-width: 140px; text-align: center;">
+                                                    <span class="p-icon-a-085 am-padding-right-xs"></span>
+                                                    <!-- 访问单对象的 type，加默认值避免空显示 -->
+                                                    <span>[[${item.fileDatalis.type ?: 'UNKNOWN'}]]</span>
+                                                </div>
+                                                <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>
+                                            </div>
+                                        </a>
+                                    </th:block>
+
+                                    <!-- 类型2：MP4视频（公开，需确认 item.url 存在） -->
+                                    <th:block th:if="${item.isShow == 1 and item.type == 2 and item.url != null}">
+                                        <div class="am-text-center"
+                                             style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">
+                                            <div style="margin: 0 10px; border: 1px solid var(--theme-wone); background-color: var(--theme-wone); border-radius: 100px; padding: 4px 8px; color: #07C160; min-width: 140px; text-align: center;">
+                                                <span class="p-icon-a-085 am-padding-right-xs"></span>
+                                                <span>MP4</span>
+                                            </div>
+                                            <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>
+                                        </div>
+                                    </th:block>
+
+                                    <!-- 类型3：受限资源（咨询按钮） -->
+<!--                                    <th:block th:if="${item.isShow == 0}">-->
+<!--                                        <div class="am-text-center"-->
+<!--                                             style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">-->
+<!--                                            <div   data-trigger="modal-1"-->
+<!--                                                   data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"-->
+<!--                                                   th:data-biz-id="'documents-'+${item.id}"-->
+<!--                                                 style="margin: 0 10px; border: 1px solid #FF8D30; background-color: #FFFFFF; border-radius: 100px; padding: 4px 8px; color: #FF8D30; min-width: 140px; text-align: center;">-->
+<!--                                                <span class="p-icon-a-0041 am-padding-right-xs"></span>-->
+<!--                                                <span>Consulting</span>-->
+<!--                                            </div>-->
+<!--                                            <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>-->
+<!--                                        </div>-->
+<!--                                    </th:block>-->
+                                </th:block>
+                            </th:block>
+                        </th:block>
+                    </th:block>
+                </th:block>
+
+                <!-- 按钮区域（大屏显示） -->
+                <div class="am-show-lg-only">
+                    <div class="am-text-center am-padding-top">
+                        <a aria-hidden="false"
+                           aria-label="Send inquiry"
+                           title="Send inquiry"
+                           class="rfq-trigger"
+                           data-trigger="modal-1"
+                           data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                           th:data-biz-id="'prods-'+${prod.id}"
+                        >
+                            <button type="button" class="am-btn am-round am-margin-sm"
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;">
+                                Send inquiry
+                            </button>
+                        </a>
+                        <a aria-hidden="false"
+                           aria-label="Chat now"
+                           title="Chat now"
+                           data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+                            <button type="button" class="am-btn am-round am-margin-sm"
+                                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;">
+                                Chat now
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 按钮区域（小屏显示） -->
+                <div class="am-hide-lg-only">
+                    <div class="am-text-center am-padding-top">
+                        <a aria-hidden="false"
+                           aria-label="Send inquiry"
+                           title="Send inquiry"
+                           data-trigger="modal-1"
+                           data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                           th:data-biz-id="'prods-'+${prod.id}">
+                            <button type="button" class="am-btn am-round am-margin-sm"
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;">
+                                Send inquiry
+                            </button>
+                        </a>
+                        <button type="button"
+                                class="am-btn am-round am-margin-sm"
+                                onclick="downloadAppHandler()"
+                                style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;">
+                            Chat now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 保修信息 -->
+                <div class="am-text-bold am-padding-top" style="color: #1D1D1F;">
+                    <span>Warranty by</span>
+                </div>
+                <div class="dd-clamp-text-2 am-padding-top-sm">
+                    <span class="p-icon-a-087 am-padding-right-xs" style="color: #FFB400;"></span>
+                    <span class="am-text-bold" style="color: #07C160;">Whole life care manager</span>
+                </div>
+                <div class="am-padding-left-lg am-padding-top-sm" style="color: #1D1D1F;">
+                    Whole-life care management services for equipment procurement, use, maintenance, and after-sales, ensuring safe operation of electrical equipment, continuous control, and worry-free electricity consumption.
+                </div>
+
+                <!-- 供应商认证信息 -->
+                <div style="background-color: #F8F8F8;border-radius: 10px;padding: 15px 25px;color: #767676;margin-top: 15px;">
+                    The equipment supplier has passed platform qualification certification and technical evaluation, ensuring compliance, professionalism, and reliability from the source.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="am-container phone-clear-padding" style="padding: 0 3%;">
+        <div class="sticky-bottom am-u-sm-12 am-u-md-12 am-u-lg-12 phone-clear-margin" style="padding: 0 15px;">
+
+            <!-- Related Products -->
+            <div th:if="${prodOther != null and #lists.size(prodOther) > 0}" class="am-g am-margin-top-xl">
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
+                    Related Products
+                </div>
+                <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
+                    <div th:with="pageName=${topNavPages.?[pageType == 2][0]?.pageName}">
+                        <a title="More" aria-hidden="false" aria-label="More" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) }}">
+                            <span style="color: #5C779F;text-decoration: underline;">More</span>
+                            <span class="p-icon-a-067 am-padding-left-sm" style="color: #5C779F"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slider -->
+            <div th:if="${prodOther != null and #lists.size(prodOther) > 0}">
+                <div data-am-widget="slider" class="am-slider am-slider-default"
+                     data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":220,"itemMargin":5}'>
+                    <ul class="am-slides">
+                        <li class="dd-hover4" th:each="prod : ${prodOther}"
+                            style="background-color: #FFFFFF !important;">
+                            <a aria-hidden="false"
+                               th:aria-label="${prod.name}"
+                               th:title="${prod.name}"
+                               th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+           'detail/'+
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           '-'+${prod.id}"
+                               style="border: none">
+                                <div style="padding: 0 15px 0 0; border-radius: 12px;">
+                                    <div class="image-box" style="border: 1px solid #E9E9E9;">
+                                        <img th:src="${prod.url}" th:alt="${prod.name}" class="image-square"
+                                             style="object-fit: cover;">
+                                    </div>
+                                    <span class="dd-clamp-text-1 am-padding-top am-text-sm" th:text="${prod.name}">Product Name</span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="am-g">
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
+                    Related Solutions
+                </div>
+                <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
+                    <a title="More" aria-hidden="false" aria-label="More" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) }}">
+                        <span style="color: #5C779F;text-decoration: underline;">More</span>
+                        <span class="p-icon-a-067  am-padding-left-sm" style="color: #5C779F"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-3 am-thumbnails phone-clear-padding">
+                    <li class="" style="padding: 0 8px 20px 8px !important;"
+                        th:each="item : ${knowList}">
+                        <a th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.title), ' ', '-'))} + '-' +
+           ${item.id}">
+                            <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
+                                <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">
+                                    <div style="am-cf">
+                                        <div class="am-fl am-margin-right am-padding-left phone-clear-padding-min">
+                                            <div class="phone-bottom" style="width: 100px; height: 100px;">
+                                                <img th:src="${item.iconUrl}" alt="" class="am-img-responsive"
+                                                     style="object-fit: cover; width: 100px; height: 100px; border-radius: 12px;">
+                                            </div>
+                                        </div>
+                                        <div class="am-padding-right" style="height: 100px;">
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${item.title}"></div>
+                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                                 th:text="${item.content}"></div>
+                                            <div class="am-padding-top-xs am-cf am-text-sm">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 30%; color: #5C779F;">
+                                                    <span class="am-icon-user"></span>
+                                                    <span th:text="${item.author}"></span>
+                                                </div>
+                                                <div class="am-fr am-padding-right" style="color: #999999">
+                                    <span th:if="${item.created != null}"
+                                          th:text="${#dates.format(item.created, 'dd/MM-yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- 搜索弹窗-->
+    <th:block th:replace="search :: search"></th:block>
+
+    <!-- 弹窗-->
+    <th:block th:replace="inquiry :: inquiry"></th:block>
+
+    <!-- PC端的右侧按钮 -->
+    <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
+
+    <!-- app端显示的下载按钮 -->
+    <th:block th:replace="phone-down :: phone-down"></th:block>
+
+    <!-- 底部导航   -->
+    <th:block th:replace="footer :: footer"></th:block>
+
+<script>
+    function scrollToTarget(event) {
+        event.preventDefault();
+        var anchor = event.target;
+        var targetId = anchor.getAttribute('href').substring(1);
+        var offset = parseInt(anchor.dataset.offset, 10);
+        var target = document.getElementById(targetId);
+        window.scrollTo({
+            top: target.offsetTop + offset,
+            behavior: 'smooth'
+        });
+    }
+</script>
+    <script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
+    <script>
+        ClassicEditor.create(document.querySelector('#editor'), {
+            readOnly: true,
+            plugins: [
+                'HorizontalRule',
+                'GeneralHtmlSupport',
+            ],
+            htmlSupport: {
+                allow: [{
+                    name: /.*/,
+                    attributes: true,
+                    classes: true,
+                    styles: true,
+                    allowEmpty: true
+                }],
+                removePlugins: ['FilterContent']
+            }
+        });
+    </script>
+
+
+<script>
+    const stickyBar = document.querySelector('.sticky-bar');
+    const bottomBlock = document.querySelector('.sticky-bottom');
+    function handleScroll() {
+        const bottomBlockTop = bottomBlock.getBoundingClientRect().top;
+
+        const stickyBarHeight = stickyBar.offsetHeight;
+
+        if (bottomBlockTop <= stickyBarHeight) {
+            stickyBar.style.top = `-${stickyBarHeight - bottomBlockTop}px`;
+        } else {
+            stickyBar.style.top = '0';
+        }
+    }
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+</script>
+</body>
+
+</html>

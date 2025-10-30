@@ -1,0 +1,38 @@
+<!-- PC端的右侧按钮 -->
+<div class=""
+     th:fragment="right-menu(param1)"
+     style="position: fixed;right: -10px;top: 30vh;background-color: #FFFFFFF2;border-radius: 10px;box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16);">
+    <div class="home-hover"  data-trigger="modal-1" th:data-biz-id="${param1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
+        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
+            <span class="p-icon-a-019 am-text-xl"></span>
+            <!-- <span>RFQ</span> -->
+        </div>
+    </div>
+    <div class="home-hover">
+        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
+            <a title="Email" aria-hidden="false" aria-label="Email" th:href="|mailto:${email}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|">
+                <span class="p-icon-a-039 am-text-xl"></span>
+                <!-- <span>Email</span> -->
+            </a>
+        </div>
+    </div>
+    <div class="home-hover" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
+        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
+            <span class="p-icon-a-029 am-text-xl"></span>
+            <!-- <span>Chat</span> -->
+        </div>
+    </div>
+    <div class="home-hover am-show-sm-only" onclick="downloadAppHandler()">
+        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
+            <span class="p-icon-a-04download am-text-xl"></span>
+<!--             <span>Download</span> -->
+        </div>
+    </div>
+
+    <div class="home-hover am-hide-sm-only" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
+            <span class="p-icon-a-04download am-text-xl"></span>
+<!--                         <span>Download</span>-->
+        </div>
+    </div>
+</div>

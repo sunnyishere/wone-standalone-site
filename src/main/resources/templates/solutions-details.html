@@ -1,0 +1,236 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title th:attr="data-title=${article.title}+'-'+${prodBrand.eName}"
+           th:text="${article.title}+'-'+${prodBrand.eName}"></title>
+
+    <link rel="canonical"
+          th:href="${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(article.title), ' ', '-')} + '-' + ${article.id}"/>
+
+    <meta property="article:published_time" th:attr="content=${article.created}"/>
+    <meta property="article:modified_time" th:attr="content=${article.updated}"/>
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta property="og:title" th:attr="content=${article.title}+'-'+${prodBrand.eName}"/>
+    <meta property="og:url"
+          th:attr="content=${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(article.title), ' ', '-')} + '-' + ${article.id}"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:image" th:attr="content=${article.iconUrl}"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta property="og:site_name" th:attr="content='@'+${prodBrand.eName}"/>
+
+    <meta name="twitter:title" th:attr="content=${article.title}+'-'+${prodBrand.eName}"/>
+    <meta name="twitter:site" content="@Experts Electrical"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" th:attr="content=${article.iconUrl}"/>
+    <meta name="twitter:creator" th:attr="content='@'+${prodBrand.eName}"/>
+
+
+    <!-- Open Graph描述 -->
+    <meta property="og:description"
+          th:attr="content=${article?.description == null ? article.title: article.description}"/>
+    <!-- Twitter描述 -->
+    <meta property="twitter:description"
+          th:attr="content=${article?.description == null ? article.title: article.description}"/>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="renderer" content="webkit"/>
+
+    <!--防某度-->
+    <th:block th:replace="head :: commonHead"></th:block>
+    <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
+    </script>
+    <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='Solutions_'+${article.id})"></th:block>
+    <!-- 手机-->
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <!-- 侧边栏内容 -->
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+
+</header>
+<div class="header-height">占位边距</div>
+<div class="m-header-banner m-header-1"
+     th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
+    <section class="am-container am-text-center wone-text">
+        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
+            <h2 th:text="${pageName}">New</h2>
+            <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
+        </hgroup>
+    </section>
+</div>
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li class="am-active">
+                <a th:href="'/'+${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<div class="" style="">
+    <div class="am-container am-padding-lg phone-clear-padding" th:if="${not #strings.isEmpty(pageDetailedText)}"
+         style="margin：0 10px 0 0 !important;padding: 0 30px 10px 15px !important;">
+        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 0px;border-radius: 12px;"
+             th:text="${pageDetailedText}">
+        </div>
+    </div>
+    <div class="am-container phone-container-top am-margin-bottom am-margin-top">
+        <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
+             style="background:#FFFFFF;">
+            <h1 class="am-text-bold " th:text="${article.title}"></h1>
+            <div class=" am-text-left">
+                <div class="am-padding-top-xs">
+                    <a th:title="${article.author}" aria-hidden="false" th:aria-label="${article.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></a>
+                    <a th:title="${article.author}" aria-hidden="false" th:aria-label="${article.author}" style="color:#5C779F;" th:text="${article.author}"></a>
+                    <a th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}"  class="am-padding-left" style="color:#999999;"
+                       th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></a>
+                </div>
+            </div>
+            <br>
+            <div class="am-padding-top am-padding-bottom-xl">
+                <div id="editor" th:utext="${article.content}"></div>
+            </div>
+
+
+        </div>
+
+        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
+
+            <div class=" am-margin-bottom" style="background:#FFFFFF;">
+                <div class="am-text-xl am-text-bold am-padding">
+                    Recent Solutions
+                </div>
+
+                <div class="am-container" style="padding: 0 !important;">
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
+                         th:if="${not #lists.isEmpty(articles)}"
+                         th:each="scate : ${articles}">
+                        <a th:title="${scate.title}" aria-hidden="false" th:aria-label="${scate.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(scate.title), ' ', '-'))} + '-' +
+           ${scate.id}">
+                            <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                    <div style="am-cf">
+                                        <div class="am-fl am-margin-right">
+                                            <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                                <img th:alt="${scate.title}" th:src="${scate.iconUrl}" class="am-img-responsive"
+                                                     style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                            </div>
+                                        </div>
+                                        <div class="" style="height: 100px;">
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.title}">
+                                                Resistance and
+                                                Leakage
+                                            </div>
+                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                                 th:text="${scate.content}">
+                                            </div>
+                                            <div class="am-padding-top-xs am-cf am-text-sm">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                                    <span class="am-icon-user"></span>
+                                                    <span th:text="${scate.author}"></span>
+                                                </div>
+                                                <div class="am-fr" style="color:#999999">
+                                                    <span th:text="${#dates.format(scate.created, 'MM/dd/yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
+                         th:if="${#lists.isEmpty(articles)}"
+                         th:each="i : ${#numbers.sequence(1, 5)}">
+                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div style="am-cf">
+                                    <div class="am-fl am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img alt="No Data" src="" class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7;">
+                                        </div>
+                                    </div>
+                                    <div class="" style="height: 100px;">
+                                        <div class="dd-clamp-text-1 am-text-bold"></div>
+                                        <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C">
+                                        </div>
+                                        <div class="am-padding-top-xs am-cf am-text-sm">
+                                            <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                                <span class="am-icon-user"></span>
+                                                <span></span>
+                                            </div>
+                                            <div class="am-fr" style="color:#999999">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
+
+<!-- 弹窗-->
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<!-- PC端的右侧按钮 -->
+<th:block th:replace="right-menu :: right-menu(param1='Solutions_'+${article.id})"></th:block>
+
+<!-- app端显示的下载按钮 -->
+<th:block th:replace="phone-down :: phone-down"></th:block>
+
+<!-- 底部导航   -->
+<th:block th:replace="footer :: footer"></th:block>
+<script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
+<script>
+    ClassicEditor.create(document.querySelector('#editor'), {
+        readOnly: true,
+        plugins: [
+            'HorizontalRule',
+            'GeneralHtmlSupport',
+        ],
+        htmlSupport: {
+            allow: [{
+                name: /.*/,
+                attributes: true,
+                classes: true,
+                styles: true,
+                allowEmpty: true
+            }],
+            removePlugins: ['FilterContent']
+        }
+    });
+</script>
+</body>
+
+</html>

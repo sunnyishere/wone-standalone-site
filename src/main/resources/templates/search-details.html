@@ -1,0 +1,215 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title th:text="${pageTitle}"></title>
+    <meta name="description" th:content="${description} ?: ''"/>
+    <meta name="keywords" th:content="${pageKeyword} ?: ''">
+    <link rel="canonical" th:href="${websitePath}+'/search' " />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <!--防某度-->
+    <th:block th:replace="head :: commonHead"></th:block>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='serach')"></th:block>
+    <!-- 手机-->
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <!-- 侧边栏内容 -->
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height">占位边距</div>
+
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a href="/"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li>search</li>
+            <li class="am-active" th:if="${not #strings.isEmpty(category1)}">
+
+                <a th:title="${category1.name}" aria-hidden="false" th:aria-label="${category1.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                   '/' :
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+                   ${#strings.toLowerCase(#strings.replace(#strings.trim(category1.name), ' ', '-'))} + '-' +
+                   ${category1.id}"
+                   th:text="${category1.name}">
+                </a>
+            </li>
+            <li class="am-active" th:if="${not #strings.isEmpty(category2)}">
+                <a th:title="${category2.name}" aria-hidden="false" th:aria-label="${category2.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                   '/' :
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+                   ${#strings.toLowerCase(#strings.replace(#strings.trim(category2.name), ' ', '-'))} + '-' +
+                   ${category2.id}"
+                   th:text="${category2.name}"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<div class="" style="">
+
+    <div class="am-container phone-clear-padding am-margin-top-sm">
+        <div class="am-u-md-3 am-u-sm-12">
+            <!-- 分类数据存在时显示 -->
+            <div class="am-list admin-sidebar-list"
+                    style="background-color: #FFFFFF; border-radius: 8px; min-height: 300px;" th:if="${association != null and #lists.size(association) > 0}">
+
+                <div class="am-padding am-text-lg am-text-bold">Product Category</div>
+                <li class="am-panel am-padding-left"
+                    th:each="cate, stat : ${association}"
+                    th:with="hasSelectedChild=${#lists.contains(cate.children.![name], selectValue)}">
+
+                    <a th:title="${cate.name}" aria-hidden="false" th:aria-label="${cate.name}" class="am-text-bold"
+                       th:attr="'data-am-collapse' = '{parent: &quot;#collapase-nav-1&quot;, target: &quot;#a_' + ${stat.index} + '&quot;}'">
+                        <span th:text="${cate.name}"></span>
+                        <i class="am-fr am-margin-right"
+                           th:if="${cate.children != null and not cate.children.empty}"
+                           th:class="${hasSelectedChild} ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
+                    </a>
+
+                    <ul th:if="${cate.children != null and not cate.children.empty}"
+                        class="am-list admin-sidebar-sub am-collapse am-in"
+                        th:id="|a_${stat.index}|"
+                        th:classappend="${hasSelectedChild} ? 'am-in' : ''" >
+                        <li th:each="subCategory : ${cate.children}"
+                            th:style="${category2 != null and category2.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a th:title="${subCategory.name}" aria-hidden="false" th:aria-label="${subCategory.name}" th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:href="@{|/search/${#strings.replace(#strings.trim(subCategory.name), ' ', '-')}-${selectValue}-${subCategory.id}-${pageData.pageNum}|}"
+                               th:text="${subCategory.name}"></a>
+                        </li>
+                    </ul>
+            </div>
+
+            <!-- 分类数据为空时显示的占位区块（背景色#afb4b7） -->
+            <div th:unless="${association != null and not association.isEmpty()}"
+                 style="background-color: #afb4b7; border-radius: 8px; min-height: 380px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+
+                <div class="am-text-center am-text-white">
+                    <i class="am-margin-bottom"></i>
+                    <h3 class="am-margin-bottom-sm"></h3>
+                    <p class="am-text-sm"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin" style="background:#FFFFFF;">
+            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
+                <!-- 产品列表存在时显示 -->
+                <div th:if="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}">
+                    <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                        style="margin: 0 0;">
+                        <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                            th:each="index : ${pageData.rows}">
+                            <a th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                   '/' :
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+                    'detail/'+
+                   ${#strings.replace(#strings.replace(#strings.trim(index.name), '/', '-'), ' ', '-')} +
+                   '-'+${index.id}">
+                                <div style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img th:src="${index.url}" th:alt="${index.name}" class="image-square">
+                                    </div>
+                                    <div class="dd-clamp-text-2 am-text-lg">
+                                        <span class="p-icon-a-087 am-padding-right-xs" style="color: #FFB400; font-size: 14px;"></span>
+                                        <span class="am-text-bold" style="color: #07C160; font-size: 14px">Whole life care manager</span>
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                          th:text="${index.name}"></span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 产品列表为空或 pageData 为 null 时显示的占位区块 -->
+                <div th:unless="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}"
+                     style="background-color: #afb4b7; border-radius: 12px; min-height: 380px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px;">
+                    <div class="am-text-center am-text-white">
+                        <i class="am-margin-bottom"></i>
+                        <h3 class="am-margin-bottom-sm">No products found</h3>
+                        <p class="am-text-sm">Please try another search.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="am-container phone-clear-margin" style="margin: 0px 15px 15px 15px; padding-top: 30px;">
+                <!-- 分页组件 -->
+                <th:block th:if="${pageData != null}">
+                    <th:block th:replace="pagination :: pagination(
+            totalPages=${pageData.totalPages},
+            currentPage=${pageData.pageNum},
+            requestUrl='search-'+${selectLabel})">
+                    </th:block>
+                </th:block>
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
+
+<!-- 弹窗-->
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<!-- PC端的右侧按钮 -->
+<th:block th:replace="right-menu :: right-menu(param1='serach_'+${selectLabel})"></th:block>
+
+<!-- app端显示的下载按钮 -->
+<th:block th:replace="phone-down :: phone-down"></th:block>
+
+<!-- 底部导航   -->
+<th:block th:replace="footer :: footer"></th:block>
+
+</body>
+
+<style>
+    /* 主分类链接样式 */
+    .am-panel > a {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+    }
+
+    /* 子分类链接样式 */
+    .admin-sidebar-sub li a {
+        display: block;
+        padding: 8px 15px 8px 25px;
+        color: #666;
+        text-decoration: none;
+    }
+
+    /* 图标浮动样式 */
+    .am-icon-angle-right, .am-icon-angle-down {
+        float: right;
+        margin-right: 16px;
+    }
+
+    /* 选中状态样式 */
+    .admin-sidebar-sub li:has(a:hover),
+    .admin-sidebar-sub li:has(a:focus) {
+        background-color: var(--theme-wone);
+    }
+
+    .admin-sidebar-sub li:has(a:hover) a,
+    .admin-sidebar-sub li:has(a:focus) a {
+        color: #fff;
+    }
+</style>
+</html>

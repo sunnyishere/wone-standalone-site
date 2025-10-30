@@ -1,0 +1,600 @@
+<!doctype html>
+<html class="no-js" lang="en-US">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${title}"></title>
+    <meta name="description" th:content="${description} ?: ''"/>
+    <meta name="keywords" th:content="${keywords} ?: ''">
+
+
+    <meta property="og:title" th:content="${title}"/>
+    <meta property="og:description" th:content="${description}"/>
+    <meta property="og:url" th:content="${websitePath}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="twitter:title" th:content="${title}"/>
+    <meta name="twitter:description" th:content="${description}"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <link rel="canonical" th:href="${websitePath}" />
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <!--防某度-->
+    <th:block th:replace="head :: commonHead"></th:block>
+
+    <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='Home')"></th:block>
+    <!-- 手机-->
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <!-- 侧边栏内容 -->
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+
+<div class="header-height">占位边距</div>
+<!-- 轮播 -->
+<div data-am-widget="slider" class="am-slider am-slider-a1" data-am-slider='{"directionNav":false;slideshow:true,}' >
+
+    <ul class="am-slides scroll-title">
+        <!-- 情况1：后端传递了 bannerImages 数据且非空 -->
+        <li th:if="${not #lists.isEmpty(banner)}"
+            th:each="index : ${banner}"
+            class="am-slider-images"
+            th:data-echo="${index.imgUrl}"
+            th:style="'background-image: url(' + ${index.imgUrl} + ');background-repeat: no-repeat;background-position: center;background-size: cover'"
+            style="background-image: url(images/banner1.jpg);background-repeat: no-repeat;background-position: center;background-size: cover">
+            <div class="am-text-center am-show-sm-only" style="margin: 10% auto;">
+                <div style="font-size: 20px;font-weight: bold" th:text="${index.title}"></div>
+                <div th:text="${index.description}"></div>
+                <div class="am-padding-top" style="display: flex;justify-content: center;">
+                    <span class="dd-clamp-text-1"
+                      style="border-radius: 40px;padding: 0px 16px;line-height: 40px;max-width: 300px;height: 40px; background-color: var(--theme-wone);">
+                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF;">Discover more</a>
+                    </span>
+                </div>
+            </div>
+
+            <div class="am-text-center am-hide-sm-only" style="margin: 10% auto;">
+                <div style="font-size: 40px;font-weight: bold"  th:text="${index.title}"></div>
+                <div th:text="${index.description}"></div>
+                <div class="am-padding-top" style="display: flex;justify-content: center;">
+                    <span class="dd-clamp-text-1"
+                          style="border-radius: 40px;padding: 0px 16px;line-height: 40px;max-width: 300px;height: 40px; background-color: var(--theme-wone);">
+                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="${index.jumpUrl}" style="color: #FFFFFF;">Discover more</a>
+                    </span>
+                </div>
+            </div>
+
+        </li>
+
+        <!-- 情况2：后端数据为空时，显示默认的3张图片 -->
+        <li th:unless="${not #lists.isEmpty(banner)}"
+            th:each="i : ${#numbers.sequence(1, 3)}"
+            class="am-slider-images"
+            th:style="'background-image: url(images/banner' + ${i} + '.jpg)'"
+            style="background-image: url(https://oss.iwone.cn/standalone/images/banner1.jpg)">
+            <!-- 添加可点击的链接 -->
+            <a title="No More"  aria-hidden="false" aria-label="No More" th:href="@{/}" class="banner-link">
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<!-- 内容框 -->
+<div class="" style="">
+
+    <!--Rockwill Main Products -->
+    <div class="am-hide-sm-only" style="background-color: #FFFFFF;">
+
+        <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+            <div class="am-text-center">
+                <div class="am-u-sm-12">
+                    <span class="am-text-xl am-text-bold" th:text="${prodBrand.eName} + '   ' + 'Main Products'"></span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="" style="background-color: #FFFFFF;">
+
+        <div class="am-container" style="padding: 10px 0 30px 0;">
+            <div class="">
+                <div class="tabs-new">
+                    <div class="category">
+                        <div>
+                            <ul th:if="${not #lists.isEmpty(categories)}">
+                                <li class="pc-active">
+                                    All
+                                </li>
+                                <li th:each="category : ${categories}">
+                                    <span th:text="${category.name}"></span>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}">
+                                    All
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="javascript:;" class="prev"><span></span></a>
+                        <a href="javascript:;" class="next"><span></span></a>
+                    </div>
+
+                    <div class="cont pc-active">
+
+                        <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                            style="margin: 0 0;">
+                            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                                th:if="${not #lists.isEmpty(featuredProducts)}"
+                                th:each="prod : ${featuredProducts}">
+                                <a th:title="${prod.name}"  aria-hidden="false" th:aria-label="${prod.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+            'detail/'+
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           '-'+${prod.id}">
+                                    <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                        <div class="image-box">
+                                            <img th:alt="${prod.name}" th:data-echo="${prod.url}" th:src="${prod.url}" src="images/fuwu.jpg" class="image-square">
+                                        </div>
+                                        <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                              th:text="${prod?.name ?: ''}"></span>
+                                    </div>
+                                </a>
+                            </li>
+                            <!-- 空状态处理 -->
+                            <li class="dd-hover4 am-margin-top"
+                                th:if="${#lists.isEmpty(featuredProducts)}"
+                                th:each="i : ${#numbers.sequence(1, 5)}"
+                                style="padding: 0 10px !important;">
+                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img class="image-square" style="background: #afb4b7">
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"></span>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div th:if="${not #lists.isEmpty(featuredProducts)}" class="am-container am-text-center am-margin-bottom-xl am-margin-top">
+                            <a title="View All Products" aria-hidden="false" aria-label="View All Products" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) }}">
+                                <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;">
+                                    View All Products
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+
+
+                    <!-- 商品内容区：每个 .cont 对应一个分类 -->
+                    <div class="cont" th:each="category : ${cateProd}">
+                        <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                            style="margin: 0 0;">
+                            <!-- 产品列表循环 -->
+                            <li class="dd-hover4 am-margin-top"
+                                th:if="${not #lists.isEmpty(cateProd)}" th:each="product : ${category.prod}"
+                                style="padding: 0 10px !important;">
+                                <a th:title="${product.name}"  aria-hidden="false" th:aria-label="${product.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+        '/' :
+        ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+          'detail/'+
+        ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(product.name), '/', '-'), ' ', '-'))} +
+        '-' +
+        ${product.id}">
+                                    <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                        <div class="image-box">
+                                            <img th:data-echo="${product.url}" th:alt="${product.name}" th:src="${product.url}" class="image-square">
+                                        </div>
+                                        <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                              th:text="${product.name ?: ''}"></span>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <!-- 空状态处理 -->
+                            <li class="dd-hover4 am-margin-top"
+                                th:if="${#lists.isEmpty(category.prod)}"
+                                th:each="i : ${#numbers.sequence(1, 5)}"
+                                style="padding: 0 10px !important;">
+                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"></span>
+                                </div>
+                            </li>
+                        </ul>
+                            <div th:if="${not #lists.isEmpty(cateProd)}" class="am-container am-text-center am-margin-bottom-xl am-margin-top">
+                                <!-- 临时调试：输出分类ID和名称 -->
+                                <div class="view-all-btn am-btn am-round load-more-btn"
+                                     th:attr="data-cate-id=${category.cateId},
+                  data-cate-name=${#strings.replace(#strings.trim(#strings.toLowerCase(category.cateName)), ' ', '-')}">
+                                    <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;">
+                                        View All Products
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <div>
+            <!--Success Reference -->
+            <div>
+                <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+
+                    <div class="">
+                        <div class="am-u-sm-3 am-padding-top-xs">
+                        </div>
+                        <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+                            <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
+                                 th:text="${#lists.isEmpty(filtered) ?
+                                '' :
+                                (filtered[0].pageName ?: '')}"></div>
+                        </div>
+                        <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+                            <a title="View ALL"  aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==7][0].pageName), ' ', '-')) }}">
+                                <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                                <span class="p-icon-a-067  am-padding-left-sm"></span>
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
+                    <ul class="am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-thumbnails am-padding-sm  ">
+
+
+                        <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                            th:if="${not #lists.isEmpty(successCases)}" th:each="success : ${successCases}">
+                            <a th:title="${success.title}" aria-hidden="false" th:aria-label="${success.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(
+               #strings.replace(
+                   #strings.replace(
+                       #strings.trim(success.title),
+                       '/', '-'
+                   ),
+                   ' ', '-'
+               )
+           )} + '-' +
+           ${success.id}">
+                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box2">
+                                        <img th:data-echo="${success.iconUrl}" th:alt="${success.title}" th:src="${success.iconUrl}" class="image-square">
+                                    </div>
+                                    <div class="am-margin-top-sm dd-clamp-text-2 am-text-bold">
+                                        <div th:text="${success?.title ?: ''}"></div>
+                                    </div>
+                                    <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm"
+                                          th:text="${success?.content ?: ''}"></span>
+                                </div>
+                            </a>
+                        </li>
+
+                        <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                            th:if="${#lists.isEmpty(successCases)}"
+                            th:each="i : ${#numbers.sequence(1, 4)}">
+                            <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="image-box2">
+                                    <img alt="No Data" src="" class="image-square" style="background: #afb4b7">
+                                </div>
+                                <div class="am-margin-top-sm dd-clamp-text-2 am-text-bold"></div>
+                                <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!--Rockwill Solutions -->
+        <div class="" style="background-color: #FFFFFF;">
+
+            <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+
+                <div class="">
+                    <div class="am-u-sm-3 am-padding-top-xs">
+                    </div>
+                    <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
+                             th:text="${#lists.isEmpty(filtered) ?
+                                '' :
+                                (filtered[0].pageName ?: '')}"></div>
+                    </div>
+                    <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+
+                        <a title="View ALL" aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) }}">
+                            <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                            <span class="p-icon-a-067  am-padding-left-sm"></span>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="am-container phone-container-all am-margin-top am-padding-bottom">
+                <div style="margin: 0 10px;">
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                         th:if="${not #lists.isEmpty(solutions)}" th:each="article : ${solutions}">
+                        <a th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(article.title), ' ', '-'))} + '-' +
+           ${article.id}">
+                            <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                    <div>
+                                        <div class="am-fl am-margin-right">
+                                            <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                                <img th:data-echo="${article.iconUrl}" th:alt="${article.title}" th:src="${article.iconUrl}" src="" alt="" class="am-img-responsive"
+                                                     style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                            </div>
+                                        </div>
+                                        <div class="" style="height: 100px;">
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${article.title}"></div>
+                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                                 th:text="${article.content}"></div>
+                                            <div class="am-padding-top-xs am-cf am-text-sm">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                                    <span class="am-icon-user"></span>
+                                                    <span th:text="${article.author}"></span>
+                                                </div>
+                                                <div class="am-fr" style="color:#999999">
+                                                <span th:if="${article.created != null}"
+                                                      th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                         th:if="${#lists.isEmpty(solutions)}"
+                         th:each="i : ${#numbers.sequence(1, 6)}">
+                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div>
+                                    <div class="am-fl am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img src="" alt="No Data" class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7">
+                                        </div>
+                                    </div>
+                                    <div class="" style="height: 100px;">
+                                        <div class="dd-clamp-text-1 am-text-bold"></div>
+                                        <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"></div>
+                                        <div class="am-padding-top-xs am-cf am-text-sm">
+                                            <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+
+                                            </div>
+                                            <div class="am-fr" style="color:#999999">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+
+        <!--Rockwill News -->
+        <div>
+            <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+
+                <div class="">
+                    <div class="am-u-sm-3 am-padding-top-xs">
+                    </div>
+                    <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
+                             th:text="${#lists.isEmpty(filtered) ?
+                                '' :
+                                (filtered[0].pageName ?: '')}"></div>
+                    </div>
+                    <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+                        <a title="View ALL"  aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) }}">
+                            <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                            <span class="p-icon-a-067  am-padding-left-sm"></span>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+                <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                    style="margin: 0 0 20px 0;"
+                >
+                    <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                        th:if="${not #lists.isEmpty(news)}" th:each="index : ${news}">
+                        <a th:title="${index.title}"  aria-hidden="false" th:aria-label="${index.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.title), ' ', '-'))} + '-' +
+           ${index.id}">
+                            <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="image-box3">
+                                    <img th:data-echo="${index.iconUrl}" th:alt="${index.title}" th:src="${index.iconUrl}" src="" alt="" class="image-square">
+                                </div>
+                                <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                                    <div th:text="${index.title}"></div>
+                                </div>
+                                <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
+                                      th:text="${index.content}"></span>
+                                <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                           <span th:if="${index.created != null}"
+                                 th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+                    <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important; "
+                        th:if="${#lists.isEmpty(news)}"
+                        th:each="i : ${#numbers.sequence(1, 6)}">
+                        <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                            <div class="image-box3">
+                                <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
+                            </div>
+                            <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                                <div></div>
+                            </div>
+                            <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"></span>
+                            <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                                <span></span>
+                            </div>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+
+        </div>
+
+        <input type="hidden" id="topNavPageName"
+               th:value="${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')}">
+    </div>
+
+    <!-- 搜索弹窗-->
+    <th:block th:replace="search :: search"></th:block>
+
+    <!-- 弹窗-->
+    <th:block th:replace="inquiry :: inquiry"></th:block>
+
+    <!-- PC端的右侧按钮 -->
+    <th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
+
+    <!-- app端显示的下载按钮 -->
+    <th:block th:replace="phone-down :: phone-down"></th:block>
+
+    <!-- 底部导航   -->
+    <th:block th:replace="footer :: footer"></th:block>
+
+    <!-- 添加必要的CSS样式确保点击区域覆盖整个图片 -->
+    <style>
+        .am-slider-images {
+            position: relative; /* 创建相对定位上下文 */
+        }
+
+        .banner-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* 确保链接在图片上方 */
+            text-decoration: none; /* 去掉下划线 */
+            color: transparent; /* 文本透明但保留SEO价值 */
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+
+    <!-- 添加JS交互以防CSS方案失效 -->
+    <script>
+        document.querySelectorAll('.am-slider-images').forEach(function (slider) {
+            slider.addEventListener('click', function () {
+                const link = this.querySelector('.banner-link');
+                if (link && link.href) {
+                    window.location.href = link.href;
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const topNavPageName = document.getElementById('topNavPageName').value || '';
+            const cateItems = document.querySelectorAll('.category li');
+            const allViewAllBtns = document.querySelectorAll('.view-all-btn');
+
+            cateItems.forEach(cateItem => {
+                cateItem.addEventListener('click', function() {
+                    cateItems.forEach(item => item.classList.remove('pc-active'));
+                    this.classList.add('pc-active');
+                });
+            });
+
+            allViewAllBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetCateId = this.getAttribute('data-cate-id');
+                    const targetCateName = this.getAttribute('data-cate-name');
+
+                    const baseUrl = topNavPageName ? `/${topNavPageName}` : '';
+                    const jumpUrl = `${baseUrl}/${targetCateName}-${targetCateId}`;
+                    const finalUrl = jumpUrl.replace(/\/+/g, '/');
+
+                    window.location.href = finalUrl;
+                });
+            });
+
+            const allCateItem = document.querySelector('.category li:first-child');
+            if (allCateItem) {
+                allCateItem.classList.add('pc-active');
+            }
+        });
+    </script>
+</body>
+
+</html>

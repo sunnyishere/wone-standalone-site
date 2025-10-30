@@ -1,0 +1,17 @@
+<div id="r-nav" class="am-offcanvas" th:fragment="r-nav">
+    <div class="am-offcanvas-bar am-offcanvas-bar-flip">
+        <nav class="am-offcanvas-content">
+            <a href="/" title="logo" aria-hidden="false" aria-label="logo"><span class="logo"></span></a>
+            <p th:each="navItem : ${topNavPages.?[pageType == 1]}"
+               th:if="${navItem.pageType}">
+                <a th:title="${navItem.pageName}" aria-hidden="false" th:aria-label="${navItem.pageName}" th:href="'/' + ${navItem.pageName}" th:text="${navItem.pageName}"></a>
+            </p>
+
+            <p th:each="navItem : ${topNavPages.?[pageType != 1]}"
+               th:if="${navItem.pageType}">
+                <a th:title="${navItem.pageName}" aria-hidden="false" th:aria-label="${navItem.pageName}" th:href="'/' + ${navItem.pageName}" th:text="${navItem.pageName}"></a>
+            </p>
+
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<!-- 分页组件片段 -->
+<div th:fragment="pagination(totalPages, currentPage, requestUrl)"
+     th:if="${totalPages > 1}">
+    <div class="phone-clear-margin" style="margin: 40px 30px 30px 15px;">
+        <ul class="am-pagination">
+            <!-- 上一页 -->
+            <li th:class="${currentPage == 1} ? 'disabled' : ''">
+                <a th:if="${currentPage > 1}"
+                   th:href="@{${requestUrl} + ${'-'} + ${currentPage - 1}}"
+                class="tn-icon-left"></a>
+                <a th:unless="${currentPage > 1}"
+                   class="tn-icon-left disabled"></a>
+            </li>
+
+            <!-- 动态页码（含省略号逻辑） -->
+            <th:block th:with="startPage = ${currentPage > 3 ? currentPage - 2 : 1},
+                             endPage = ${currentPage < totalPages - 2 ? currentPage + 2 : totalPages}">
+                <!-- 前省略号 -->
+                <li th:if="${startPage > 1}">
+                    <a href="#" class="disabled">···</a>
+                </li>
+
+                <!-- 页码按钮（核心：短横线拼接页码） -->
+                <li th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                    th:class="${pageNum == currentPage} ? 'am-active' : ''">
+                    <a th:href="@{${requestUrl} + ${'-'} + ${pageNum}}"
+                    th:text="${pageNum}"></a>
+                </li>
+
+                <!-- 后省略号 -->
+                <li th:if="${endPage < totalPages}">
+                    <a href="#" class="disabled">···</a>
+                </li>
+            </th:block>
+
+            <!-- 下一页 -->
+            <li th:class="${currentPage == totalPages} ? 'disabled' : ''">
+                <a th:if="${currentPage < totalPages}"
+                   th:href="@{${requestUrl} + ${'-'} + ${currentPage + 1}}"
+                class="tn-icon-right"></a>
+                <a th:unless="${currentPage < totalPages}"
+                   class="tn-icon-right disabled"></a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+<!-- 搜索弹窗 -->
+<div class="am-modal am-modal-no-btn" tabindex="-1" id="search-modal" th:fragment="search">
+    <div class="am-modal-dialog" style="border-radius: 12px;">
+        <div class="am-modal-hd am-padding-xl am-text-xl">
+            <a href="javascript: void(0)" class="am-close am-close-spin tn-icon-close am-margin"
+               style="color: var(--theme-wone);" data-am-modal-close></a>
+        </div>
+        <form class="am-form am-form-horizontal am-padding-bottom-lg am-padding-top-lg am-margin-top-lg">
+            <div class="am-g">
+                <div class="am-u-lg-12">
+                    <div class="am-input-group">
+                        <input type="text" placeholder="Search Products..." class="am-form-field search-input"
+                               style="height: 60px;border: none;border-bottom: 1px solid var(--theme-wone);border-radius: 0;">
+                        <span class="am-input-group-btn am-padding-left">
+                  <!-- 修正：将ID添加到button元素而非span -->
+                  <button id="search-button" class="am-btn search-button"
+                          style="background-color: var(--theme-wone);color: #FFFFFF;height: 60px;width: 80px;border: none;border-radius: 10px;"
+                          type="button"><span class="tn-icon-search"></span></button>
+                </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

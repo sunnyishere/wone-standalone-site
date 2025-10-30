@@ -1,0 +1,94 @@
+/*后台css*/
+
+/*login1*/
+#top-image {
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2)
+  ), url('../images/f11.jpg') no-repeat fixed;
+  position:fixed ;
+  top:0;
+  width:100%;
+  z-index:0;
+  height:100%;
+}
+
+.jumbotron {
+  background-color: transparent !important;
+  color: white !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+#content {
+  transform: 			translateY(-50%);
+  top: 30%;
+  position: relative;
+}
+
+
+
+
+
+
+/*login2*/
+.am-margin-login{
+	margin-right: 1.5rem;
+}
+
+.login-pic {
+	background: url(../images/f11.jpg) 0 0 repeat #ececec; /*背景图片*/
+	background-position: top center;
+	background-attachment:fixed;
+  	background-repeat: no-repeat;
+  	-webkit-background-size: cover;/*把背景图像扩展至足够大*/
+	-o-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+	
+}
+
+.header-login {
+	padding: 110px 0 0 0;
+	color: #fff;
+	text-align: center;
+}
+
+.header-login h1 {
+	letter-spacing: 5px;
+	font-size: 220%;
+}
+
+.header-login p {
+	font-size: 14px;
+}
+
+.langue-padding {
+	padding-left: 10px;
+}
+
+.login-back {
+	/*background: #E8F1F8;*/
+	background: rgba(232,241,248,0.6);
+	padding: 20px;
+	border-radius: 5px;
+}
+
+.logo-size {
+	margin-top: 4px;
+	width: 120px;
+}
+
+@media only screen and (min-width: 100px) and (max-width: 640px) {
+	.header-login {
+		padding: 20px 0 0 0;
+	}
+	.header-login h1 {
+		font-size: 150%;
+	}
+}
+
+@media only screen and (min-width: 641px) and (max-width: 1024px) {
+	.header-login h1 {
+		font-size: 200%;
+	}
+}

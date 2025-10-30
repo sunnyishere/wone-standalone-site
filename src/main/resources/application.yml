@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  tomcat:
+    uri-encoding: UTF-8
+    accept-count: 1000
+    threads:
+      max: 800
+      min-spare: 100
+    connection-timeout: 20000
+
+
+logging:
+  level:
+    com.rockwill: info
+    org.springframework: warn
+
+
+spring:
+  profiles:
+    active: dev
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+
+
+brand:
+  domain:   #品牌商申请的域名
+  static-output: ./static-output  #静态文件生成目录，也是Nginx配置的静态目录
+  scheduler-enable: true #定时任务开启
+  execute-on-start: true #启动时执行页面静态化
+
+
