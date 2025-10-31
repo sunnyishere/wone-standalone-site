@@ -69,7 +69,7 @@ public class StaticPageService {
     @Value("${static.output.path:${user.dir}/static-output}")
     private String staticOutputPath;
 
-    List<String> docFixedList = Arrays.asList("Chinese", "English", "French", "Oldest-first", "Newest-first");
+    static List<String> docFixedList = Arrays.asList("chinese-3686323", "english-3259826", "french-443636", "oldest-first-883325", "newest-first-632325");
     @Autowired
     @Qualifier("rockwillTaskExecutor")
     private ThreadPoolTaskExecutor taskExecutor;
@@ -84,7 +84,7 @@ public class StaticPageService {
      *
      */
     public void generateAllPages() {
-        if (ObjectUtils.isEmpty(brandConfig.getDomain())){
+        if (ObjectUtils.isEmpty(brandConfig.getDomain())) {
             log.warn("需提供独立部署域名配置: brand.domain");
             return;
         }
@@ -142,7 +142,7 @@ public class StaticPageService {
             }
             String menuPath = getApiPath(sitePage.getPageName());
             DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath);
-            if (domainHtmlVo != null) {
+            if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 saveHtml(sitePage.getPageName(), domainHtmlVo.getHtmlContent());
                 addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + sitePage.getPageName(), 0.64);
                 CompletableFuture<Void> pageTask = CompletableFuture.runAsync(() -> {
@@ -202,7 +202,7 @@ public class StaticPageService {
             List<LinkedHashMap<String, Object>> categories = (List<LinkedHashMap<String, Object>>) domainHtmlVo.getModelMap().get("association");
             for (LinkedHashMap<String, Object> category : categories) {
                 SitePage cate = new SitePage();
-                cate.setPageName(category.get("name").toString());
+                cate.setPageName(category.get("name").toString().toLowerCase());
                 cate.setId(Long.parseLong(category.get("id").toString()));
                 processSubCategory(sitePage, cate);
                 if (category.containsKey("children")) {
@@ -210,7 +210,7 @@ public class StaticPageService {
                     if (!childs.isEmpty()) {
                         for (LinkedHashMap<String, Object> child : childs) {
                             SitePage sub = new SitePage();
-                            sub.setPageName(child.get("name").toString());
+                            sub.setPageName(child.get("name").toString().toLowerCase());
                             sub.setId(Long.parseLong(child.get("id").toString()));
                             processSubCategory(sitePage, sub);
                         }
@@ -222,10 +222,14 @@ public class StaticPageService {
         if (sitePage.getPageType() == SitePage.SitePageType.DOCUMENTS) {
             //资料 语言及排序分类页
             for (String sort : docFixedList) {
-                String docName = sitePage.getPageName() + "/" + sort + "/" + sort.split("-")[0] + "-1";
+                String docName = sitePage.getPageName() + "/" + sort;
                 DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName));
                 saveHtml(docName, subVo.getHtmlContent());
                 addWebSitemap(subVo.getHtmlContent(), "/" + docName, 0.64);
+                SitePage sub = new SitePage();
+                sub.setPageName(sort.substring(0,sort.lastIndexOf("-")));
+                sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-")+1)));
+                processPagination(sitePage, sub, subVo);
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());

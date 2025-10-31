@@ -102,7 +102,7 @@ public class TemplateEnginePageRenderer {
             parentDir.mkdirs();
         }
         Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
-        log.info("Static page saved: {}", file.getAbsolutePath().substring(file.getAbsolutePath().indexOf(staticDirName)));
+        log.info("Static page saved: {}", file.getAbsolutePath());
     }
 
 }
