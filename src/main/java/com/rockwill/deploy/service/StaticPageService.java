@@ -28,6 +28,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +147,7 @@ public class StaticPageService {
                 saveHtml(sitePage.getPageName(), domainHtmlVo.getHtmlContent());
                 addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + sitePage.getPageName(), 0.64);
                 CompletableFuture<Void> pageTask = CompletableFuture.runAsync(() -> {
-                    processPagination(sitePage, null, domainHtmlVo);
+                    processPagination(sitePage, null, domainHtmlVo,false);
                 }, taskExecutor);
                 futures.add(pageTask);
                 if (sitePage.getPageType() == SitePage.SitePageType.PRODUCTS
@@ -174,7 +175,7 @@ public class StaticPageService {
         log.info("End of generating  menu html files,site: {}", brandConfig.getDomain());
     }
 
-    private void processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo) {
+    private void processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo,boolean isSubMenu) {
         if (domainHtmlVo.getTotalPages() != null && domainHtmlVo.getTotalPages() > 1) {
             for (int p = 1; p <= domainHtmlVo.getTotalPages(); p++) {
                 String menuName = sitePage.getPageName() + "-" + p;
@@ -184,6 +185,14 @@ public class StaticPageService {
                 DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName));
                 saveHtml(menuName, menuPageVo.getHtmlContent());
                 addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64);
+
+                //仅对菜单根列表页面进行处理详情采集
+                if (p >= 2 &&!isSubMenu) {
+                    if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
+                            && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
+                        processDetailPages(sitePage, menuPageVo);
+                    }
+                }
             }
         }
     }
@@ -227,9 +236,9 @@ public class StaticPageService {
                 saveHtml(docName, subVo.getHtmlContent());
                 addWebSitemap(subVo.getHtmlContent(), "/" + docName, 0.64);
                 SitePage sub = new SitePage();
-                sub.setPageName(sort.substring(0,sort.lastIndexOf("-")));
-                sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-")+1)));
-                processPagination(sitePage, sub, subVo);
+                sub.setPageName(sort.substring(0, sort.lastIndexOf("-")));
+                sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-") + 1)));
+                processPagination(sitePage, sub, subVo,true);
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());
@@ -240,7 +249,7 @@ public class StaticPageService {
         DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName));
         saveHtml(docName, categoryVo.getHtmlContent());
         addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64);
-        processPagination(menu, sitePage, categoryVo);
+        processPagination(menu, sitePage, categoryVo,true);
     }
 
     public void processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo) {
@@ -261,22 +270,20 @@ public class StaticPageService {
             saveHtml(detailUrl, subVo.getHtmlContent());
             addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8);
             if (detailUrl.startsWith("Products/detail")) {
-                processProdModelPages(subVo.getHtmlContent());
+                if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
+                    List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
+                    for (LinkedHashMap<String, Object> model : modelList) {
+                        String modelName = "Products/" + model.get("name").toString().trim()
+                                .toLowerCase().replace("/", "-")
+                                .replace(" ", "-") + "-" + model.get("prodId") + "-series" + model.get("id");
+                        DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName));
+                        saveHtml(modelName, modelVo.getHtmlContent());
+                        addWebSitemap(modelVo.getHtmlContent(), "/" + modelName, 0.9);
+                    }
+                }
             }
         }
         log.info("End of generating details html files,detail: {}", sitePage.getPageName());
-    }
-
-    public void processProdModelPages(String productHtml) {
-        if (ObjectUtils.isEmpty(productHtml)) {
-            return;
-        }
-        List<String> modelUrlList = getDetailLinkFromPage(productHtml, "div.dd-scroll > div > a");
-        for (String modelUrl : modelUrlList) {
-            DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelUrl));
-            saveHtml(modelUrl, subVo.getHtmlContent());
-            addWebSitemap(subVo.getHtmlContent(), "/" + modelUrl, 0.9);
-        }
     }
 
     private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {

@@ -133,7 +133,7 @@ public class RockwillKnowledgeService {
     }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss+08:00");
 
     List<String> dateList = Arrays.asList("created", "updated");
 
@@ -145,7 +145,11 @@ public class RockwillKnowledgeService {
             if (dateList.contains(key) && value instanceof String
                     && !ObjectUtils.isEmpty(value)) {
                 try {
-                    LocalDate parsedDate = LocalDate.parse((String) value, ((String) value).length() == 10 ? DATE_FORMATTER : TIME_FORMATTER);
+                    String date = (String) value;
+                    if (date.length()>10){
+                        date = date.substring(0,10);
+                    }
+                    LocalDate parsedDate = LocalDate.parse(date,date.length() == 10 ? DATE_FORMATTER : TIME_FORMATTER);
                     model.put(key, Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
                 } catch (Exception e) {
                     log.error("日期格式解析错误，键: {}, 值: {}", key, value);

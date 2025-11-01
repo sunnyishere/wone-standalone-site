@@ -15,7 +15,7 @@
 	
 	<!-- 系统日志输出 -->
 	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/sys-info.log</file>
+	    <file>${log.path}/wone-site-info.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${log.path}/wone-site-info.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>60</maxHistory>
@@ -32,7 +32,7 @@
 	</appender>
 	
 	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/sys-error.log</file>
+	    <file>${log.path}/wone-site-error.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/wone-site-error.%d{yyyy-MM-dd}.log</fileNamePattern>
 			<maxHistory>60</maxHistory>
