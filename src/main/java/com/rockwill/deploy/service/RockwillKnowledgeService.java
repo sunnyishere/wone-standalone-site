@@ -205,6 +205,7 @@ public class RockwillKnowledgeService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Premium-Real-IP",originalRequest.getHeader("X-Real-IP"));
         HttpEntity<String> requestEntity = new HttpEntity<>(formBody.toString(), headers);
         return restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class);
     }

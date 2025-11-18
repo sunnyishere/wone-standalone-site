@@ -10,11 +10,13 @@
                 <h2 class="am-text-sm" th:text="${section.title}"></h2>
 
                 <!-- 循环渲染子导航项 -->
-                <a th:title="${item.text}" aria-hidden="false" th:aria-label="${item.text}" class="am-text-xs" th:each="item : ${section.items}"
-                   th:href="@{${item.href}}"
-                   th:rel="${item.rel}"
-                   th:text="${item.text}"
-                   th:utext="${item.text} + '<br><br>'"></a>
+                <div style="display: flex;flex-direction: column;gap:10px;">
+                    <a th:title="${item.text}" aria-hidden="false" th:aria-label="${item.text}" class="am-text-xs" th:each="item : ${section.items}"
+                       th:href="@{${item.href}}"
+                       th:text="${item.text}"
+                       th:utext="${item.text}"></a>
+                </div>
+
             </section>
         </section>
     </div>
