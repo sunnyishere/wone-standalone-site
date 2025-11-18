@@ -79,7 +79,7 @@
                 <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.title), ' ', '-'))} + '-' +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
            ${index.id}">
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">

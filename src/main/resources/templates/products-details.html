@@ -207,6 +207,12 @@
                         <td style="background-color: #F9F9F9; width: 45%;">Series</td>
                         <td style="width: 55%;" th:text="${prod.series}">Series Name</td>
                     </tr>
+                    <th:block th:if="${customProps != null and !customProps.isEmpty()}">
+                        <tr th:each="prop : ${customProps}">
+                            <td style="background-color: #F9F9F9;width: 45%;" th:text="${prop.key}"></td>
+                            <td style="width: 55%;" th:text="${prop.value}"></td>
+                        </tr>
+                    </th:block>
                     </tbody>
                 </table>
             </div>
@@ -278,18 +284,27 @@
                                     <div class="PC-24">
                                         <!-- 公开 + 文档 -->
                                         <div class="am-show-lg-only" th:if="${item.isShow == 1 and item.type == 1}">
-                                            <a aria-hidden="false" th:aria-label="${item.faAssoc.name}"
-                                               th:title="${item.faAssoc.name}"
-                                               th:href="${item.fileDatalis.url}" th:download="${item.fileDatalis.name}"
-                                               style="border: none">
-                                                <div class="am-text-center"
-                                                     style="display: flex;justify-content: right;">
-                                                    <div style="margin-top: 30px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 100px;">
-                                                        <span th:text="${item.fileDatalis?.type ?: 'UNKNOWN'}">PDF</span>
-                                                        <span class="p-icon-a-0031 am-padding-left-sm"></span>
+                                            <div th:if="${item.fileDatalis != null}">
+                                                <a aria-hidden="false"
+                                                   th:aria-label="${item.faAssoc?.name ?: 'Document'}"
+                                                   th:title="${item.faAssoc?.name ?: 'Document'}"
+                                                   th:href="${item.fileDatalis.url}"
+                                                   th:download="${item.fileDatalis.name}"
+                                                   style="border: none">
+                                                    <div class="am-text-center"
+                                                         style="display: flex;justify-content: right;">
+                                                        <div style="margin-top: 30px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 100px;">
+                                                            <span th:text="${item.fileDatalis.type ?: 'UNKNOWN'}">PDF</span>
+                                                            <span class="p-icon-a-0031 am-padding-left-sm"></span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
+                                                </a>
+                                            </div>
+                                            <!-- fileDatalis 为 null 时显示“无文件” -->
+                                            <div th:unless="${item.fileDatalis != null}"
+                                                 style="margin-top: 30px;color: #999;text-align: right;">
+                                                No file
+                                            </div>
                                         </div>
 
                                         <!-- 公开 + 视频 -->
@@ -309,10 +324,10 @@
                                         <div class="am-show-lg-only" th:if="${item.isShow == 0}">
                                             <div class="am-text-center" style="display: flex;justify-content: right;">
                                                 <div
-                                                     data-trigger="modal-1"
-                                                     data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                     th:data-biz-id="'documents-'+${item.id}"
-                                                     style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
+                                                        data-trigger="modal-1"
+                                                        data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                                        th:data-biz-id="'documents-'+${item.id}"
+                                                        style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
                                                     <span>Consulting</span>
                                                     <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                                 </div>
@@ -324,25 +339,32 @@
 
                             <!-- 手机端按钮 -->
                             <div class="am-hide-lg-only">
-                                <div th:if="${item.isShow == 1 and item.type == 1}"
-                                     style="width: 100%;display: inline-flex;justify-content: center;">
-                                    <a aria-hidden="false" th:aria-label="${item.faAssoc.name}"
-                                       th:title="${item.faAssoc.name}"
-                                       th:href="${item.fileDatalis.url}" th:download="${item.fileDatalis.name}"
-                                       style="border: none">
-                                        <div class="am-text-center"
-                                             style="margin-bottom: 10px;border: 1px solid var(--theme-wone);;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);;width: 120px;">
-                                            <span th:text="${item.fileDatalis?.type ?: 'UNKNOWN'}">PDF</span>
-                                            <span class="p-icon-a-0031 am-padding-left-sm"></span>
-                                        </div>
-                                    </a>
+                                <div th:if="${item.isShow == 1 and item.type == 1}">
+                                    <div th:if="${item.fileDatalis != null}" style="width: 100%;display: inline-flex;justify-content: center;">
+                                        <a aria-hidden="false"
+                                           th:aria-label="${item.faAssoc?.name ?: 'Document'}"
+                                           th:title="${item.faAssoc?.name ?: 'Document'}"
+                                           th:href="${item.fileDatalis.url}"
+                                           th:download="${item.fileDatalis.name}"
+                                           style="border: none">
+                                            <div class="am-text-center"
+                                                 style="margin-bottom: 10px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 120px;">
+                                                <span th:text="${item.fileDatalis.type ?: 'UNKNOWN'}">PDF</span>
+                                                <span class="p-icon-a-0031 am-padding-left-sm"></span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div th:unless="${item.fileDatalis != null}"
+                                         style="width: 100%;display: inline-flex;justify-content: center;color: #999;">
+                                        No file
+                                    </div>
                                 </div>
 
                                 <!-- 手机端：公开 + 视频 -->
                                 <div th:if="${item.isShow == 1 and item.type == 2 and item.url != null}"
                                      style="width: 100%;display: inline-flex;justify-content: center;">
                                     <div class="am-text-center"
-                                         style="margin-bottom: 10px;border: 1px solid var(--theme-wone);;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);;width: 120px;">
+                                         style="margin-bottom: 10px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 120px;">
                                         <span>MP4</span>
                                         <span class="p-icon-a-0051 am-padding-left-sm"></span>
                                     </div>
@@ -379,7 +401,7 @@
                             <li class="dd-hover4"
                                 th:each="item : ${prCercateList}"
                                 th:if="${item.url != null}">
-                                <div style="background-color: #FFFFFF;padding: 10px 0;border-radius: 12px;">
+                                <div style="background-color: #FFFFFF;padding: 10px 0;">
                                     <div class="phone-bottom" style="width: 165px;height: 234px;">
                                         <img th:src="${item.url}" alt="" class="am-img-responsive"
                                              style="object-fit: cover;width: 165px;height: 234px;border-radius: 0;border: 1px solid #E9E9E9;">
@@ -439,6 +461,7 @@
                 </div>
 
                 <!-- 型号列表 -->
+                <th:block th:if="${modelList != null && modelList.size() > 0}">
                 <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
                     <div class="am-g">
                         <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
@@ -466,15 +489,16 @@
                         </div>
                     </div>
                 </div>
+                </th:block>
 
                 <!-- 文档/文件列表 -->
-                <!-- 修复后的文档/文件列表区域 -->
                 <th:block th:if="${faLibraryList != null and faLibraryList != null and #lists.size(faLibraryList) > 0}">
                     <th:block th:each="item : ${faLibraryList}">
                         <!-- 判断 item 不为空 + fileDatalis 单对象不为空（无需循环，因正常部分是单对象） -->
                         <th:block th:if="${item != null and item.fileDatalis != null}">
                             <!-- 直接获取单对象的 url 和 name，无需循环 -->
-                            <th:block th:with="url = ${item.fileDatalis.url}, fileName = ${item.fileDatalis.name}">
+                            <th:block th:if="${item.fileDatalis != null}"
+                                      th:with="url = ${item.fileDatalis.url}, fileName = ${item.fileDatalis.name}">
                                 <th:block th:if="${url != null}">
                                     <!-- 类型1：可下载文件（公开） -->
                                     <th:block th:if="${item.isShow == 1 and item.type == 1}">
@@ -673,7 +697,7 @@
                         <a th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.title), ' ', '-'))} + '-' +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
            ${item.id}">
                             <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
                                 <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">
@@ -738,25 +762,53 @@
     }
 </script>
     <script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
-    <script>
-        ClassicEditor.create(document.querySelector('#editor'), {
-            readOnly: true,
-            plugins: [
-                'HorizontalRule',
-                'GeneralHtmlSupport',
-            ],
-            htmlSupport: {
-                allow: [{
-                    name: /.*/,
-                    attributes: true,
-                    classes: true,
-                    styles: true,
-                    allowEmpty: true
-                }],
-                removePlugins: ['FilterContent']
+<script>
+    // 全局变量存储 CKEditor 实例，避免重复创建
+    let editorInstance = null;
+
+    // 初始化函数（确保只执行一次）
+    async function initCKEditor() {
+        // 如果已有实例，先销毁
+        if (editorInstance) {
+            await editorInstance.destroy();
+        }
+
+        try {
+            editorInstance = await ClassicEditor.create(document.querySelector('#editor'), {
+                readOnly: true,
+                toolbar: [],
+                plugins: [
+                    'HorizontalRule',
+                    'GeneralHtmlSupport'
+                ],
+                htmlSupport: {
+                    allow: [{
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true,
+                        allowEmpty: true
+                    }]
+                }
+            });
+            console.log('CKEditor 初始化成功');
+        } catch (error) {
+            // 只忽略「插件未找到」的误报，其他错误正常打印
+            if (error.name === 'CKEditorError') {
+                if (error.message.includes('plugin-not-found')) {
+                    console.log('忽略插件声明警告（功能正常）：', error.plugin);
+                } else if (error.message.includes('duplicated-modules')) {
+                    console.error('CKEditor 模块重复加载，请检查脚本引入是否重复：', error);
+                } else {
+                    console.error('CKEditor 初始化失败：', error);
+                }
             }
-        });
-    </script>
+        }
+    }
+
+    // 确保 DOM 加载完成后再初始化（避免找不到 #editor 元素）
+    document.addEventListener('DOMContentLoaded', initCKEditor);
+</script>
 
 
 <script>
