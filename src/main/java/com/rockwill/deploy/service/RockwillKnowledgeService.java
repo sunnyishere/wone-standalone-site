@@ -1,5 +1,6 @@
 package com.rockwill.deploy.service;
 
+import com.alibaba.fastjson2.JSON;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
 import com.rockwill.deploy.vo.AjaxResult;
 import com.rockwill.deploy.vo.DomainHtmlVo;
@@ -108,6 +109,7 @@ public class RockwillKnowledgeService {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
                 if (model != null) {
+                    handleSchemaJson(model);
                     handleDateKey(model);
                     if (!model.isEmpty()) {
                         String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
@@ -130,6 +132,16 @@ public class RockwillKnowledgeService {
             return new DomainHtmlVo();
         }
         return new DomainHtmlVo();
+    }
+
+    private void handleSchemaJson(Map<String, Object> model) {
+        for (String key : model.keySet()) {
+            if (key.toLowerCase().endsWith("schemajson") &&
+                    (model.get(key) instanceof Map || model.get(key) instanceof List)) {
+                String newVal=JSON.toJSONString(model.get(key));
+                model.put(key, newVal);
+            }
+        }
     }
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
