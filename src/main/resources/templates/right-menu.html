@@ -1,38 +1,46 @@
 <!-- PC端的右侧按钮 -->
-<div class=""
-     th:fragment="right-menu(param1)"
-     style="position: fixed;right: -10px;top: 30vh;background-color: #FFFFFFF2;border-radius: 10px;box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16);">
-    <div class="home-hover"  data-trigger="modal-1" th:data-biz-id="${param1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
-        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
-            <span class="p-icon-a-019 am-text-xl"></span>
-            <!-- <span>RFQ</span> -->
-        </div>
-    </div>
-    <div class="home-hover">
-        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
-            <a title="Email" aria-hidden="false" aria-label="Email" th:href="|mailto:${email}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|">
-                <span class="p-icon-a-039 am-text-xl"></span>
-                <!-- <span>Email</span> -->
+<div th:fragment="right-menu(param1)"
+     style="position: fixed; right: 0px; top: 30vh; background-color: #FFFFFFF2; border-radius: 10px; box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16); z-index: 999;">
+    <!-- 动态遍历 siteMenuWidget 列表 -->
+    <div th:each="widget : ${siteMenuWidget}" class="home-hover" style="padding: 8px 10px; text-align: center;">
+
+        <!-- WhatsApp (type=0) -->
+        <div th:if="${widget.type == 0}">
+            <a th:href="'https://wa.me/' + ${widget.details}" target="_blank" title="WhatsApp">
+                <img th:src="${widget.iconUrl}" alt="WhatsApp" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
             </a>
         </div>
-    </div>
-    <div class="home-hover" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
-        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
-            <span class="p-icon-a-029 am-text-xl"></span>
-            <!-- <span>Chat</span> -->
+
+        <!-- RFQ (type=1) -->
+        <div th:if="${widget.type == 1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0}">
+            <span th:data-biz-id="${param1}"></span>
+            <img th:src="${widget.iconUrl}" alt="RFQ" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
         </div>
-    </div>
-    <div class="home-hover am-show-sm-only" onclick="downloadAppHandler()">
-        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
-            <span class="p-icon-a-04download am-text-xl"></span>
-<!--             <span>Download</span> -->
+
+        <!-- Email (type=2) -->
+        <div th:if="${widget.type == 2}">
+            <a th:href="|mailto:${widget.details}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
+               title="Email">
+                <img th:src="${widget.iconUrl}" alt="Email" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
+            </a>
+        </div>
+
+        <!-- 客服 (type=3) -->
+        <div class="chat-btn"
+             th:if="${widget.type == 3}"
+             th:data-details="${widget.details}">
+            <span th:data-biz-id="${param1}"></span>
+            <img th:src="${widget.iconUrl}" alt="Chat" style="width: 32px; height: 32px; object-fit: contain; border-radius: 50%;" />
         </div>
     </div>
 
-    <div class="home-hover am-hide-sm-only" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
-        <div style="color: #0F0F0F;padding: 10px;margin: 0 10px;">
-            <span class="p-icon-a-04download am-text-xl"></span>
-<!--                         <span>Download</span>-->
-        </div>
-    </div>
+    <!-- Download App (保留原有逻辑) -->
+<!--    <div class="home-hover am-show-sm-only" onclick="downloadAppHandler()" style="padding: 8px 10px; text-align: center;">-->
+<!--        <span class="p-icon-a-04download am-text-xl"></span>-->
+<!--    </div>-->
+<!--    <div class="home-hover am-hide-sm-only" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0}" style="padding: 8px 10px; text-align: center;">-->
+<!--        <span class="p-icon-a-04download am-text-xl"></span>-->
+<!--    </div>-->
+
 </div>
+

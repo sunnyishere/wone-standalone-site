@@ -208,5 +208,123 @@
             });
         });
     </script>
+
+    <script type="text/javascript">
+
+        const CONFIG = {
+            android: 'https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp',
+            ios: 'https://apps.apple.com/zm/app/wone/id6503928704',
+            scheme: 'iwone://chat?id=#(brand.id)'
+        };
+
+        function goConfirmAddr() {
+            let { isAndroid } = judgePhoneType();
+            window.location.href =  !isAndroid  ? CONFIG.ios : CONFIG.android ;
+        }
+
+        function isWeiXin() {
+            return /micromessenger/i.test(navigator.userAgent.toLowerCase()) || typeof navigator.wxuserAgent !== 'undefined'
+        }
+
+        function judgePhoneType() {
+            let isAndroid = false, isIOS = false, isIOS9 = false, version,
+                u = navigator.userAgent,
+                ua = u.toLowerCase();
+            //Android系统
+            if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) {   //android终端或者uc浏览器
+                isAndroid = true
+            }
+            //ios
+            if (ua.indexOf("like mac os x") > 0) {
+                let regStr_saf = /os [\d._]*/gi;
+                let verinfo = ua.match(regStr_saf);
+                version = (verinfo + "").replace(/[^0-9|_.]/ig, "").replace(/_/ig, ".");
+            }
+            let version_str = version + "";
+            // ios9以上
+            if (version_str !== "undefined" && version_str.length > 0) {
+                version = parseInt(version);
+                if (version >= 8) {
+                    isIOS9 = true
+                } else {
+                    isIOS = true
+                }
+            }
+            return {isAndroid, isIOS, isIOS9};
+        }
+
+        function openApp(url, callback) {
+            let {isAndroid, isIOS, isIOS9} = judgePhoneType();
+            if(isWeiXin()){
+                alert("Please open it in the system's built-in browser.") ;
+                return ;
+            }
+
+            if (isAndroid || isIOS) {
+                let hasApp = true, t = 1000,
+                    t1 = Date.now(),
+                    ifr = document.createElement("iframe");
+                setTimeout(function () {
+                    if (!hasApp) {
+                        callback && callback()
+                    }
+                    document.body.removeChild(ifr);
+                }, 2000);
+
+                ifr.setAttribute('src', url);
+                ifr.setAttribute('style', 'display:none');
+                document.body.appendChild(ifr);
+
+                setTimeout(function () { //启动app时间较长处理
+                    let t2 = Date.now();
+                    if (t2 - t1 < t + 100) {
+                        hasApp = false;
+                    }
+                }, t);
+            }
+            if (isIOS9) {
+                location.href = url;
+                setTimeout(function () {
+                    callback && callback()
+                }, 250);
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        function isMobile() {
+            const ua = navigator.userAgent;
+            return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+        }
+
+        jQuery(function() {
+            $(".vivo").click(function() {
+                layer.tips("Search by using 'wone' in the app store!", $(this), {tips:[1, '#07C160 ']});
+            });
+            $(".oppo").click(function() {
+                layer.tips("Please anticipate!", $(this), {tips:[1, '#07C160 ']});
+            });
+            $(".palm").click(function() {
+                layer.tips("Search by using 'wone' in the app store!", $(this), {tips:[1, '#07C160 ']});
+            });
+
+            $("#chatBtn").click(function(){
+                openApp(CONFIG.scheme, goConfirmAddr);
+            });
+
+            $(document).on('click', '.chat-btn', function() {
+                const details = $(this).data('details');
+
+                if (isMobile()) {
+                    const schemeUrl = 'iwone://c2cChat?id=' + encodeURIComponent(details);
+                    openApp(schemeUrl, goConfirmAddr);
+                } else {
+                    $('#doc-modal-2').modal('open');
+
+                }
+            });
+        });
+    </script>
 </head>
 </html>
