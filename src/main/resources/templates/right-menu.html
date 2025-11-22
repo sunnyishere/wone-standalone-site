@@ -8,6 +8,8 @@
         <div th:if="${widget.type == 0}">
             <a th:href="'https://wa.me/' + ${widget.details}" target="_blank" title="WhatsApp">
                 <img th:src="${widget.iconUrl}" alt="WhatsApp" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
+                <br>
+                <div style="font-size: 12px">WhatsApp</div>
             </a>
         </div>
 
@@ -22,6 +24,8 @@
             <a th:href="|mailto:${widget.details}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
                title="Email">
                 <img th:src="${widget.iconUrl}" alt="Email" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
+                <br>
+                <div style="font-size: 12px">E-mail</div>
             </a>
         </div>
 
@@ -31,6 +35,8 @@
              th:data-details="${widget.details}">
             <span th:data-biz-id="${param1}"></span>
             <img th:src="${widget.iconUrl}" alt="Chat" style="width: 32px; height: 32px; object-fit: contain; border-radius: 50%;" />
+            <br>
+            <div style="font-size: 12px" th:text="${widget.positions}"></div>
         </div>
     </div>
 
