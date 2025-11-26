@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
@@ -11,9 +11,9 @@
 
     <meta property="og:title" th:content="${title}"/>
     <meta property="og:description" th:content="${description}"/>
-    <meta property="og:url" th:content="${websitePath}"/>
+    <meta property="og:url" th:content="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang : ''})"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -22,7 +22,7 @@
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
-    <link rel="canonical" th:href="${websitePath}" />
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang : ''})" />
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large" />
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
@@ -32,7 +32,6 @@
     <meta name="renderer" content="webkit">
     <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
-
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
 </head>
@@ -66,7 +65,7 @@
                 <div class="am-padding-top" style="display: flex;justify-content: center;">
                     <span class="dd-clamp-text-1"
                       style="border-radius: 40px;padding: 0px 16px;line-height: 40px;max-width: 300px;height: 40px; background-color: var(--theme-wone);">
-                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF;">Discover more</a>
+                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF;" th:text="${advanced['discover.more']}"></a>
                     </span>
                 </div>
             </div>
@@ -77,7 +76,7 @@
                 <div class="am-padding-top" style="display: flex;justify-content: center;">
                     <span class="dd-clamp-text-1"
                           style="border-radius: 40px;padding: 0px 16px;line-height: 40px;max-width: 300px;height: 40px; background-color: var(--theme-wone);">
-                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="${index.jumpUrl}" style="color: #FFFFFF;">Discover more</a>
+                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="${index.jumpUrl}" style="color: #FFFFFF;" th:text="${advanced['discover.more']}"></a>
                     </span>
                 </div>
             </div>
@@ -107,7 +106,7 @@
         <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
             <div class="am-text-center">
                 <div class="am-u-sm-12">
-                    <span class="am-text-xl am-text-bold" th:text="${prodBrand.eName} + '   ' + 'Main Products'"></span>
+                    <span class="am-text-xl am-text-bold" th:text="${prodBrand.eName} + '   ' + ${advanced['products']}"></span>
                 </div>
 
             </div>
@@ -123,15 +122,15 @@
                     <div class="category">
                         <div>
                             <ul th:if="${not #lists.isEmpty(categories)}">
-                                <li class="pc-active">
+                                <li class="pc-active" th:text="${advanced['all']}">
                                     All
                                 </li>
                                 <li th:each="category : ${categories}">
-                                    <span th:text="${category.name}"></span>
+                                    <span th:text="${category.i18nName}"></span>
                                 </li>
                             </ul>
                             <ul>
-                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}">
+                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}" th:text="${advanced['all']}">
                                     All
                                 </li>
                             </ul>
@@ -147,7 +146,8 @@
                             <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                                 th:if="${not #lists.isEmpty(featuredProducts)}"
                                 th:each="prod : ${featuredProducts}">
-                                <a th:title="${prod.name}"  aria-hidden="false" th:aria-label="${prod.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                                <a th:title="${prod.i18nName}"  aria-hidden="false" th:aria-label="${prod.i18nName}"
+                                   th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
             'detail/'+
@@ -155,10 +155,10 @@
            '-'+${prod.id}">
                                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                         <div class="image-box">
-                                            <img th:alt="${prod.name}" th:data-echo="${prod.url}" th:src="${prod.url}" src="images/fuwu.jpg" class="image-square">
+                                            <img th:alt="${prod.i18nName}" th:data-echo="${prod.url}" th:src="${prod.url}" src="images/fuwu.jpg" class="image-square">
                                         </div>
                                         <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
-                                              th:text="${prod?.name ?: ''}"></span>
+                                              th:text="${prod?.i18nName ?: ''}"></span>
                                     </div>
                                 </a>
                             </li>
@@ -177,11 +177,14 @@
                         </ul>
 
                         <div th:if="${not #lists.isEmpty(featuredProducts)}" class="am-container am-text-center am-margin-bottom-xl am-margin-top">
-                            <a title="View All Products" aria-hidden="false" aria-label="View All Products" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
+                            <a title="View All Products" aria-hidden="false" aria-label="View All Products"
+                               th:href="
+                               ${currentPathLang} +
+                               (${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) }}">
-                                <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;">
-                                    View All Products
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) })">
+                                <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;" th:text="${advanced['view.all']} + ' ' + ${advanced['products']}">
+
                                 </button>
                             </a>
                         </div>
@@ -196,7 +199,9 @@
                             <li class="dd-hover4 am-margin-top"
                                 th:if="${not #lists.isEmpty(cateProd)}" th:each="product : ${category.prod}"
                                 style="padding: 0 10px !important;">
-                                <a th:title="${product.name}"  aria-hidden="false" th:aria-label="${product.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                                <a th:title="${product.i18nName}"  aria-hidden="false" th:aria-label="${product.i18nName}"
+                                   th:href="${currentPathLang} +
+                                (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
         '/' :
         ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
           'detail/'+
@@ -205,10 +210,10 @@
         ${product.id}">
                                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                         <div class="image-box">
-                                            <img th:data-echo="${product.url}" th:alt="${product.name}" th:src="${product.url}" class="image-square">
+                                            <img th:data-echo="${product.url}" th:alt="${product.i18nName}" th:src="${product.url}" class="image-square">
                                         </div>
                                         <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
-                                              th:text="${product.name ?: ''}"></span>
+                                              th:text="${product.i18nName ?: ''}"></span>
                                     </div>
                                 </a>
                             </li>
@@ -230,9 +235,10 @@
                                 <!-- 临时调试：输出分类ID和名称 -->
                                 <div class="view-all-btn am-btn am-round load-more-btn"
                                      th:attr="data-cate-id=${category.cateId},
-                  data-cate-name=${#strings.replace(#strings.trim(#strings.toLowerCase(category.cateName)), ' ', '-')}">
-                                    <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;">
-                                        View All Products
+                                     data-lang-url=${currentPathLang},
+                                     data-cate-name=${#strings.replace(#strings.trim(#strings.toLowerCase(category.cateName)), ' ', '-')}">
+                                    <button type="button" class="am-btn am-round" style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;" th:text="${advanced['view.all']}  + ' ' + ${advanced['products']}">
+
                                     </button>
                                 </div>
                             </div>
@@ -259,13 +265,14 @@
                             <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
                                  th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].pageName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div>
                         </div>
                         <div class="am-u-sm-3 am-text-right am-padding-top-xs">
-                            <a title="View ALL"  aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
+                            <a th:title="${advanced['view.all']}"  aria-hidden="false" th:aria-label="${advanced['view.all']}"
+                               th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==7][0].pageName), ' ', '-')) }}">
-                                <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==7][0].pageName), ' ', '-')) })">
+                                <span style="color: #000000;text-decoration: underline;" th:text="${advanced['view.all']}"></span>
                                 <span class="p-icon-a-067  am-padding-left-sm"></span>
                             </a>
                         </div>
@@ -279,7 +286,9 @@
 
                         <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
                             th:if="${not #lists.isEmpty(successCases)}" th:each="success : ${successCases}">
-                            <a th:title="${success.title}" aria-hidden="false" th:aria-label="${success.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+                            <a th:title="${success.title}" aria-hidden="false" th:aria-label="${success.title}" th:href="
+                            ${currentPathLang} +
+                            (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(
@@ -297,7 +306,7 @@
                                         <img th:data-echo="${success.iconUrl}" th:alt="${success.title}" th:src="${success.iconUrl}" class="image-square">
                                     </div>
                                     <div class="am-margin-top-sm dd-clamp-text-2 am-text-bold">
-                                        <div th:text="${success?.title ?: ''}"></div>
+                                        <div th:text="${success?.i18nTitle ?: ''}"></div>
                                     </div>
                                     <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm"
                                           th:text="${success?.content ?: ''}"></span>
@@ -334,14 +343,16 @@
                         <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
                              th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].pageName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div>
                     </div>
                     <div class="am-u-sm-3 am-text-right am-padding-top-xs">
 
-                        <a title="View ALL" aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                        <a th:title="${advanced['view.all']}" aria-hidden="false"
+                           th:aria-label="${advanced['view.all']}"
+                           th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) }}">
-                            <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
+                            <span style="color: #000000;text-decoration: underline;" th:text="${advanced['view.all']}"></span>
                             <span class="p-icon-a-067  am-padding-left-sm"></span>
                         </a>
                     </div>
@@ -355,7 +366,9 @@
 
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
                          th:if="${not #lists.isEmpty(solutions)}" th:each="article : ${solutions}">
-                        <a th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+                        <a th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(#strings.replace(#strings.trim(article.slugTitle), ' ', '-'))} + '-' +
@@ -370,7 +383,7 @@
                                             </div>
                                         </div>
                                         <div class="" style="height: 100px;">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${article.title}"></div>
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${article.i18nTitle}"></div>
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                                  th:text="${article.content}"></div>
                                             <div class="am-padding-top-xs am-cf am-text-sm">
@@ -437,13 +450,15 @@
                         <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
                              th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].pageName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div>
                     </div>
                     <div class="am-u-sm-3 am-text-right am-padding-top-xs">
-                        <a title="View ALL"  aria-hidden="false" aria-label="View ALL" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
+                        <a th:title="${advanced['view.all']}"  aria-hidden="false"
+                           th:aria-label="${advanced['view.all']}"
+                           th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) }}">
-                            <span style="color: #000000;text-decoration: underline;">View ALL</span>
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) })">
+                            <span style="color: #000000;text-decoration: underline;" th:text="${advanced['view.all']}"></span>
                             <span class="p-icon-a-067  am-padding-left-sm"></span>
                         </a>
                     </div>
@@ -458,7 +473,9 @@
                 >
                     <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                         th:if="${not #lists.isEmpty(news)}" th:each="index : ${news}">
-                        <a th:title="${index.title}"  aria-hidden="false" th:aria-label="${index.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
+                        <a th:title="${index.title}"  aria-hidden="false" th:aria-label="${index.title}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
@@ -468,7 +485,7 @@
                                     <img th:data-echo="${index.iconUrl}" th:alt="${index.title}" th:src="${index.iconUrl}" src="" alt="" class="image-square">
                                 </div>
                                 <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
-                                    <div th:text="${index.title}"></div>
+                                    <div th:text="${index.i18nTitle}"></div>
                                 </div>
                                 <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
                                       th:text="${index.content}"></span>
@@ -517,7 +534,7 @@
     <th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
 
     <!-- app端显示的下载按钮 -->
-    <th:block th:replace="phone-down :: phone-down"></th:block>
+    <!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
     <!-- 底部导航   -->
     <th:block th:replace="footer :: footer"></th:block>
@@ -580,12 +597,13 @@
                     e.preventDefault();
                     const targetCateId = this.getAttribute('data-cate-id');
                     const targetCateName = this.getAttribute('data-cate-name');
+                     const targetLangUrl = this.getAttribute('data-lang-url');
 
                     const baseUrl = topNavPageName ? `/${topNavPageName}` : '';
                     const jumpUrl = `${baseUrl}/${targetCateName}-${targetCateId}`;
                     const finalUrl = jumpUrl.replace(/\/+/g, '/');
 
-                    window.location.href = finalUrl;
+                    window.location.href = targetLangUrl + finalUrl;
                 });
             });
 

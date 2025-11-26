@@ -1,14 +1,10 @@
-<nav data-am-widget="header" class="am-header am-show-sm-only" th:fragment="phone-header">
+<nav data-am-widget="header" class="am-header am-show-sm-only" th:fragment="phone-header"
+     style="position: sticky; top: 0;right: 0;left: 0;">
     <div class="am-header-left am-header-nav">
-        <!-- <a href="index.html" rel="nofollow" class="min-logo"><i class="am-icon-spinner"></i> </a> -->
         <a href="/" title="Home" aria-hidden="false" aria-label="Home">
             <img th:src="${prodBrand.icon}" alt="Home" class="logo-square">
         </a>
-        <!--<a href="/" rel="nofollow">
-<i class="am-header-icon am-icon-home"></i> 首页
-</a>-->
     </div>
-    </h1>
     <div class="am-header-right am-header-nav">
         <a title="right" aria-hidden="false" aria-label="right" class="" style="color: var(--theme-wone);" rel="nofollow"
            data-am-modal="{target: '#search-modal', closeViaDimmer: 0, }">

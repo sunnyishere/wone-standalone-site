@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,13 +8,13 @@
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <link rel="canonical"
           th:if="${selectLabel != null and selectLabel != ''}"
-          th:href="${websitePath + pageName + '/' + selectLabel + '-' + (pageData?.pageNum ?: 1)}" />
+          th:href="${websitePath  + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') +  pageName + '/' + selectLabel + '-' + (pageData?.pageNum ?: 1)}" />
 
     <meta property="og:title" th:content="${title}" />
     <meta property="og:description" th:content="${description}"/>
-    <meta property="og:url" th:content="${websitePath + pageName + '/' + selectLabel  + '-' + (pageData?.pageNum ?: 1)}" />
+    <meta property="og:url" th:content="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '/' + selectLabel  + '-' + (pageData?.pageNum ?: 1)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" th:content="en_US" />
+    <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -49,7 +49,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -57,9 +57,9 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li>
-                <a th:href="'/' + ${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+                <a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
             <li th:if="${selectValue != null and selectValue != ''}" class="am-active">
                 <a th:href="${selectLabel}" th:text="${selectValue}" th:title="${selectLabel}" aria-hidden="false" th:aria-label="${selectLabel}"></a>
@@ -79,13 +79,13 @@
 
         <div class="am-u-md-3 am-u-sm-12 ">
             <ul class="am-list admin-sidebar-list" id="collapase-nav-1" style="background-color: #FFFFFF;">
-                <div class="am-padding am-text-lg am-text-bold">Filters</div>
+                <div class="am-padding am-text-lg am-text-bold" th:text="${advanced['filters']}">Filters</div>
                 <!-- Document king 面板 -->
                 <li class="am-panel am-padding-left">
                     <!-- 面板标题添加展开图标切换 -->
                     <a class="am-text-bold"
                        data-am-collapse="{parent: '#collapase-nav-1', target: '#a1'}">
-                        Document king
+                        <span th:text="${advanced['sort.by.time']}"></span>
                         <i class="am-fr am-margin-right"
                            th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![name], selectValue)}
                ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
@@ -98,9 +98,10 @@
             ? 'am-in' : ''">
                         <li th:each="index : ${association}"
                             th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="${index.name}"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                            <a th:title="${index.i18nName}" aria-hidden="false" th:aria-label="${index.i18nName}" th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:text="${index.i18nName}"
+                               th:href="${currentPathLang} +
+                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -116,7 +117,7 @@
                 <!-- Language 面板 -->
                 <li class="am-panel am-padding-left">
                     <a class="am-text-bold" data-am-collapse="{parent: '#collapase-nav-1', target: '#a2'}">
-                        Language
+                        <span th:text="${advanced['language']}"></span>
                         <i class="am-fr am-margin-right"
                            th:classappend="${#lists.contains({'Chinese','English','French'}, selectValue)}
                ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
@@ -128,7 +129,8 @@
                         <li th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a title="Chinese" aria-hidden="false" aria-label="Chinese" th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
                                th:text="'Chinese'"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                               th:href="${currentPathLang} +
+                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -139,7 +141,8 @@
                         <li th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a title="English" aria-hidden="false" aria-label="English" th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
                                th:text="'english'"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                               th:href="${currentPathLang} +
+                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -150,7 +153,8 @@
                         <li th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a title="French" aria-hidden="false" aria-label="French" th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
                                th:text="'French'"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                               th:href="${currentPathLang} +
+                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -164,7 +168,8 @@
                 <!-- Sort By 面板 -->
                 <li class="am-panel am-padding-left">
                     <a class="am-text-bold" data-am-collapse="{parent: '#collapase-nav-1', target: '#a3'}">
-                        Sort By
+                        <span th:text="${advanced['sort.by.time']}"></span>
+
                         <i class="am-fr am-margin-right"
                            th:classappend="${#lists.contains({'Oldest first','Newest first'}, selectValue)}
                ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
@@ -175,8 +180,8 @@
                         th:classappend="${#lists.contains({'Oldest first','Newest first'}, selectValue)} ? 'am-in' : ''">
                         <li th:style="${selectValue == 'Oldest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a title="Oldest first" aria-hidden="false" aria-label="Oldest first" th:style="${selectValue == 'Oldest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="'oldest-first'"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                               th:text="${advanced['ascending']}"
+                               th:href="${currentPathLang} + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -186,8 +191,9 @@
                         </li>
                         <li th:style="${selectValue == 'Newest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a title="Newest first" aria-hidden="false" aria-label="Newest first" th:style="${selectValue == 'Newest first'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="'Newest first'"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
+                               th:text="${advanced['descending']}"
+                               th:href="
+                               ${currentPathLang} + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
@@ -222,16 +228,19 @@
                                                 <div th:if="${item.isShow} == 1" class="dd-clamp-text-1"
                                                      style="color: #07C160;">
                                                     <span class="p-icon-a-0012"></span>
-                                                    <span>Public.</span>
+                                                    <span th:text="${advanced['public']} + '.'"></span>
                                                 </div>
                                                 <div th:if="${item.isShow} == 0" class="dd-clamp-text-1"
                                                      style="color: var(--theme-wone);">
                                                     <span class="p-icon-a-0022"></span>
-                                                    <span>Restricted.</span>
+                                                    <span th:text="${advanced['restricted']} + '.'"></span>
                                                 </div>
                                                 <div class="dd-clamp-text-2 am-padding-top-sm am-text-bold"
                                                      style="min-height: 5rem;" th:text="${item.name}">
                                                 </div>
+<!--                                                <div class="dd-clamp-text-2 am-padding-top-sm"-->
+<!--                                                     style="min-height: 5rem;" th:text="${item.content}">-->
+<!--                                                </div>-->
                                                 <div class=" dd-clamp-text-1 am-text-sm">
                                                     <span class="am-padding-right"
                                                           style="color: #5C779F; " th:text="${item.eName}"></span>
@@ -271,7 +280,7 @@
                                                  th:data-biz-id="'documents-'+${item.id}"
                                                  th:if="${item.isShow} == 0"
                                                  style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
-                                                <span>Consulting</span>
+                                                <span th:text="${advanced['consulting']}"></span>
                                                 <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                             </div>
                                         </div>
@@ -330,7 +339,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='Documents')"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

@@ -3,6 +3,7 @@ package com.rockwill.deploy.conf;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 @ConfigurationProperties(prefix = "brand")
@@ -12,4 +13,6 @@ public class BrandConfig {
     private String staticOutput;
     private Boolean schedulerEnable;
     private Boolean executeOnStart;
+    private List<String> languages;
+    private List<String> domainList;
 }

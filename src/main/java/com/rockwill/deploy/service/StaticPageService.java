@@ -24,8 +24,10 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -75,8 +78,8 @@ public class StaticPageService {
     @Qualifier("rockwillTaskExecutor")
     private ThreadPoolTaskExecutor taskExecutor;
 
-    List<WebSitemapUrl> webSitemapUrls = new CopyOnWriteArrayList<>();
-    boolean isHttps;
+    Map<String, List<WebSitemapUrl>> webSitemapUrls = new ConcurrentHashMap<>();
+
 
     /**
      * 生成所有静态页面
@@ -84,43 +87,51 @@ public class StaticPageService {
      * 生成robots
      *
      */
-    public void generateAllPages() {
-        if (ObjectUtils.isEmpty(brandConfig.getDomain())) {
+    public void generateAllPages(String domain) {
+        if (ObjectUtils.isEmpty(domain)) {
             log.warn("需提供独立部署域名配置: brand.domain");
             return;
         }
-        webSitemapUrls.clear();
+        webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
         try {
-            generateIndexPage();
-            generateMenuAndDetailPage();
-            copyStaticResources();
+            generateIndexPage(domain);
+            knowledgeService.getSiteMenu(domain);
+            String domainPath = staticOutputPath;
+            if (!domain.equals(brandConfig.getDomain())) {
+                domainPath = staticOutputPath + "/" + domain;
+                new File(domainPath).mkdirs();
+            }
+            generateMenuAndDetailPage("", domain);
+            for (String lang : SiteMenuUtils.getLangList()) {
+                generateMenuAndDetailPage(lang, domain);
+            }
+            copyStaticResources(domain);
 
-            isHttps = isHttpsSupported();
-            siteSitemapUtils.generateStaticSitemap(isHttps, webSitemapUrls);
-            RobotsUtils.generateRobots(brandConfig.getDomain(), isHttps, staticOutputPath);
+            siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
+            RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
         } catch (Exception e) {
-            log.error("Failed to generating {} html files", brandConfig.getDomain(), e);
+            log.error("Failed to generating {} html files", domain, e);
         }
     }
 
     /**
      * 生成首页静态文件
      */
-    public void generateIndexPage() {
+    public void generateIndexPage(String domain) {
         try {
-            log.info("Start generating index  html files,site:{}", brandConfig.getDomain());
-            String htmlContent = knowledgeService.getHome(jobRestTemplate);
+            log.info("Start generating index  html files,site:{}", domain);
+            String htmlContent = knowledgeService.getHome(jobRestTemplate, domain);
             if (ObjectUtils.isEmpty(htmlContent)) {
                 log.info("Failed to request index content");
                 return;
             }
-            saveHtml("index", htmlContent);
-            saveHtml("Home", htmlContent);
-            addWebSitemap(htmlContent, "", 1.0);
-            addWebSitemap(htmlContent, "/Home", 1.0);
-            log.info("End of generating index html files,site: {}", brandConfig.getDomain());
+            saveHtml(domain, "index", htmlContent);
+            saveHtml(domain, "Home", htmlContent);
+            addWebSitemap(htmlContent, "", 1.0, domain);
+            addWebSitemap(htmlContent, "/Home", 1.0, domain);
+            log.info("End of generating index html files,site: {}", domain);
         } catch (Exception e) {
-            log.error("generate index html files exception，site: {}", brandConfig.getDomain(), e);
+            log.error("generate index html files exception，site: {}", domain, e);
         }
     }
 
@@ -128,39 +139,49 @@ public class StaticPageService {
     /**
      * 菜单及详情页面
      */
-    public void generateMenuAndDetailPage() {
-        log.info("Start generating menu  html files,site:{}", brandConfig.getDomain());
-        List<SitePage> menuList = knowledgeService.getSiteMenu();
-        if (ObjectUtils.isEmpty(menuList)) {
-            log.warn("Failed to request menu data: {}", brandConfig.getDomain());
+    public void generateMenuAndDetailPage(String lang, String domain) {
+        log.info("Start generating menu  html files,site:{},lang:{}", domain, lang);
+        if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages())) {
+            log.warn("Failed to request menu data: {}", domain);
             return;
         }
-        SiteMenuUtils.setMenuPages(menuList);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        for (SitePage sitePage : menuList) {
-            if (sitePage.getPageType() == SitePage.SitePageType.HOME) {
+        for (SitePage sitePage : SiteMenuUtils.getMenuPages()) {
+            if (sitePage.getPageType() == SitePage.SitePageType.HOME
+                    && ObjectUtils.isEmpty(lang)) {
                 continue;
             }
-            String menuPath = getApiPath(sitePage.getPageName());
-            DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath);
+            String pageName = sitePage.getPageName();
+            if (!ObjectUtils.isEmpty(pageName)) {
+                pageName = lang + "/" + pageName;
+            }
+            String menuPath = getApiPath(pageName);
+            DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath, domain);
             if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
-                saveHtml(sitePage.getPageName(), domainHtmlVo.getHtmlContent());
-                addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + sitePage.getPageName(), 0.64);
+                saveHtml(domain, pageName, domainHtmlVo.getHtmlContent());
+                addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + pageName,
+                        sitePage.getPageType() == SitePage.SitePageType.HOME ? 0.8 : 0.64, domain);
+                if (sitePage.getPageType() == SitePage.SitePageType.HOME) {
+                    //其他语种首页
+                    saveHtml(domain, lang, domainHtmlVo.getHtmlContent());
+                    addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 0.8, domain);
+                    continue;
+                }
                 CompletableFuture<Void> pageTask = CompletableFuture.runAsync(() -> {
-                    processPagination(sitePage, null, domainHtmlVo,false);
+                    processPagination(sitePage, null, domainHtmlVo, false, lang, domain);
                 }, taskExecutor);
                 futures.add(pageTask);
                 if (sitePage.getPageType() == SitePage.SitePageType.PRODUCTS
                         || sitePage.getPageType() == SitePage.SitePageType.DOCUMENTS) {
                     CompletableFuture<Void> menuTask = CompletableFuture.runAsync(() -> {
-                        processMenuCategory(sitePage, domainHtmlVo);
+                        processMenuCategory(sitePage, domainHtmlVo, lang, domain);
                     }, taskExecutor);
                     futures.add(menuTask);
                 }
                 if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                         && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
                     CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-                        processDetailPages(sitePage, domainHtmlVo);
+                        processDetailPages(sitePage, domainHtmlVo, lang, domain);
                     }, taskExecutor);
                     futures.add(detailTask);
                 }
@@ -172,25 +193,28 @@ public class StaticPageService {
         } catch (Exception e) {
             log.error("waiting menu and detail result exception", e);
         }
-        log.info("End of generating  menu html files,site: {}", brandConfig.getDomain());
+        log.info("End of generating  menu html files,site: {},lang:{}", domain, lang);
     }
 
-    private void processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo,boolean isSubMenu) {
+    private void processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain) {
         if (domainHtmlVo.getTotalPages() != null && domainHtmlVo.getTotalPages() > 1) {
             for (int p = 1; p <= domainHtmlVo.getTotalPages(); p++) {
                 String menuName = sitePage.getPageName() + "-" + p;
                 if (catePage != null) {
                     menuName = sitePage.getPageName() + "/" + catePage.getPageName() + "-" + catePage.getId() + "-" + p;
                 }
-                DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName));
-                saveHtml(menuName, menuPageVo.getHtmlContent());
-                addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64);
+                if (!ObjectUtils.isEmpty(lang)) {
+                    menuName = lang + "/" + menuName;
+                }
+                DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName), domain);
+                saveHtml(domain, menuName, menuPageVo.getHtmlContent());
+                addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
 
                 //仅对菜单根列表页面进行处理详情采集
-                if (p >= 2 &&!isSubMenu) {
+                if (p >= 2 && !isSubMenu) {
                     if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                             && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-                        processDetailPages(sitePage, menuPageVo);
+                        processDetailPages(sitePage, menuPageVo, lang, domain);
                     }
                 }
             }
@@ -204,8 +228,8 @@ public class StaticPageService {
      * @param sitePage     页面类型
      * @param domainHtmlVo 包含渲染后的html数据对象
      */
-    public void processMenuCategory(SitePage sitePage, DomainHtmlVo domainHtmlVo) {
-        log.info("Start generating menu category  html files,menu:{}", sitePage.getPageName());
+    public void processMenuCategory(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain) {
+        log.info("Start generating menu category  html files,menu:{},lang:{}", sitePage.getPageName(), lang);
         // 分类
         if (domainHtmlVo.getModelMap() != null) {
             List<LinkedHashMap<String, Object>> categories = (List<LinkedHashMap<String, Object>>) domainHtmlVo.getModelMap().get("association");
@@ -213,7 +237,7 @@ public class StaticPageService {
                 SitePage cate = new SitePage();
                 cate.setPageName(category.get("name").toString().toLowerCase());
                 cate.setId(Long.parseLong(category.get("id").toString()));
-                processSubCategory(sitePage, cate);
+                processSubCategory(sitePage, cate, lang, domain);
                 if (category.containsKey("children")) {
                     List<LinkedHashMap<String, Object>> childs = (List<LinkedHashMap<String, Object>>) category.get("children");
                     if (!childs.isEmpty()) {
@@ -221,7 +245,7 @@ public class StaticPageService {
                             SitePage sub = new SitePage();
                             sub.setPageName(child.get("name").toString().toLowerCase());
                             sub.setId(Long.parseLong(child.get("id").toString()));
-                            processSubCategory(sitePage, sub);
+                            processSubCategory(sitePage, sub, lang, domain);
                         }
                     }
                 }
@@ -232,27 +256,33 @@ public class StaticPageService {
             //资料 语言及排序分类页
             for (String sort : docFixedList) {
                 String docName = sitePage.getPageName() + "/" + sort;
-                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName));
-                saveHtml(docName, subVo.getHtmlContent());
-                addWebSitemap(subVo.getHtmlContent(), "/" + docName, 0.64);
+                if (!ObjectUtils.isEmpty(lang)) {
+                    docName = lang + "/" + docName;
+                }
+                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
+                saveHtml(domain, docName, subVo.getHtmlContent());
+                addWebSitemap(subVo.getHtmlContent(), "/" + docName, 0.64, domain);
                 SitePage sub = new SitePage();
                 sub.setPageName(sort.substring(0, sort.lastIndexOf("-")));
                 sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-") + 1)));
-                processPagination(sitePage, sub, subVo,true);
+                processPagination(sitePage, sub, subVo, true, lang, domain);
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());
     }
 
-    private void processSubCategory(SitePage menu, SitePage sitePage) {
+    private void processSubCategory(SitePage menu, SitePage sitePage, String lang, String domain) {
         String docName = menu.getPageName() + "/" + sitePage.getPageName() + "-" + sitePage.getId();
-        DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName));
-        saveHtml(docName, categoryVo.getHtmlContent());
-        addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64);
-        processPagination(menu, sitePage, categoryVo,true);
+        if (!ObjectUtils.isEmpty(lang)) {
+            docName = lang + "/" + docName;
+        }
+        DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
+        saveHtml(domain, docName, categoryVo.getHtmlContent());
+        addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64, domain);
+        processPagination(menu, sitePage, categoryVo, true, lang, domain);
     }
 
-    public void processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo) {
+    public void processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain) {
         log.info("Start generating details html files,detail:{}", sitePage.getPageName());
         String cssQuery = "";
         if (sitePage.getPageType() == 3) {
@@ -266,19 +296,22 @@ public class StaticPageService {
         }
         List<String> detailUrlList = getDetailLinkFromPage(domainHtmlVo.getHtmlContent(), cssQuery);
         for (String detailUrl : detailUrlList) {
-            DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl));
-            saveHtml(detailUrl, subVo.getHtmlContent());
-            addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8);
-            if (detailUrl.startsWith("Products/detail")) {
+            DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
+            saveHtml(domain, detailUrl, subVo.getHtmlContent());
+            addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8, domain);
+            if (detailUrl.contains(sitePage.getPageName()+"/detail")) {
                 if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
                     List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
                     for (LinkedHashMap<String, Object> model : modelList) {
-                        String modelName = "Products/" + model.get("name").toString().trim()
+                        String modelName = sitePage.getPageName()+"/" + model.get("name").toString().trim()
                                 .toLowerCase().replace("/", "-")
                                 .replace(" ", "-") + "-" + model.get("prodId") + "-series" + model.get("id");
-                        DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName));
-                        saveHtml(modelName, modelVo.getHtmlContent());
-                        addWebSitemap(modelVo.getHtmlContent(), "/" + modelName, 0.9);
+                        if (!ObjectUtils.isEmpty(lang)) {
+                            modelName = lang + "/" + modelName;
+                        }
+                        DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName), domain);
+                        saveHtml(domain, modelName, modelVo.getHtmlContent());
+                        addWebSitemap(modelVo.getHtmlContent(), "/" + modelName, 0.9, domain);
                     }
                 }
             }
@@ -289,17 +322,22 @@ public class StaticPageService {
     private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {
         Document document = Jsoup.parse(htmlContent);
         Elements directChildLinks = document.select(cssQuery);
-        return directChildLinks.stream().map(element -> element.attr("href")).filter(s -> s.startsWith("/")).map(link -> link.substring(1)).collect(Collectors.toList());
+        return directChildLinks.stream().map(element -> element.attr("href"))
+                .filter(s -> s.startsWith("/")).map(link -> link.substring(1)).collect(Collectors.toList());
     }
 
 
-    public void saveHtml(String namePrefix, String html) {
+    public void saveHtml(String domain, String namePrefix, String html) {
         if (ObjectUtils.isEmpty(html)) {
             log.info("Empty html content,uri:{}", namePrefix);
             return;
         }
         String fileName = sanitizeFileName(namePrefix) + ".html";
-        String siteDir = new File(staticOutputPath).getAbsolutePath();
+        String baseStaticPath = staticOutputPath;
+        if (!domain.equals(brandConfig.getDomain())) {
+            baseStaticPath += "/" + domain;
+        }
+        String siteDir = new File(baseStaticPath).getAbsolutePath();
         if (!"index.html".equals(fileName)) {
             String baseName = fileName.replace(".html", "");
             siteDir = new File(siteDir, baseName).getAbsolutePath();
@@ -324,7 +362,7 @@ public class StaticPageService {
     /**
      * 复制静态资源文件到输出目录
      */
-    public void copyStaticResources() throws IOException {
+    public void copyStaticResources(String domain) throws IOException {
         log.info("Start copying static resource files");
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         try {
@@ -343,13 +381,19 @@ public class StaticPageService {
                     if (resourcePath == null) {
                         continue;
                     }
-                    Path targetFile = Paths.get(staticOutputPath + "/static", resourcePath);
+                    String target = staticOutputPath;
+                    if (!domain.equals(brandConfig.getDomain())) {
+                        target += "/" + domain;
+                    }
+                    Path targetFile = Paths.get(target + "/static", resourcePath);
                     Files.createDirectories(targetFile.getParent());
 
                     // 特殊处理robots.txt和sitemap文件，复制到根目录
                     String filename = targetFile.getFileName().toString();
                     if ("robots.txt".equals(filename) || filename.startsWith("sitemap")) {
-                        Path rootTarget = Paths.get(staticOutputPath, filename);
+                        Path rootTarget = Paths.get(staticOutputPath,
+                                domain.equals(brandConfig.getDomain()) ? "" : domain,
+                                filename);
                         copyResourceToFile(resource, rootTarget);
                     } else {
                         copyResourceToFile(resource, targetFile);
@@ -400,9 +444,9 @@ public class StaticPageService {
     }
 
 
-    private boolean isHttpsSupported() {
+    private boolean isHttpsSupported(String domain) {
         try {
-            String httpsUrl = "https://" + brandConfig.getDomain();
+            String httpsUrl = "https://" + domain;
             URL url = new URL(httpsUrl);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("HEAD");
@@ -416,11 +460,11 @@ public class StaticPageService {
         }
     }
 
-    private void addWebSitemap(String html, String uri, double priority) {
+    private void addWebSitemap(String html, String uri, double priority, String domain) {
         if (ObjectUtils.isEmpty(html)) {
             return;
         }
-        String baseUrl = (isHttps ? "https://" : "http://") + brandConfig.getDomain();
+        String baseUrl = "https://" + domain;
         String url = baseUrl + uri;
         try {
             WebSitemapUrl index = new WebSitemapUrl.Options(url)
@@ -428,7 +472,7 @@ public class StaticPageService {
                     .priority(priority)
                     .changeFreq(ChangeFreq.DAILY)
                     .build();
-            webSitemapUrls.add(index);
+            webSitemapUrls.get(domain).add(index);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

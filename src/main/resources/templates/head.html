@@ -211,7 +211,7 @@
 
     <script type="text/javascript">
 
-        const CONFIG = {
+        const APPCONFIG = {
             android: 'https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp',
             ios: 'https://apps.apple.com/zm/app/wone/id6503928704',
             scheme: 'iwone://chat?id=#(brand.id)'
@@ -219,7 +219,7 @@
 
         function goConfirmAddr() {
             let { isAndroid } = judgePhoneType();
-            window.location.href =  !isAndroid  ? CONFIG.ios : CONFIG.android ;
+            window.location.href =  !isAndroid  ? APPCONFIG.ios : APPCONFIG.android ;
         }
 
         function isWeiXin() {

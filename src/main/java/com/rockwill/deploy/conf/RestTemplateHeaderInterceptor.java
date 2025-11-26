@@ -19,7 +19,7 @@ public class RestTemplateHeaderInterceptor implements ClientHttpRequestIntercept
     BrandConfig brandConfig;
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        request.getHeaders().add("Deploy-Domain", brandConfig.getDomain());
+//        request.getHeaders().add("Deploy-Domain", brandConfig.getDomain());
         String originalUri = getOriginalUriFromCurrentRequest();
         if (originalUri != null && !originalUri.isEmpty()) {
             request.getHeaders().add("X-Original-URI", originalUri);

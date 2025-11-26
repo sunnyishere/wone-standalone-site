@@ -1,6 +1,7 @@
 package com.rockwill.deploy.conf;
 
 import com.rockwill.deploy.utils.PathMatchUtils;
+import com.rockwill.deploy.utils.PathPatternType;
 import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.vo.SitePage;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,8 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
         String path = request.getServletPath();
 
         PathMatchUtils.MatchResult matchResult = PathMatchUtils.matchResult(path);
-        if (matchResult.getPatternType() == null) {
+        if (matchResult.getPatternType() == null
+                || matchResult.getIllegal()) {
             log.warn("illegal request url : {}", path);
             response.sendRedirect("/");
             return false;

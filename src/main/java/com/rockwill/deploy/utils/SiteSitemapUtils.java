@@ -4,6 +4,7 @@ import com.redfin.sitemapgenerator.SitemapIndexGenerator;
 import com.redfin.sitemapgenerator.WebSitemapGenerator;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
 import com.rockwill.deploy.conf.BrandConfig;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -27,18 +28,15 @@ public class SiteSitemapUtils {
 
     @Resource
     BrandConfig brandConfig;
-    private final List<WebSitemapUrl> webSitemapUrlList = new ArrayList<>();
-    private boolean isHttps;
 
-    public void generateStaticSitemap(boolean isHttps, List<WebSitemapUrl> webSitemapUrls) {
-        log.info("generate  Sitemap ,url size:{}", webSitemapUrls.size());
-        this.isHttps = isHttps;
-        webSitemapUrlList.clear();
+
+    public void generateStaticSitemap(String domain, List<WebSitemapUrl> webSitemapUrls) {
+        log.info("generate {} Sitemap ,url size:{}", domain, webSitemapUrls.size());
         try {
             if (!webSitemapUrls.isEmpty()) {
-                webSitemapUrlList.addAll(webSitemapUrls);
+                List<WebSitemapUrl> webSitemapUrlList = new ArrayList<>(webSitemapUrls);
                 webSitemapUrlList.sort((o1, o2) -> o2.getPriority().compareTo(o1.getPriority()));
-                generateSitemapWithIndex();
+                generateSitemapWithIndex(webSitemapUrlList, domain);
             }
         } catch (IOException e) {
             log.error("generating sitemap exception:{}", e.getMessage(), e);
@@ -48,11 +46,15 @@ public class SiteSitemapUtils {
     /**
      * 生成分块Sitemap和索引文件
      */
-    private void generateSitemapWithIndex()
+    private void generateSitemapWithIndex(List<WebSitemapUrl> webSitemapUrlList, String domain)
             throws IOException {
         int maxUrlsPerSitemap = 2000;
 
-        File outputDirectory = new File(brandConfig.getStaticOutput());
+        String path = brandConfig.getStaticOutput();
+        if (!domain.equals(brandConfig.getDomain())) {
+            path += "/" + domain;
+        }
+        File outputDirectory = new File(path);
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
@@ -61,7 +63,7 @@ public class SiteSitemapUtils {
         int numSitemaps = (int) Math.ceil((double) urlCount / maxUrlsPerSitemap);
 
         if (numSitemaps <= 1) {
-            generateSitemap(brandConfig.getStaticOutput());
+            generateSitemap(webSitemapUrlList, domain);
             return;
         }
 
@@ -73,7 +75,7 @@ public class SiteSitemapUtils {
             String chunkFilename = "sitemap_" + (i + 1);
 
             WebSitemapGenerator chunkGenerator = WebSitemapGenerator
-                    .builder(getWebsiteUrl(), outputDirectory)
+                    .builder(getWebsiteUrl(domain), outputDirectory)
                     .fileNamePrefix(chunkFilename)
                     .build();
             chunkGenerator.addUrls(chunkUrls);
@@ -82,7 +84,7 @@ public class SiteSitemapUtils {
             if (!chunkFiles.isEmpty()) {
                 sitemapFileNames.add(chunkFiles.get(0).getName());
             }
-            String xslUrl = getWebsiteUrl() + "/sitemap_nb.xsl";
+            String xslUrl = getWebsiteUrl(domain) + "/sitemap_nb.xsl";
             for (File sitemapFile : chunkFiles) {
                 addXslStylesheet(sitemapFile.getAbsolutePath(), xslUrl);
             }
@@ -90,14 +92,14 @@ public class SiteSitemapUtils {
 
         File indexFile = new File(outputDirectory, "sitemap.xml");
         SitemapIndexGenerator indexGenerator = new SitemapIndexGenerator
-                .Options(getWebsiteUrl(), indexFile)
+                .Options(getWebsiteUrl(domain), indexFile)
                 .build();
 
         for (String filename : sitemapFileNames) {
-            indexGenerator.addUrl(getWebsiteUrl() + "/" + filename);
+            indexGenerator.addUrl(getWebsiteUrl(domain) + "/" + filename);
         }
         indexGenerator.write();
-        String xslUrl = getWebsiteUrl() + "/sitemap_nb.xsl";
+        String xslUrl = getWebsiteUrl(domain) + "/sitemap_nb.xsl";
         addXslStylesheet(indexFile.getAbsolutePath(), xslUrl);
 
     }
@@ -106,16 +108,20 @@ public class SiteSitemapUtils {
     /**
      * 生成Sitemap XML文件
      *
-     * @param outputDir 输出目录
+     * @param domain
      */
-    private void generateSitemap(String outputDir) throws IOException {
-        File outputDirectory = new File(outputDir);
+    private void generateSitemap(List<WebSitemapUrl> webSitemapUrlList, String domain) throws IOException {
+        String path = brandConfig.getStaticOutput();
+        if (!domain.equals(brandConfig.getDomain())) {
+            path += "/" + domain;
+        }
+        File outputDirectory = new File(path);
         if (!outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }
 
         WebSitemapGenerator sitemapGenerator = WebSitemapGenerator
-                .builder(getWebsiteUrl(), outputDirectory)
+                .builder(getWebsiteUrl(domain), outputDirectory)
                 .fileNamePrefix("sitemap")
                 .gzip(false)
                 .build();
@@ -123,7 +129,7 @@ public class SiteSitemapUtils {
         sitemapGenerator.addUrls(webSitemapUrlList);
         List<File> sitemapFiles = sitemapGenerator.write();
 
-        String xslUrl = getWebsiteUrl() + "/sitemap_nb.xsl";
+        String xslUrl = getWebsiteUrl(domain) + "/sitemap_nb.xsl";
         for (File sitemapFile : sitemapFiles) {
             addXslStylesheet(sitemapFile.getAbsolutePath(), xslUrl);
         }
@@ -155,8 +161,8 @@ public class SiteSitemapUtils {
         Files.write(filePath, lines);
     }
 
-    String getWebsiteUrl() {
-        return (isHttps ? "https://" : "http://") + brandConfig.getDomain();
+    String getWebsiteUrl(String domain) {
+        return "https://" + domain;
     }
 
 }

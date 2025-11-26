@@ -1,17 +1,17 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
-    <link rel="canonical" th:href="${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) +  ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
     <meta property="og:title" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta property="og:description" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
-    <meta property="og:url" th:attr="content=${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
+    <meta property="og:url" th:attr="content=${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:image" th:attr="content=${news.iconUrl}" />
     <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
 
@@ -53,7 +53,7 @@
 <div class="m-header-banner m-header-1" th:style="'background-image: url(' + ${pageIcon} + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}">New</h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -61,9 +61,9 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
-                <a th:href="'/'+${pageName}"  th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+                <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${pageName}"></a>
             </li>
         </ol>
     </div>
@@ -90,7 +90,7 @@
             <br>
             <!-- 富文本-->
             <div class="am-padding-top am-padding-bottom-xl">
-                <div id="editor" style="width: 100%;overflow-x: auto" th:utext="${news.content}"></div>
+                <div id="editor" th:utext="${news.content}"></div>
             </div>
 
         </div>
@@ -98,7 +98,7 @@
         <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
 
             <div class=" am-margin-bottom" style="background:#FFFFFF;">
-                <div class="am-text-xl am-text-bold am-padding">
+                <div class="am-text-xl am-text-bold am-padding"  th:text="${advanced['recent.news']}">
                     Recent News
                 </div>
 
@@ -107,7 +107,9 @@
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
                          th:if="${not #lists.isEmpty(newList)}"
                          th:each="news : ${newList}">
-                        <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
+                        <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(#strings.replace(#strings.trim(news.slugTitle), ' ', '-'))} + '-' +
@@ -117,12 +119,12 @@
                                     <div style="am-cf">
                                         <div class="am-fl am-margin-right">
                                             <div class="phone-bottom" style="width: 100px;height: 100px;">
-                                                <img th:src="${news.iconUrl}" th:alt="${news.title}" class="am-img-responsive"
+                                                <img th:src="${news.iconUrl}" th:alt="${news.i18nTitle}" class="am-img-responsive"
                                                      style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
                                             </div>
                                         </div>
                                         <div class="" style="height: 100px;">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${news.title}">Resistance
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${news.i18nTitle}">Resistance
                                                 and
                                                 Leakage
                                             </div>
@@ -195,7 +197,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='News_'+${news.id})"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

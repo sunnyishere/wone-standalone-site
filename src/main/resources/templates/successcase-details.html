@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
@@ -8,14 +8,14 @@
     <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
 
     <!-- 链接标签优化 -->
-    <link rel="canonical" th:href="${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
 
     <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content="${currentLang}" />
     <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
     <meta property="og:description" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
-    <meta property="og:url" th:attr="content=${websitePath} +  ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
+    <meta property="og:url" th:attr="content=${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
     <meta property="og:image" th:attr="content=${successCase.iconUrl}" />
     <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName}" />
 
@@ -61,7 +61,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}">New</h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -69,9 +69,9 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
-                <a th:href="'/'+${pageName}"  th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+                <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
         </ol>
     </div>
@@ -99,7 +99,7 @@
             </div>
             <br>
             <div class="am-padding-top am-padding-bottom-xl">
-                <div id="editor" style="width: 100%;overflow-x: auto" th:utext="${successCase.content}"></div>
+                <div id="editor" th:utext="${successCase.content}"></div>
             </div>
 
         </div>
@@ -107,7 +107,7 @@
         <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
 
             <div class=" am-margin-bottom" style="background:#FFFFFF;">
-                <div class="am-text-xl am-text-bold am-padding">
+                <div class="am-text-xl am-text-bold am-padding" th:text="${advanced['recent.success.reference']}">
                     Recent Success Reference
                 </div>
 
@@ -116,7 +116,9 @@
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
                          th:if="${not #lists.isEmpty(successCases)}"
                          th:each="scate : ${successCases}">
-                        <a th:title="${scate.title}" aria-hidden="false" th:aria-label="${scate.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+                        <a th:title="${scate.i18nTitle}" aria-hidden="false" th:aria-label="${scate.i18nTitle}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(#strings.replace(#strings.trim(scate.slugTitle), ' ', '-'))} + '-' +
@@ -131,7 +133,7 @@
                                             </div>
                                         </div>
                                         <div class="" style="height: 100px;">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.title}">
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.i18nTitle}">
                                                 Resistance and
                                                 Leakage
                                             </div>
@@ -200,7 +202,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='Success Reference_'+${successCase.id})"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

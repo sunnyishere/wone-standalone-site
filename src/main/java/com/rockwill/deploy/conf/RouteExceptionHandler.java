@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 
 @ControllerAdvice
@@ -15,8 +16,8 @@ import java.net.URI;
 public class RouteExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleRouteException(Exception ex) {
-        log.error("global exception:{},", ex.getMessage(), ex);
+    public ResponseEntity<?> handleRouteException(Exception ex, HttpServletRequest request) {
+        log.error("global exception:url:{},{},",request.getRequestURI(), ex.getMessage(), ex);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_HTML);
         return ResponseEntity.status(HttpStatus.FOUND)

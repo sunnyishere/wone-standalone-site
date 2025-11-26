@@ -1,7 +1,10 @@
 package com.rockwill.deploy.service;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
+import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.vo.AjaxResult;
 import com.rockwill.deploy.vo.DomainHtmlVo;
 import com.rockwill.deploy.vo.SitePage;
@@ -47,7 +50,7 @@ public class RockwillKnowledgeService {
     @PostConstruct
     public void initUrl() {
         if (devMode.equals("dev")) {
-            wcmApi = "http://192.168.34.62/wcm-api/site/static/";
+            wcmApi = "http://192.168.35.22/wcm-api/site/static/";
         }
     }
 
@@ -57,22 +60,32 @@ public class RockwillKnowledgeService {
      *
      * @return 菜单列表
      */
-    public List<SitePage> getSiteMenu() {
+    public List<SitePage> getSiteMenu(String domain) {
         log.info("request site menu data");
         try {
-            ParameterizedTypeReference<AjaxResult<List<SitePage>>> typeReference =
-                    new ParameterizedTypeReference<AjaxResult<List<SitePage>>>() {
+            ParameterizedTypeReference<AjaxResult<JSONObject>> typeReference =
+                    new ParameterizedTypeReference<AjaxResult<JSONObject>>() {
                     };
-            ResponseEntity<AjaxResult<List<SitePage>>> response = restTemplate.exchange(
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Deploy-Domain", domain);
+            HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+            ResponseEntity<AjaxResult<JSONObject>> response = restTemplate.exchange(
                     wcmApi + "getMenu",
                     HttpMethod.GET,
-                    null,
+                    requestEntity,
                     typeReference
             );
-            AjaxResult<List<SitePage>> ajaxResult = response.getBody();
+            AjaxResult<JSONObject> ajaxResult = response.getBody();
             if (ajaxResult != null) {
                 if (ajaxResult.getCode() == 200) {
-                    return ajaxResult.getData();
+                    List<SitePage> sitePageList = JSON.parseArray(ajaxResult.getData().getJSONArray("sitePages")
+                            .toString(), SitePage.class);
+                    List<String> langList = JSON.parseArray(ajaxResult.getData().getJSONArray("langList")
+                            .toString(), String.class);
+                    SiteMenuUtils.setMenuPages(sitePageList);
+                    SiteMenuUtils.setLangList(langList);
+                    log.info("lang list:{}", String.join(",", langList));
+                    return sitePageList;
                 }
                 log.warn("request resp code:{},msg:{}", ajaxResult.getCode(), ajaxResult.getMsg());
             }
@@ -90,19 +103,22 @@ public class RockwillKnowledgeService {
      * @param path 请求api路径
      * @return 返回html内容
      */
-    public DomainHtmlVo getFromApi(RestTemplate restTemplate, String path) {
+    public DomainHtmlVo getFromApi(RestTemplate restTemplate, String path,String host) {
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
-        log.info("request wcm  {} ",   path);
+        log.info("request wcm  {} ", path);
         try {
             ParameterizedTypeReference<AjaxResult<Map<String, Object>>> typeReference =
                     new ParameterizedTypeReference<AjaxResult<Map<String, Object>>>() {
                     };
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Deploy-Domain", host);
+            HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
             ResponseEntity<AjaxResult<Map<String, Object>>> responseEntity = restTemplate.exchange(
                     wcmApi + path,
                     HttpMethod.GET,
-                    null,
+                    requestEntity,
                     typeReference
             );
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
@@ -138,7 +154,7 @@ public class RockwillKnowledgeService {
         for (String key : model.keySet()) {
             if (key.toLowerCase().endsWith("schemajson") &&
                     (model.get(key) instanceof Map || model.get(key) instanceof List)) {
-                String newVal=JSON.toJSONString(model.get(key));
+                String newVal = JSON.toJSONString(model.get(key));
                 model.put(key, newVal);
             }
         }
@@ -158,10 +174,10 @@ public class RockwillKnowledgeService {
                     && !ObjectUtils.isEmpty(value)) {
                 try {
                     String date = (String) value;
-                    if (date.length()>10){
-                        date = date.substring(0,10);
+                    if (date.length() > 10) {
+                        date = date.substring(0, 10);
                     }
-                    LocalDate parsedDate = LocalDate.parse(date,date.length() == 10 ? DATE_FORMATTER : TIME_FORMATTER);
+                    LocalDate parsedDate = LocalDate.parse(date, date.length() == 10 ? DATE_FORMATTER : TIME_FORMATTER);
                     model.put(key, Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
                 } catch (Exception e) {
                     log.error("日期格式解析错误，键: {}, 值: {}", key, value);
@@ -205,7 +221,8 @@ public class RockwillKnowledgeService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add("Premium-Real-IP",originalRequest.getHeader("X-Real-IP"));
+        headers.add("Deploy-Domain", originalRequest.getHeader("Host"));
+        headers.add("Premium-Real-IP", originalRequest.getHeader("X-Real-IP"));
         HttpEntity<String> requestEntity = new HttpEntity<>(formBody.toString(), headers);
         return restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class);
     }
@@ -215,10 +232,10 @@ public class RockwillKnowledgeService {
      *
      * @return 返回首页html
      */
-    public String getHome(RestTemplate restTemplate) {
+    public String getHome(RestTemplate restTemplate,String host) {
         log.info("request Home data");
         try {
-            return getFromApi(restTemplate, "home").getHtmlContent();
+            return getFromApi(restTemplate, "home",host).getHtmlContent();
         } catch (Exception e) {
             log.error("request Home data exception", e);
             return "";

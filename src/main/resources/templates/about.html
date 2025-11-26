@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
@@ -7,11 +7,12 @@
     <title th:text="${pageTitle}"></title>
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
-    <link rel="canonical" th:href="${websitePath}+${pageName}" />
 
-    <meta property="og:url" th:href="${websitePath}+${pageName}" />
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
+    <meta property="og:url" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
+
     <meta property="og:type" th:content="${pageName}"/>
-    <meta property="og:locale" content="en_US"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="${pageContent}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
@@ -47,7 +48,7 @@
 <div class="m-header-banner m-header-1" th:style="'background-image: url(' + ${pageIcon} + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -56,8 +57,8 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
-            <li><a th:text="${pageName}" th:href="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
 </nav>
@@ -87,8 +88,7 @@
 
     <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding">
         <div class="">
-            <div class="am-text-lg am-text-bold am-margin-top-sm">
-                About Us
+            <div class="am-text-lg am-text-bold am-margin-top-sm"  th:text="${advanced['about.us']}">
             </div>
         </div>
         <p th:text="${brand.profile}">
@@ -102,10 +102,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold">Verifed Profile</span>
+                <span class="am-text-xl am-text-bold" th:text="${advanced['verified.profile']}"></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold">Verifed Profile</span>
+                <span class="am-text-lg am-text-bold" th:text="${advanced['verified.profile']}"></span>
             </div>
 
         </div>
@@ -114,55 +114,63 @@
     <div class="am-padding-top">
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
             <div class="am-hide-sm-only am-padding type-hover">
-                <div>Organization Name</div>
+                <div  th:text="${advanced['organization.name']}"></div>
                 <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
-                <div>Main Categories</div>
+                <div  th:text="${advanced['main.categories']}"></div>
                 <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
-                <div>Business Type</div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${brand.compNat}"></div>
+                <div  th:text="${advanced['business.type']}"></div>
+                <div class="am-text-xl am-text-bold dd-clamp-text-1"
+                     th:with="
+                       input=${brand.compNat},
+                       step1=${#strings.replace(input, 'Design', advanced['design'])},
+                       step2=${#strings.replace(step1, 'Manufacture', advanced['manufacture'])},
+                       step3=${#strings.replace(step2, 'Sales', advanced['sales'])}
+                     "
+                     th:text="${step3}">
+                </div>
             </div>
             <div class="am-show-sm-only am-padding type-hover">
-                <div>Organization Name</div>
+                <div th:text="${advanced['organization.name']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
-                <div>Main Categories</div>
+                <div th:text="${advanced['main.categories']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
-                <div>Business Type</div>
+                <div  th:text="${advanced['business.type']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${brand.compNat}"></div>
             </div>
         </div>
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
             <div class="am-hide-sm-only am-padding type-hover">
-                <div>Employees Num</div>
+                <div th:text="${advanced['employees']}"></div>
                 <div class="am-text-xl am-text-bold" th:text="${brand.empCount + '  people'} "></div>
-                <div>Workplace</div>
+                <div th:text="${advanced['workplace']}"></div>
                 <div class="am-text-xl am-text-bold" th:text="${brand.workplace} "></div>
-                <div>Registered Capital</div>
+                <div th:text="${advanced['registered.capital']}"></div>
                 <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${factory.entRegFeeType}+${factory.entRegFee}"></div>
             </div>
             <div class="am-show-sm-only am-padding type-hover">
-                <div>Employees Num</div>
+                <div th:text="${advanced['employees']}"></div>
                 <div class="am-text-bold" th:text="${brand.empCount + '  people'} "></div>
-                <div>Workplace</div>
+                <div th:text="${advanced['workplace']}"></div>
                 <div class="am-text-bold" th:text="${brand.workplace+ 'm²'} "></div>
-                <div>Registered Capital</div>
+                <div th:text="${advanced['registered.capital']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${factory.entRegFeeType}+${factory.entRegFee}"></div>
             </div>
         </div>
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
             <div class="am-hide-sm-only am-padding type-hover">
-                <div>Highest Annual Export (USD)</div>
+                <div th:text="${advanced['highest.annual.export.usd']}"></div>
                 <div class="am-text-xl am-text-bold" th:text="${'$'+brand.maxAnnExp}"></div>
-                <div>Professional Experience</div>
+                <div th:text="${advanced['professional.experience']}"></div>
                 <div class="am-text-xl am-text-bold" th:text="${brand.regYears + '  years'} "></div>
-                <div>Offce Address</div>
+                <div th:text="${advanced['office.address']}"></div>
                 <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${factory.eOffAddr}"></div>
             </div>
             <div class="am-show-sm-only am-padding type-hover">
-                <div>Highest Annual Export (USD)</div>
+                <div th:text="${advanced['highest.annual.export.usd']}"></div>
                 <div class="am-text-bold" th:text="${'$'+brand.maxAnnExp}"></div>
-                <div>Professional Experience</div>
+                <div th:text="${advanced['professional.experience']}"></div>
                 <div class="am-text-bold" th:text="${brand.regYears + '  years'} "></div>
-                <div>Offce Address</div>
+                <div th:text="${advanced['office.address']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${factory.eOffAddr}"></div>
             </div>
 
@@ -177,10 +185,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold">Certifcations</span>
+                <span class="am-text-xl am-text-bold" th:text="${advanced['certifcations']}"></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold">Certifcations</span>
+                <span class="am-text-lg am-text-bold" th:text="${advanced['certifcations']}"></span>
             </div>
 
         </div>
@@ -218,10 +226,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold">Members</span>
+                <span class="am-text-xl am-text-bold" th:text="${advanced['members']}"></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold">Members</span>
+                <span class="am-text-lg am-text-bold" th:text="${advanced['members']}"></span>
             </div>
 
         </div>
@@ -250,8 +258,7 @@
                 </div>
                 <div class="am-text-center am-padding-top-xs">
                     <button type="button" class="am-btn am-round" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }"
-                            style="background-color: #FFFFFF;color: #FFFFFF;width: 80%;border: 1px solid var(--theme-wone);color: var(--theme-wone);height: 40px;">
-                        Chat
+                            style="background-color: #FFFFFF;color: #FFFFFF;width: 80%;border: 1px solid var(--theme-wone);color: var(--theme-wone);height: 40px;"  th:text="${advanced['chat.now']}">
                     </button>
                 </div>
             </div>
@@ -281,10 +288,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold">Organization Structure</span>
+                <span class="am-text-xl am-text-bold" th:text="${advanced['organization.structure']}"></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold">Organization Structure</span>
+                <span class="am-text-lg am-text-bold" th:text="${advanced['organization.structure']}"></span>
             </div>
 
         </div>
@@ -295,13 +302,13 @@
             <tbody>
             <tr>
                 <td class="am-text-center am-text-bold am-text-lg">
-                    <div class="am-margin-sm">
-                        Shareholder Names
+                    <div class="am-margin-sm" th:text="${advanced['shareholder.names']}">
+
                     </div>
                 </td>
                 <td class="am-text-center am-text-bold am-text-lg">
-                    <div class="am-margin-sm">
-                        Shareholding Percentage
+                    <div class="am-margin-sm" th:text="${advanced['shareholding.percentage']}">
+
                     </div>
                 </td>
             </tr>
@@ -372,7 +379,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='about')"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

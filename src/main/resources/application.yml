@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
   servlet:
     context-path: /
   tomcat:
@@ -27,9 +27,11 @@ spring:
 
 
 brand:
-  domain:   #品牌商申请的域名
+  languages: en,fr,pl,et,bn,id,uk,cs,kn,gl,pa,sv,pt,no,ar,ku,hr,fi,eu,vi,tr,sw,ja,is,lv,nl,de,fa,hi,it,hy,es,te,eo,ka,ru,uz,sl,ca,bg,hu,el,he,sr,ps,ne,kk,az,af,ms,la,ko,mk,mt,tl,ur,ta,si,ha,da,ga,ceb,fil,th
+  domain: www.test-static.com  #品牌商申请的域名
   static-output: ./static-output  #静态文件生成目录，也是Nginx配置的静态目录
   scheduler-enable: true #定时任务开启
   execute-on-start: true #启动时执行页面静态化
+  domain-list:
 
 

@@ -10,9 +10,38 @@
                             <li class="am-dropdown" data-am-dropdown>
                                 <a title="English" aria-hidden="false" aria-label="English" style="color: var(--theme-menu-font-color) !important;">
                                     <span class="p-icon-a-104"></span>
-                                    <span class="am-padding-right">English</span>
+                                    <span class="am-padding-right" th:text="${langName}">English</span>
                                 </a>
+                                <ul class="sub-menu am-text-sm">
+                                    <li class="menu-item">
 
+                                        <nav class="" style="width: 100%;height: auto; max-height: 200px;overflow-y: scroll;">
+                                            <ul class="am-menu-nav am-avg-sm-1" style="background-color: var(--theme-header-bg)">
+                                                <li class="am-parent" th:each="item : ${langList}">
+                                                    <!-- 有后缀的情况 -->
+                                                    <a th:if="${suffix != null}"
+                                                       th:href="${item.lang == 'en'} ?
+                                                        ('/' + ${pageName} + ${suffix}) :
+                                                        ('/' + ${item.lang} + '/' + ${pageName} + ${suffix})"
+                                                       th:text="${item.langName}"
+                                                       th:title="${item.langName}"
+                                                       th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                    </a>
+                                                    <!-- 无后缀的情况 -->
+                                                    <a th:unless="${suffix != null}"
+                                                       th:href="${item.lang == 'en'} ?
+                                                        ('/' + ${pageName}) :
+                                                        ('/' + ${item.lang} + '/' + ${pageName})"
+                                                       th:text="${item.langName}"
+                                                       th:title="${item.langName}"
+                                                       th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+
+                                    </li>
+                                </ul>
                             </li>
 
                             <li>
@@ -34,19 +63,19 @@
         <div class="fl">
             <div>
                 <nav class="am-fl" style="margin-top: -5px;">
-                    <a class="am-fl am-padding-right" href="/" rel="nofollow">
+                    <a class="am-fl am-padding-right" th:href="${currentPathLang} + '/Home'" rel="nofollow">
                         <img th:alt="${prodBrand.name}" th:src="${prodBrand.icon}"
                              class="logo-square">
                     </a>
                     <ul class="m-nav am-nav am-nav-pills am-fl" style="margin-top: 10px;">
                         <li th:each="navItem : ${topNavPages.?[pageType == 1]}"
                             th:class="${navItem.pageName == pageName ? 'nav-hover' : ''}">
-                            <a th:title="${navItem.pageName}" aria-hidden="false" th:aria-label="${navItem.pageName}" th:href="'/' + ${navItem.pageName}" th:text="${navItem.pageName}"></a>
+                            <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang} + '/' + ${navItem.pageName}" th:text="${navItem.i18nName}"></a>
                         </li>
 
                         <li th:each="navItem : ${topNavPages.?[pageType != 1]}"
                             th:class="${navItem.pageName == pageName ? 'nav-hover' : ''}">
-                            <a th:title="${navItem.pageName}" aria-hidden="false" th:aria-label="${navItem.pageName}" th:href="'/' + ${navItem.pageName}" th:text="${navItem.pageName}"></a>
+                            <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang} + '/' + ${navItem.pageName}" th:text="${navItem.i18nName}"></a>
                         </li>
 
                     </ul>
@@ -59,9 +88,9 @@
                 <a title="Search" aria-hidden="false" aria-label="Search" class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;" rel="nofollow" data-am-modal="{target: '#search-modal', closeViaDimmer: 0, }">
                     <span class="tn-icon-search am-text-lg"></span>
                 </a>
-                <a title="Download the app" aria-hidden="false" aria-label="Download the app" class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;" rel="nofollow" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+                <a th:title="${advanced['download.the.app']}" aria-hidden="false" th:aria-label="${advanced['download.the.app']}" class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;" rel="nofollow" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
                     <span class="tn-icon-download am-text-lg"></span>
-                    <span class="am-hide-md-only am-padding-left-sm">Download the app</span>
+                    <span class="am-hide-md-only am-padding-left-sm" th:text="${advanced['download.the.app']}"></span>
                 </a>
             </div>
 

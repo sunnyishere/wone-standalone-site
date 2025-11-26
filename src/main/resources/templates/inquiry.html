@@ -1,45 +1,46 @@
 <div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-1" th:fragment="inquiry">
     <div class="am-modal-dialog" style="border-radius: 12px;">
-        <div class="am-modal-hd am-padding-xl am-text-xl">Inquiry
+        <div class="am-modal-hd am-padding-xl am-text-xl">
+            <span th:text="${advanced['send.inquiry']}"></span>
             <div href="javascript: void(0)" class="am-close am-close-spin tn-icon-close am-margin"
                style="color: var(--theme-wone);" data-am-modal-close></div>
         </div>
         <form class="am-form am-form-horizontal am-padding-bottom-lg am-padding-top-lg">
             <input type="hidden" id="input-biz-id" name="bizId">
             <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label">Your Name</label>
+                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.name']}"></label>
                 <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-name" class="" placeholder="Your Name:">
+                    <input type="text" id="input-name" class="" th:placeholder="${advanced['your.name']}">
                 </div>
             </div>
             <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label">Your Phone</label>
+                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.phone']}"></label>
                 <div class="am-u-sm-7 am-u-md-9">
-                    <input type="number" id="input-phone" class="" placeholder="Your Phone:">
+                    <input type="number" id="input-phone" class="" th:placeholder="${advanced['your.phone']}">
                 </div>
             </div>
             <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label">Your Email </label>
+                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.email']}"></label>
                 <div class="am-u-sm-7 am-u-md-9">
-                    <input type="email" id="input-email" class="" placeholder="Your Email :">
+                    <input type="email" id="input-email" class="" th:placeholder="${advanced['your.email']}">
                 </div>
             </div>
             <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label">Your Country</label>
+                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.country']}"></label>
                 <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-country" class="" placeholder="Your Country:">
+                    <input type="text" id="input-country" class="" th:placeholder="${advanced['your.country']}">
                 </div>
             </div>
             <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label">Your Message</label>
+                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.message']}"></label>
                 <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-message" class="" placeholder="Your Message:">
+                    <input type="text" id="input-message" class="" th:placeholder="${advanced['your.message']}">
                 </div>
             </div>
             <div class="am-form-group am-padding-top-lg">
                 <button type="button" class="am-btn am-btn-default am-round am-margin-sm"
-                        style="background-color: var(--theme-wone) !important;color: #FFFFFF;width: 90%;max-width: 300px;height: 46px;">
-                    Send Now
+                        style="background-color: var(--theme-wone) !important;color: #FFFFFF;width: 90%;max-width: 300px;height: 46px;" th:text="${advanced['send.now']}">
+
                 </button>
             </div>
 
@@ -51,7 +52,8 @@
 
 <div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-3" th:fragment="inquiry">
     <div class="am-modal-dialog" style="border-radius: 12px;">
-        <div class="am-modal-hd am-padding-xl am-text-xl">Download
+        <div class="am-modal-hd am-padding-xl am-text-xl">
+            <span th:text="${advanced['download']}"></span>
             <div href="javascript: void(0)" class="am-close am-close-spin tn-icon-close am-margin"
                style="color: var(--theme-wone);" data-am-modal-close></div>
         </div>
@@ -118,17 +120,16 @@
 
 <div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-2" th:fragment="inquiry">
     <div class="am-modal-dialog" style="border-radius: 12px;">
-        <div class="am-modal-hd am-padding-xl am-text-xl">Download
+        <div class="am-modal-hd am-padding-xl am-text-xl">
+            <span th:text="${advanced['download']}"></span>
             <div class="am-close am-close-spin tn-icon-close am-margin" style="color: #F75755;"
                  data-am-modal-close></div>
         </div>
         <div class="am-modal-bd am-margin" style="max-height: 70vh;overflow-y: scroll;">
-            <div class="am-text-bold am-text-left">Get the IEE Business Application
+            <div class="am-text-bold am-text-left"  th:text="${advanced['app.download.title']}">
             </div>
-            <div class="am-text-left am-margin-top">
-                Use the IEE-Business app to find equipment, obtain solutions, connect with experts, and participate in
-                industry collaboration anytime, anywhere—fully supporting the development of your power projects and
-                business.
+            <div class="am-text-left am-margin-top"  th:text="${advanced['app.description.repeat']}">
+
             </div>
 
             <div class="am-container">

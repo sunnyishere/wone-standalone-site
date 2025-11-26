@@ -1,6 +1,15 @@
 package com.rockwill.deploy.utils;
 
 
+import com.rockwill.deploy.conf.ApplicationContextHolder;
+import com.rockwill.deploy.conf.BrandConfig;
+import com.rockwill.deploy.vo.SitePage;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.util.ObjectUtils;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,6 +20,7 @@ import java.util.stream.Collectors;
  */
 public class PathMatchUtils {
     private static final List<PathPattern> patterns = new ArrayList<>();
+    private static final List<String> SUPPORTED_LANGS = loadSupportedLangs();
 
     // 初始化正则表达式模式，对应nginx的location规则
     static {
@@ -50,7 +60,7 @@ public class PathMatchUtils {
 
         // 带页码菜单 /menuName-pageNum
         patterns.add(new PathPattern(
-                Pattern.compile("^/(?<menuName>[a-zA-Z0-9_%\\-]+)-(?<pageNum>\\d+)$"),
+                Pattern.compile("^/(?<menuName>[a-zA-Z0-9_%.\\-]+)-(?<pageNum>\\d+)$"),
                 PathPatternType.MENU_WITH_PAGE
         ));
 
@@ -72,21 +82,39 @@ public class PathMatchUtils {
         }
     }
 
+    private static List<String> loadSupportedLangs() {
+        BrandConfig appConfig = ApplicationContextHolder.getBean(BrandConfig.class);
+        return new ArrayList<>(appConfig.getLanguages());
+    }
+
     public static MatchResult matchResult(String path) {
         MatchResult matchResult = new MatchResult();
-        if (path.equals("/") || path.equals("/Home")) {
+        String normalizedPath = path;
+        String lang = "";
+        for (String sLang : SUPPORTED_LANGS) {
+            if (normalizedPath.startsWith("/" + sLang)) {
+                lang = sLang;
+                normalizedPath=normalizedPath.substring(sLang.length()+1);
+                break;
+            }
+        }
+        if (normalizedPath.equals("/") || normalizedPath.equals("/Home")) {
             matchResult.setPatternType(PathPatternType.DEFAULT);
-            matchResult.setForwardTarget("/");
+            if (ObjectUtils.isEmpty(lang)){
+                matchResult.setForwardTarget("/");
+            }else{
+                matchResult.setForwardTarget("/home?lang=" + lang);
+            }
             return matchResult;
         }
         //搜索时直接转发请求
-        if (path.startsWith("/search-")) {
+        if (normalizedPath.startsWith("/search-")) {
             matchResult.setPatternType(PathPatternType.MENU_WITHOUT_PAGE);
-            matchResult.setForwardTarget(PathPatternType.MENU_WITHOUT_PAGE.getForwardTarget()+"?name="+path.substring(1));
+            matchResult.setForwardTarget(PathPatternType.MENU_WITHOUT_PAGE.getForwardTarget() + "?name=" + normalizedPath.substring(1));
             return matchResult;
         }
         for (PathPattern pattern : patterns) {
-            Matcher matcher = pattern.regex.matcher(path);
+            Matcher matcher = pattern.regex.matcher(normalizedPath);
             if (matcher.matches()) {
                 matchResult.setPatternType(pattern.type);
                 Map<String, String> params = extractNamedGroups(matcher);
@@ -95,6 +123,24 @@ public class PathMatchUtils {
                     if (!params.containsKey("pageNum")) {
                         params.put("pageNum", "1");
                     }
+                }
+                if (pattern.type == PathPatternType.MULTI_LEVEL) {
+                    String id = params.get("id");
+                    if (!id.startsWith("series") && !NumberUtils.isCreatable(id)) {
+                        matchResult.setIllegal(true);
+                    }
+                }
+                if (params.get("menuName") != null) {
+                    Optional<SitePage> optional = SiteMenuUtils.getMenuPages().stream()
+                            .filter(sitePage -> sitePage.getPageName().toLowerCase()
+                                    .equals(params.get("menuName")))
+                            .findAny();
+                    if (optional.isPresent()) {
+                        matchResult.setIllegal(true);
+                    }
+                }
+                if (!ObjectUtils.isEmpty(lang)) {
+                    params.put("lang", lang);
                 }
                 String target = pattern.type.getForwardTarget() + "?" + buildGetParams(params);
                 if (target.endsWith("?")) {
@@ -139,24 +185,11 @@ public class PathMatchUtils {
         return params;
     }
 
+    @Data
     public static class MatchResult {
         PathPatternType patternType;
         String forwardTarget;
+        Boolean illegal=false;
 
-        public PathPatternType getPatternType() {
-            return patternType;
-        }
-
-        public void setPatternType(PathPatternType patternType) {
-            this.patternType = patternType;
-        }
-
-        public String getForwardTarget() {
-            return forwardTarget;
-        }
-
-        public void setForwardTarget(String forwardTarget) {
-            this.forwardTarget = forwardTarget;
-        }
     }
 }

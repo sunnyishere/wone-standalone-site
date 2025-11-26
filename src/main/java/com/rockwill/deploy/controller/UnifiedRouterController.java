@@ -9,6 +9,7 @@ import com.rockwill.deploy.vo.DomainHtmlVo;
 import com.rockwill.deploy.vo.SitePage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
@@ -63,7 +64,13 @@ public class UnifiedRouterController {
 
     @RequestMapping(value = "/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> routeRequest(HttpServletRequest request) throws IOException {
-        String realUri = request.getAttribute("X-Original-URI").toString();
+        String realUri = "";
+        if (request.getAttribute("X-Original-URI") != null) {
+            realUri = request.getAttribute("X-Original-URI").toString();
+        } else {
+            realUri = request.getHeader("X-Original-URI");
+        }
+        String host = request.getHeader("Host");
         log.info("request url : {}", realUri);
         Object patternType = request.getAttribute("patternType");
         Object forwardTarget = request.getAttribute("forwardTarget");
@@ -85,7 +92,7 @@ public class UnifiedRouterController {
             case CATEGORY_WITH_ID:
             case MENU_WITH_PAGE:
             case SEARCH:
-                domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString());
+                domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString(),host);
                 break;
             case DEFAULT:
             default:
@@ -104,10 +111,9 @@ public class UnifiedRouterController {
         //静态化未存储，及时保存html文件
         if (!realUri.startsWith("/search")) {
             String savePrefix = realUri.substring(1);
-            staticPageService.saveHtml(savePrefix, domainHtmlVo.getHtmlContent());
+            staticPageService.saveHtml(host,savePrefix, domainHtmlVo.getHtmlContent());
         }
         return new ResponseEntity<>(domainHtmlVo.getHtmlContent(), headers, HttpStatus.OK);
     }
-
 
 }

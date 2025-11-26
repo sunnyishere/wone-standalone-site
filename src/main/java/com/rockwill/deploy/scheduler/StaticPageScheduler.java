@@ -3,8 +3,6 @@ package com.rockwill.deploy.scheduler;
 import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.service.StaticPageService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,11 +31,17 @@ public class StaticPageScheduler {
             log.warn("Static page scheduled tasks are disabled and will be skipped.");
             return;
         }
+        String domain = brandConfig.getDomain();
         try {
-            log.info("Scheduled task trigger: Start generating all static pages, sites: {}", brandConfig.getDomain());
-            staticPageService.generateAllPages();
+            log.info("Scheduled task trigger: Start generating all static pages, sites: {}", domain);
+            staticPageService.generateAllPages(domain);
         } catch (Exception e) {
-            log.error("Scheduled task execution exception,site: {}", brandConfig.getDomain(), e);
+            log.error("Scheduled task execution exception,site: {}", domain, e);
+        }
+        if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
+            for (String otherDomain : brandConfig.getDomainList()) {
+                staticPageService.generateAllPages(otherDomain);
+            }
         }
     }
 }

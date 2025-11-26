@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
@@ -7,12 +7,12 @@
     <title th:text="${pageTitle}"></title>
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
-    <link rel="canonical" th:href="${websitePath + pageName + '-' + (pageData?.pageNum ?: 1)}"/>
+    <link rel="canonical" th:href="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}"/>
     <meta property="og:title" th:content="${title}"/>
     <meta property="og:description" th:content="${description}"/>
-    <meta property="og:url" th:content="${websitePath + pageName + '-' + (pageData?.pageNum ?: 1)}"/>
+    <meta property="og:url" th:content="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -49,7 +49,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -57,8 +57,8 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home"  aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
-            <li><a th:text="${pageName}" th:href="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}"  aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
 </nav>
@@ -76,17 +76,21 @@
             <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                 th:if="${not #lists.isEmpty(pageData.rows)}"
                 th:each="index : ${pageData.rows}">
-                <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
-           '/' :
-           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
-           ${index.id}">
+                <a th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
+                   th:href="
+                   ${currentPathLang} +
+                   (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+                   '/' :
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
+                   ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+                   ${index.id}"
+                >
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">
                             <img th:alt="${index.title}" th:src="${index.iconUrl}" alt="" class="image-square">
                         </div>
                         <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
-                            <div th:text="${index.title}"></div>
+                            <div th:text="${index.i18nTitle}"></div>
                         </div>
                         <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm" th:text="${index.content}"></span>
                         <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
@@ -132,7 +136,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='Success Reference')"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

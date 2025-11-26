@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +8,7 @@
     <meta name="description" th:content="${prod.description} ?: ''"/>
 
     <!-- Canonical URL -->
-    <link rel="canonical" th:href="${websitePath} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '' :
            ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
             'detail/'+
@@ -23,14 +23,14 @@
     <!-- Open Graph -->
     <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta property="og:description" th:content="${prod.description}"/>
-    <meta property="og:url" th:content="${websitePath} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+    <meta property="og:url" th:content="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '' :
            ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
             'detail/'+
            ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
            '-'+${prod.id}"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <!-- Twitter Card -->
@@ -77,7 +77,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -85,27 +85,30 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
-            <li><a th:href="'/'+${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}">Products</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
+            <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
             <li th:if="${category1 != null}">
-                <a th:title="${category1.name}" aria-hidden="false" th:aria-label="${category1.name}" th:href="${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
+                <a th:title="${category1.i18nName}" aria-hidden="false" th:aria-label="${category1.i18nName}" th:href="
+                ${currentPathLang} +
+                ${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
                     #strings.replace(#strings.trim(category1.name), ' ', '-') +
                     '-' + category1.id}"
-                   th:text="${category1.name}">Sub Category</a>
+                   th:text="${category1.i18nName}">Sub Category</a>
             </li>
             <li th:if="${category2 != null}">
-                <a th:title="${category2.name}" aria-hidden="false" th:aria-label="${category2.name}" th:href="${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
+                <a th:title="${category2.i18nName}" aria-hidden="false" th:aria-label="${category2.i18nName}"
+                   th:href="${currentPathLang} + ${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
                     '/' :
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
                     #strings.replace(#strings.trim(category2.name), ' ', '-') +
                     '-' + category2.id}"
-                   th:text="${category2.name}">Sub Category</a>
+                   th:text="${category2.i18nName}">Sub Category</a>
             </li>
         </ol>
     </div>
@@ -164,18 +167,19 @@
                     <div class="" style="border-bottom: 1px solid #E6E6E6;padding-bottom: 10px;">
                         <div class="am-text-lg am-text-bold border-active">
                             <a class="am-margin-right-lg" data-offset="240" href="#target1"
-                               onclick="scrollToTarget(event)">Attributes</a>
+                               onclick="scrollToTarget(event)" th:text="${advanced['attributes']}">Attributes</a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target2"
-                               onclick="scrollToTarget(event)">Description</a>
+                               onclick="scrollToTarget(event)" th:text="${advanced['description']}">Description</a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target4"
-                               onclick="scrollToTarget(event)">Documentation Resource Library</a>
+                               onclick="scrollToTarget(event)"  th:text="${advanced['documentation.library']}">Documentation Resource Library</a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 定位1 -->
-            <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg">
+            <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg"
+                 th:text="${advanced['key.attributes']}">
                 Key attributes
             </div>
 
@@ -183,7 +187,7 @@
                 <table class="am-table am-padding-top-sm">
                     <tbody>
                     <tr>
-                        <td style="background-color: #F9F9F9; width: 45%;">Brand</td>
+                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['brand']}">Brand</td>
                         <td style="width: 55%;">
                             <a  aria-hidden="false"
                                th:aria-label="${brand.name}"
@@ -194,7 +198,7 @@
                     </tr>
 
                     <tr th:if="${model != null}">
-                        <td style="background-color: #F9F9F9; width: 45%;">Model NO.</td>
+                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['model.no']}">Model NO.</td>
                         <td style="width: 55%;" th:text="${model.name}">Model Name</td>
                     </tr>
 
@@ -204,7 +208,7 @@
                     </tr>
 
                     <tr>
-                        <td style="background-color: #F9F9F9; width: 45%;">Series</td>
+                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['series']}">Series</td>
                         <td style="width: 55%;" th:text="${prod.series}">Series Name</td>
                     </tr>
                     <th:block th:if="${customProps != null and !customProps.isEmpty()}">
@@ -217,10 +221,11 @@
                 </table>
             </div>
 
-            <div class="dd-clamp-text-2 am-text-bold am-text-lg am-margin-bottom-lg">
+            <div class="dd-clamp-text-2 am-text-bold am-text-lg am-margin-bottom-lg"
+                 th:text="${advanced['product.descriptions.supplier']}">
                 Product descriptions from the supplier
             </div>
-            <span id="target2" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px;">
+            <span id="target2" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px;" th:text="${advanced['description']}">
             Description
             </span>
             <div id="editor" class="am-margin-bottom"
@@ -231,7 +236,7 @@
 
             <!-- 文档资源库 -->
             <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}">
-                <span id="target4" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
+                <span id="target4" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px" th:text="${advanced['documentation.library']}">
                     Documentation Resource Library
                 </span>
 
@@ -250,11 +255,11 @@
                                     <div class="PC-76">
                                         <div th:if="${item.isShow == 1}" style="color: #07C160;">
                                             <span class="p-icon-a-0012"></span>
-                                            <span>Public.</span>
+                                            <span th:text="${advanced['public']} + '.'">Public.</span>
                                         </div>
                                         <div th:if="${item.isShow == 0}" style="color: #F75755;">
                                             <span class="p-icon-a-0022"></span>
-                                            <span>Restricted.</span>
+                                            <span th:text="${advanced['restricted']} + '.'">Restricted.</span>
                                         </div>
 
                                         <div class="dd-clamp-text-2 am-text-lg" th:text="${item.name}">文档名称</div>
@@ -328,7 +333,7 @@
                                                         data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
                                                         th:data-biz-id="'documents-'+${item.id}"
                                                         style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
-                                                    <span>Consulting</span>
+                                                    <span th:text="${advanced['consulting']}">Consulting</span>
                                                     <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                                 </div>
                                             </div>
@@ -377,7 +382,7 @@
                                          data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
                                          th:data-biz-id="'documents-'+${item.id}"
                                          style="margin-bottom: 10px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
-                                        <span>Consulting</span>
+                                        <span  th:text="${advanced['consulting']}">Consulting</span>
                                         <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                     </div>
                                 </div>
@@ -390,7 +395,8 @@
 
             <!-- 证书 -->
             <div th:if="${prCercateList != null and #lists.size(prCercateList) > 0}">
-                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
+                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px"
+                      th:text="${advanced['certifications']}">
                     Certifications
                 </span>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0 0 0;">
@@ -438,7 +444,7 @@
                 <div style="border-bottom: 1px solid #E6E6E6;padding-bottom: 15px;">
                     <div>
                         <span class="am-text-xl am-text-bold" style="color: #F75755;"></span>
-                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;" th:text="${userPrice}"></span>
+                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;" th:text="${(userPrice != null && userPrice != '$Negotiable') ? userPrice : advanced['negotiable']}"></span>
                     </div>
                     <div class="am-padding-top-sm">
                         <!-- 条件判断：显示公式名称或默认文本 -->
@@ -455,7 +461,7 @@
                         </th:block>
                         <th:block th:unless="${formula != null}">
                             <span class="p-icon-a-106" style="color: #07C160;"></span>
-                            <span class="am-text-bold">Pricing calculator</span>
+                            <span class="am-text-bold" th:text="${advanced['pricing.calculator']}">Pricing calculator</span>
                         </th:block>
                     </div>
                 </div>
@@ -465,7 +471,7 @@
                 <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
                     <div class="am-g">
                         <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
-                            <span>Model</span>
+                            <span th:text="${advanced['model']}">Model</span>
                         </div>
                         <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
                             <!-- 循环遍历型号列表 -->
@@ -477,7 +483,11 @@
                                         <a aria-hidden="false"
                                            th:aria-label="${item.modelName}"
                                            th:title="${item.modelName}"
-                                           th:href="|${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' : ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/')}${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-'))}-${item.prodId}-series${item.id}|"
+                                           th:href="${currentPathLang +
+         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
+           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
+         #strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-')) +
+         '-' + item.prodId + '-series' + item.id}"
                                            th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
                                             <div style="padding: 10px 20px;">
                                                 <span th:text="${item.modelName}"></span>
@@ -564,7 +574,7 @@
                            th:data-biz-id="'prods-'+${prod.id}"
                         >
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;">
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
                                 Send inquiry
                             </button>
                         </a>
@@ -573,7 +583,7 @@
                            title="Chat now"
                            data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;">
+                                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
                                 Chat now
                             </button>
                         </a>
@@ -590,14 +600,14 @@
                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
                            th:data-biz-id="'prods-'+${prod.id}">
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;">
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
                                 Send inquiry
                             </button>
                         </a>
                         <button type="button"
                                 class="am-btn am-round am-margin-sm"
                                 onclick="downloadAppHandler()"
-                                style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;">
+                                style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
                             Chat now
                         </button>
                     </div>
@@ -605,18 +615,20 @@
 
                 <!-- 保修信息 -->
                 <div class="am-text-bold am-padding-top" style="color: #1D1D1F;">
-                    <span>Warranty by</span>
+                    <span th:text="${advanced['warranty.by']}">Warranty by</span>
                 </div>
                 <div class="dd-clamp-text-2 am-padding-top-sm">
                     <span class="p-icon-a-087 am-padding-right-xs" style="color: #FFB400;"></span>
-                    <span class="am-text-bold" style="color: #07C160;">Whole life care manager</span>
+                    <span class="am-text-bold" style="color: #07C160;" th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
                 </div>
-                <div class="am-padding-left-lg am-padding-top-sm" style="color: #1D1D1F;">
+                <div class="am-padding-left-lg am-padding-top-sm" style="color: #1D1D1F;"
+                     th:text="${advanced['prod.detail.company.overview.one']}">
                     Whole-life care management services for equipment procurement, use, maintenance, and after-sales, ensuring safe operation of electrical equipment, continuous control, and worry-free electricity consumption.
                 </div>
 
                 <!-- 供应商认证信息 -->
-                <div style="background-color: #F8F8F8;border-radius: 10px;padding: 15px 25px;color: #767676;margin-top: 15px;">
+                <div style="background-color: #F8F8F8;border-radius: 10px;padding: 15px 25px;color: #767676;margin-top: 15px;"
+                     th:text="${advanced['prod.detail.company.overview.two']}">
                     The equipment supplier has passed platform qualification certification and technical evaluation, ensuring compliance, professionalism, and reliability from the source.
                 </div>
             </div>
@@ -630,15 +642,19 @@
 
             <!-- Related Products -->
             <div th:if="${prodOther != null and #lists.size(prodOther) > 0}" class="am-g am-margin-top-xl">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
+                     th:text="${advanced['related.products']}">
                     Related Products
                 </div>
                 <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
                     <div th:with="pageName=${topNavPages.?[pageType == 2][0]?.pageName}">
-                        <a title="More" aria-hidden="false" aria-label="More" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
+                        <a title="More" aria-hidden="false" aria-label="More"
+                           th:href="
+                           ${currentPathLang} +
+                        (${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) }}">
-                            <span style="color: #5C779F;text-decoration: underline;">More</span>
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) })">
+                            <span style="color: #5C779F;text-decoration: underline;" th:text="${advanced['more']}">More</span>
                             <span class="p-icon-a-067 am-padding-left-sm" style="color: #5C779F"></span>
                         </a>
                     </div>
@@ -653,9 +669,11 @@
                         <li class="dd-hover4" th:each="prod : ${prodOther}"
                             style="background-color: #FFFFFF !important;">
                             <a aria-hidden="false"
-                               th:aria-label="${prod.name}"
-                               th:title="${prod.name}"
-                               th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                               th:aria-label="${prod.i18nName}"
+                               th:title="${prod.i18nName}"
+                               th:href="
+                               ${currentPathLang} +
+                               (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
@@ -664,10 +682,10 @@
                                style="border: none">
                                 <div style="padding: 0 15px 0 0; border-radius: 12px;">
                                     <div class="image-box" style="border: 1px solid #E9E9E9;">
-                                        <img th:src="${prod.url}" th:alt="${prod.name}" class="image-square"
+                                        <img th:src="${prod.url}" th:alt="${prod.i18nName}" class="image-square"
                                              style="object-fit: cover;">
                                     </div>
-                                    <span class="dd-clamp-text-1 am-padding-top am-text-sm" th:text="${prod.name}">Product Name</span>
+                                    <span class="dd-clamp-text-1 am-padding-top am-text-sm" th:text="${prod.i18nName}">Product Name</span>
                                 </div>
                             </a>
                         </li>
@@ -677,14 +695,18 @@
 
 
             <div class="am-g">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
-                    Related Solutions
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
+                     th:text="${advanced['related.solutions']}">
+
                 </div>
                 <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
-                    <a title="More" aria-hidden="false" aria-label="More" th:href="@{${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                    <a th:title="${advanced['more']}" aria-hidden="false" :aria-label="${advanced['more']}"
+                       th:href="
+                    ${currentPathLang} +
+                    (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
                  '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) }}">
-                        <span style="color: #5C779F;text-decoration: underline;">More</span>
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
+                        <span style="color: #5C779F;text-decoration: underline;" th:text="${advanced['more']}">More</span>
                         <span class="p-icon-a-067  am-padding-left-sm" style="color: #5C779F"></span>
                     </a>
                 </div>
@@ -694,7 +716,9 @@
                 <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-3 am-thumbnails phone-clear-padding">
                     <li class="" style="padding: 0 8px 20px 8px !important;"
                         th:each="item : ${knowList}">
-                        <a th:href="(${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+                        <a th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
            ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
@@ -709,7 +733,7 @@
                                             </div>
                                         </div>
                                         <div class="am-padding-right" style="height: 100px;">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${item.title}"></div>
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${item.i18nTitle}"></div>
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                                  th:text="${item.content}"></div>
                                             <div class="am-padding-top-xs am-cf am-text-sm">
@@ -732,6 +756,29 @@
             </div>
         </div>
     </div>
+
+    <div class="am-hide-lg-only"
+         style="position: fixed;bottom: 0; left : 0; right: 0; height: auto; width: 100%;background: #fff;">
+        <div class="am-text-center am-padding-top">
+            <a aria-hidden="false"
+               aria-label="Send inquiry"
+               title="Send inquiry"
+               data-trigger="modal-1"
+               data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+               th:data-biz-id="'prods-'+${prod.id}">
+                <button type="button" class="am-btn am-round am-margin-sm"
+                        style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
+                    Send inquiry
+                </button>
+            </a>
+            <button type="button"
+                    class="am-btn am-round am-margin-sm"
+                    onclick="downloadAppHandler()"
+                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
+                Chat now
+            </button>
+        </div>
+    </div>
 </div>
     <!-- 搜索弹窗-->
     <th:block th:replace="search :: search"></th:block>
@@ -743,8 +790,7 @@
     <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
 
     <!-- app端显示的下载按钮 -->
-    <th:block th:replace="phone-down :: phone-down"></th:block>
-
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
     <!-- 底部导航   -->
     <th:block th:replace="footer :: footer"></th:block>
 

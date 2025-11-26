@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang}">
 
 <head>
     <meta charset="utf-8">
@@ -10,11 +10,11 @@
     <!-- Open Graph 标签 -->
     <meta property="og:title"  th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${description}"/>
-    <link rel="canonical" th:href="${websitePath + pageName + '-' + (pageData?.pageNum ?: 1)}" />
+    <link rel="canonical" th:href="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}" />
     <meta property="og:url"
-          th:content="${websitePath + pageName + '-' + (pageData?.pageNum ?: 1)}" />
+          th:content="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}" />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" th:content="en_US" />
+    <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -50,7 +50,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h2 th:text="${i18nName}"></h2>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -58,8 +58,8 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
-            <li><a th:text="${pageName}" th:href="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
 </nav>
@@ -78,7 +78,7 @@
             <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
                  th:if="${not #lists.isEmpty(pageData.rows)}"
                  th:each="index : ${pageData.rows}">
-                <a th:href="${
+                <a th:href="${currentPathLang} + ${
     (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
         '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
     ) +
@@ -98,7 +98,7 @@
                                     </div>
                                 </div>
                                 <div class="" style="height: 100px;">
-                                    <div class="dd-clamp-text-1 am-text-bold" th:text="${index.title}"></div>
+                                    <div class="dd-clamp-text-1 am-text-bold" th:text="${index.i18nTitle}"></div>
                                     <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                          th:text="${index.content}">
                                     </div>
@@ -174,7 +174,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='Solutions')"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

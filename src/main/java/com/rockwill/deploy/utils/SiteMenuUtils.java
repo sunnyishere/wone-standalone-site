@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 public class SiteMenuUtils {
 
+    private static List<String> langList = new ArrayList<>();
     private static List<SitePage> menuPages = new ArrayList<>();
 
     public static List<SitePage> getMenuPages() {
@@ -20,5 +21,13 @@ public class SiteMenuUtils {
 
     public static List<String> getNameList() {
         return menuPages.stream().map(SitePage::getPageName).collect(Collectors.toList());
+    }
+
+    public static List<String> getLangList() {
+        return langList;
+    }
+
+    public static void setLangList(List<String> langList) {
+        SiteMenuUtils.langList = langList;
     }
 }

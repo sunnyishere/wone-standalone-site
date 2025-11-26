@@ -1,6 +1,7 @@
 <!-- PC端的右侧按钮 -->
 <div th:fragment="right-menu(param1)"
-     style="position: fixed; right: 0px; top: 30vh; background-color: #FFFFFFF2; border-radius: 10px; box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16); z-index: 999;">
+     style="position: fixed; right: 0px; bottom: 15vh; background-color: #FFFFFFF2;
+     border-radius: 10px; box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16); z-index: 1;">
     <!-- 动态遍历 siteMenuWidget 列表 -->
     <div th:each="widget : ${siteMenuWidget}" class="home-hover" style="padding: 8px 10px; text-align: center;">
 
@@ -8,6 +9,8 @@
         <div th:if="${widget.type == 0}">
             <a th:href="'https://wa.me/' + ${widget.details}" target="_blank" title="WhatsApp">
                 <img th:src="${widget.iconUrl}" alt="WhatsApp" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
+                <br>
+                <div style="font-size: 12px">WhatsApp</div>
             </a>
         </div>
 
@@ -22,6 +25,8 @@
             <a th:href="|mailto:${widget.details}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
                title="Email">
                 <img th:src="${widget.iconUrl}" alt="Email" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
+                <br>
+                <div style="font-size: 12px">E-mail</div>
             </a>
         </div>
 
@@ -31,16 +36,18 @@
              th:data-details="${widget.details}">
             <span th:data-biz-id="${param1}"></span>
             <img th:src="${widget.iconUrl}" alt="Chat" style="width: 32px; height: 32px; object-fit: contain; border-radius: 50%;" />
+            <br>
+            <div style="font-size: 12px" th:text="${widget.positions}"></div>
         </div>
     </div>
 
     <!-- Download App (保留原有逻辑) -->
-<!--    <div class="home-hover am-show-sm-only" onclick="downloadAppHandler()" style="padding: 8px 10px; text-align: center;">-->
-<!--        <span class="p-icon-a-04download am-text-xl"></span>-->
-<!--    </div>-->
-<!--    <div class="home-hover am-hide-sm-only" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0}" style="padding: 8px 10px; text-align: center;">-->
-<!--        <span class="p-icon-a-04download am-text-xl"></span>-->
-<!--    </div>-->
+    <!--    <div class="home-hover am-show-sm-only" onclick="downloadAppHandler()" style="padding: 8px 10px; text-align: center;">-->
+    <!--        <span class="p-icon-a-04download am-text-xl"></span>-->
+    <!--    </div>-->
+    <!--    <div class="home-hover am-hide-sm-only" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0}" style="padding: 8px 10px; text-align: center;">-->
+    <!--        <span class="p-icon-a-04download am-text-xl"></span>-->
+    <!--    </div>-->
 
 </div>
 
