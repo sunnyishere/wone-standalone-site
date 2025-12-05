@@ -24,7 +24,7 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
         PathMatchUtils.MatchResult matchResult = PathMatchUtils.matchResult(path);
         if (matchResult.getPatternType() == null
                 || matchResult.getIllegal()) {
-            log.warn("illegal request url : {}", path);
+            log.error("illegal request url : {}", path);
             response.sendRedirect("/");
             return false;
         }
@@ -37,7 +37,7 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
         if (menuName != null && !menuName.isEmpty() && !menuName.get(0).startsWith("search")) {
             boolean isNormalMenu = SiteMenuUtils.getMenuPages().stream().map(SitePage::getPageName).collect(Collectors.toList()).contains(menuName.get(0));
             if (!isNormalMenu) {
-                log.warn("illegal request:{}", path);
+                log.error("illegal request:{}", path);
                 response.sendRedirect("/");
                 return false;
             }

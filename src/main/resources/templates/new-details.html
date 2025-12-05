@@ -82,7 +82,7 @@
             <div class=" am-text-left">
                 <div class="am-padding-top-xs">
                     <a th:title="${news.author}" aria-hidden="false" th:aria-label="${news.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></a>
-                    <a th:title="${news.author}" aria-hidden="false" th:aria-label="${news.author}" style="color:#5C779F;" th:text="${news.author}"></a>
+                    <a th:title="${news.author}" th:href="${brandUrl}" aria-hidden="false" th:aria-label="${news.author}" style="color:#5C779F;" th:text="${news.author}"></a>
                     <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}" class="am-padding-left" style="color:#999999;"
                        th:text="${#dates.format(news.created, 'MM/dd/yyyy')}"></a>
                 </div>
@@ -134,7 +134,10 @@
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
-                                                    <span th:text="${news.author}"></span>
+                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${news.author}" th:title="${news.author}"
+                                                       th:href="${brandUrl}" style="border: none">
+                                                       <span th:text="${news.author}"></span>
+                                                    </a>
                                                 </div>
                                                 <div class="am-fr" style="color:#999999">
                                                     <span th:text="${#dates.format(news.created, 'MM/dd/yyyy')}"></span>

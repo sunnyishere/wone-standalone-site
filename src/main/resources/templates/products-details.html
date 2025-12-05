@@ -192,7 +192,7 @@
                             <a  aria-hidden="false"
                                th:aria-label="${brand.name}"
                                th:title="${brand.name}"
-                               th:href="|/brand/${brand.name.trim().toLowerCase().replace(' ', '-')}-${brand.id}|"
+                                th:href="${brandUrl}"
                                th:text="${brand.name}">Brand Name</a>
                         </td>
                     </tr>
@@ -739,7 +739,10 @@
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%; color: #5C779F;">
                                                     <span class="am-icon-user"></span>
-                                                    <span th:text="${item.author}"></span>
+                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${item.author}" th:title="${item.author}"
+                                                       th:href="${brandUrl}" style="border: none">
+                                                        <span th:text="${item.author}"></span>
+                                                    </a>
                                                 </div>
                                                 <div class="am-fr am-padding-right" style="color: #999999">
                                     <span th:if="${item.created != null}"

@@ -89,7 +89,7 @@ public class StaticPageService {
      */
     public void generateAllPages(String domain) {
         if (ObjectUtils.isEmpty(domain)) {
-            log.warn("需提供独立部署域名配置: brand.domain");
+            log.error("需提供独立部署域名配置: brand.domain");
             return;
         }
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
@@ -142,7 +142,7 @@ public class StaticPageService {
     public void generateMenuAndDetailPage(String lang, String domain) {
         log.info("Start generating menu  html files,site:{},lang:{}", domain, lang);
         if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages())) {
-            log.warn("Failed to request menu data: {}", domain);
+            log.error("Failed to request menu data: {}", domain);
             return;
         }
         List<CompletableFuture<Void>> futures = new ArrayList<>();
@@ -291,7 +291,7 @@ public class StaticPageService {
             cssQuery = "li.dd-hover4 > a";
         }
         if (ObjectUtils.isEmpty(cssQuery)) {
-            log.warn("Currently, only products, news, solutions, and Success Reference are supported for static details.");
+            log.error("Currently, only products, news, solutions, and Success Reference are supported for static details.");
             return;
         }
         List<String> detailUrlList = getDetailLinkFromPage(domainHtmlVo.getHtmlContent(), cssQuery);
@@ -368,7 +368,7 @@ public class StaticPageService {
         try {
             Resource[] resources = resolver.getResources("classpath:/static/**/*");
             if (resources.length == 0) {
-                log.warn("No static resource files were found under classpath:/static/");
+                log.error("No static resource files were found under classpath:/static/");
                 return;
             }
             for (Resource resource : resources) {
@@ -425,7 +425,7 @@ public class StaticPageService {
             }
         }
 
-        log.warn("Unable to resolve relative path to resource: {}", resourceDescription);
+        log.error("Unable to resolve relative path to resource: {}", resourceDescription);
         return null;
     }
 

@@ -96,7 +96,7 @@ public class UnifiedRouterController {
                 break;
             case DEFAULT:
             default:
-                log.warn("Unsupported pattern type,request:{}", realUri);
+                log.error("Unsupported pattern type,request:{}", realUri);
                 return ResponseEntity.status(HttpStatus.FOUND)
                         .location(URI.create("/"))
                         .headers(headers)

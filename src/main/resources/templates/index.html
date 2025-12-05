@@ -389,7 +389,10 @@
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
-                                                    <span th:text="${article.author}"></span>
+                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${article.author}" th:title="${article.author}"
+                                                       th:href="${brandUrl}" style="border: none">
+                                                        <span th:text="${article.author}"></span>
+                                                    </a>
                                                 </div>
                                                 <div class="am-fr" style="color:#999999">
                                                 <span th:if="${article.created != null}"
