@@ -28,7 +28,7 @@ public class StaticPageScheduler {
     @Scheduled(cron = "0 0 2 * * ?")
     public void scheduledGenerateAllPages() {
         if (!brandConfig.getSchedulerEnable()) {
-            log.warn("Static page scheduled tasks are disabled and will be skipped.");
+            log.error("Static page scheduled tasks are disabled and will be skipped.");
             return;
         }
         String domain = brandConfig.getDomain();

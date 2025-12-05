@@ -50,7 +50,7 @@ public class RockwillKnowledgeService {
     @PostConstruct
     public void initUrl() {
         if (devMode.equals("dev")) {
-            wcmApi = "http://192.168.35.22/wcm-api/site/static/";
+            wcmApi = "http://192.168.34.62/wcm-api/site/static/";
         }
     }
 
@@ -87,7 +87,7 @@ public class RockwillKnowledgeService {
                     log.info("lang list:{}", String.join(",", langList));
                     return sitePageList;
                 }
-                log.warn("request resp code:{},msg:{}", ajaxResult.getCode(), ajaxResult.getMsg());
+                log.error("request resp code:{},msg:{}", ajaxResult.getCode(), ajaxResult.getMsg());
             }
 
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class RockwillKnowledgeService {
                         return domainHtmlVo;
                     }
                 } else {
-                    log.warn("request resp code:{},msg:{}", result.getCode(), result.getMsg());
+                    log.error("request resp code:{},msg:{}", result.getCode(), result.getMsg());
                 }
             }
             log.error("request {} error: {}", path, responseEntity.getStatusCode());
@@ -241,5 +241,4 @@ public class RockwillKnowledgeService {
             return "";
         }
     }
-
 }
