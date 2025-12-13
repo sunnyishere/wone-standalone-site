@@ -25,7 +25,7 @@ public class StaticPageScheduler {
      * 每日凌晨2点自动生成所有静态页面
      *
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "${brand.cron}")
     public void scheduledGenerateAllPages() {
         if (!brandConfig.getSchedulerEnable()) {
             log.error("Static page scheduled tasks are disabled and will be skipped.");
