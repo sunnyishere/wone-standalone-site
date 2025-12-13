@@ -8,14 +8,14 @@
     <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
 
     <!-- 链接标签优化 -->
-    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
+    <link rel="canonical" th:href="${websiteUrl}" />
 
     <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="${currentLang}" />
     <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
     <meta property="og:description" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
-    <meta property="og:url" th:attr="content=${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(successCase.title), ' ', '-')} + '-' + ${successCase.id}" />
+    <meta property="og:url" th:attr="content=${websiteUrl}" />
     <meta property="og:image" th:attr="content=${successCase.iconUrl}" />
     <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName}" />
 

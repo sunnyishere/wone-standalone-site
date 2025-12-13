@@ -6,10 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
-    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) +  ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
+    <link rel="canonical" th:href="${websiteUrl}" />
     <meta property="og:title" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta property="og:description" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
-    <meta property="og:url" th:attr="content=${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(news.title), ' ', '-')} + '-' + ${news.id}" />
+    <meta property="og:url" th:attr="content=${websiteUrl}" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:image" th:attr="content=${news.iconUrl}" />

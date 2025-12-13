@@ -8,12 +8,7 @@
     <meta name="description" th:content="${prod.description} ?: ''"/>
 
     <!-- Canonical URL -->
-    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
-           '' :
-           ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
-           '-'+${prod.id}"/>
+    <link rel="canonical" th:href="${websiteUrl}"/>
 
     <!-- Robots -->
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
@@ -23,12 +18,7 @@
     <!-- Open Graph -->
     <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta property="og:description" th:content="${prod.description}"/>
-    <meta property="og:url" th:content="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
-           '' :
-           ('' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
-           '-'+${prod.id}"/>
+    <meta property="og:url" th:content="${websiteUrl}"/>
     <meta property="og:type" content="website"/>
     <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>

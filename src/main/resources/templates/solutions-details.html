@@ -9,7 +9,7 @@
            th:text="${article.title}+'-'+${prodBrand.eName}"></title>
 
     <link rel="canonical"
-          th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(article.title), ' ', '-')} + '-' + ${article.id}"/>
+          th:href="${websiteUrl}"/>
 
     <meta property="article:published_time" th:attr="content=${article.created}"/>
     <meta property="article:modified_time" th:attr="content=${article.updated}"/>
@@ -19,7 +19,7 @@
 
     <meta property="og:title" th:attr="content=${article.title}+'-'+${prodBrand.eName}"/>
     <meta property="og:url"
-          th:attr="content=${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName} + '/' + ${#strings.replace(#strings.trim(article.title), ' ', '-')} + '-' + ${article.id}"/>
+          th:attr="content=${websiteUrl}"/>
     <meta property="og:type" content="article"/>
     <meta property="og:image" th:attr="content=${article.iconUrl}"/>
     <meta property="og:locale" th:content="${currentLang}"/>

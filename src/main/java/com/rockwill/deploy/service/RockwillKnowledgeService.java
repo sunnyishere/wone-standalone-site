@@ -127,6 +127,19 @@ public class RockwillKnowledgeService {
                 if (model != null) {
                     handleSchemaJson(model);
                     handleDateKey(model);
+                    if (model.containsKey("suffix")) {
+                        Object suffix = model.get("suffix");
+                        Object pageName = model.get("pageName");
+                        Object website = model.get("websitePath");
+                        if (model.containsKey("currentLang")
+                                && model.get("currentLang") != null && !model.get("currentLang")
+                                .equals("en")) {
+                            website += model.get("currentLang") + "/" + pageName + suffix;
+                        } else {
+                            website += "" + pageName + suffix;
+                        }
+                        model.put("websiteUrl", website);
+                    }
                     if (!model.isEmpty()) {
                         String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
