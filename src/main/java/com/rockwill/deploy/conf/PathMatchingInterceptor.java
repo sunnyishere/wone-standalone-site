@@ -21,6 +21,9 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String path = request.getServletPath();
 
+        if (path.startsWith("/page")){
+            path = path.substring(5);
+        }
         PathMatchUtils.MatchResult matchResult = PathMatchUtils.matchResult(path);
         if (matchResult.getPatternType() == null
                 || matchResult.getIllegal()) {

@@ -31,7 +31,9 @@ brand:
   domain: www.test-static.com  #品牌商申请的域名
   static-output: ./static-output  #静态文件生成目录，也是Nginx配置的静态目录
   scheduler-enable: true #定时任务开启
+  cron: "0 0 0,12 * * ?"
   execute-on-start: true #启动时执行页面静态化
   domain-list:
+  secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c
 
 

@@ -241,6 +241,32 @@ public class RockwillKnowledgeService {
     }
 
     /**
+     * 主动发起表单请求
+     *
+     * @param targetUrl 请求path
+     * @param domain 域名
+     * @param params 表单参数
+     * @return
+     */
+    @SneakyThrows
+    public ResponseEntity<String> submitForm(String targetUrl,String domain,Map<String, String> params) {
+        StringBuilder formBody = new StringBuilder();
+        for (String key : params.keySet()){
+            if (formBody.length() > 0) {
+                formBody.append("&");
+            }
+            formBody.append(URLEncoder.encode(key, "UTF-8"))
+                    .append("=")
+                    .append(URLEncoder.encode(params.get( key), "UTF-8"));
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Deploy-Domain", domain);
+        HttpEntity<String> requestEntity = new HttpEntity<>(formBody.toString(), headers);
+        return restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class);
+    }
+
+    /**
      * 首页
      *
      * @return 返回首页html

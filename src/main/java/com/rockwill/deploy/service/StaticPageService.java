@@ -22,6 +22,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
@@ -80,6 +82,36 @@ public class StaticPageService {
 
     Map<String, List<WebSitemapUrl>> webSitemapUrls = new ConcurrentHashMap<>();
 
+
+    @Async("rockwillTaskExecutor")
+    public void triggerGenPages(String domain) {
+        webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
+        int state = 0;
+        String reason = "";
+        try {
+            generateIndexPage(domain);
+            knowledgeService.getSiteMenu(domain);
+            String domainPath = staticOutputPath;
+            if (!domain.equals(brandConfig.getDomain())) {
+                domainPath = staticOutputPath + "/" + domain;
+                new File(domainPath).mkdirs();
+            }
+            generateMenuAndDetailPage("", domain);
+            copyStaticResources(domain);
+            siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
+            RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
+            state = 2;
+        } catch (Exception e) {
+            log.error("triggerGenPages exception: {}", domain, e);
+            reason =e.getMessage();
+            state = 3;
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put("state", state + "");
+        map.put("reason", reason);
+        ResponseEntity<String> response = knowledgeService.submitForm("/publish/updateState", domain, map);
+        log.info("主动发布更新发布状态：{},响应:{}", response.getStatusCode().value(), response.getBody());
+    }
 
     /**
      * 生成所有静态页面

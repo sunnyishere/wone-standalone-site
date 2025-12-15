@@ -1,6 +1,7 @@
 package com.rockwill.deploy.conf;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
@@ -21,10 +22,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private PathMatchingInterceptor pathMatchingInterceptor;
 
+    @Autowired
+    ApiSignatureInterceptor apiSignatureInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(pathMatchingInterceptor)
-                .addPathPatterns("/**")
+                .addPathPatterns("/page/**")
+                .excludePathPatterns("/api/staticize/**")
                 .excludePathPatterns("/static/**",
                         "/css/**",
                         "/js/**",
@@ -32,6 +37,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "/fonts/**",
                         "/favicon.ico"
                 );
+        registry.addInterceptor(apiSignatureInterceptor)
+                .addPathPatterns("/api/staticize/**");
     }
 
     @Override
@@ -52,6 +59,21 @@ public class WebConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+    }
+
+
+    @Autowired
+    CachingRequestBodyFilter cachingRequestBodyFilter;
+
+    @Bean
+    public FilterRegistrationBean someFilterRegistration()
+    {
+        FilterRegistrationBean registration = new FilterRegistrationBean();
+        registration.setFilter(cachingRequestBodyFilter);
+        registration.addUrlPatterns("/api/*");
+        registration.setName("cachingRequestBodyFilter");
+        registration.setOrder(FilterRegistrationBean.LOWEST_PRECEDENCE);
+        return registration;
     }
 
 }
