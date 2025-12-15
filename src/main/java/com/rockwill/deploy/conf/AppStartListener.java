@@ -1,12 +1,15 @@
 package com.rockwill.deploy.conf;
 
+import com.rockwill.deploy.service.RockwillKnowledgeService;
 import com.rockwill.deploy.service.StaticPageService;
+import com.rockwill.deploy.utils.PathMatchUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Executor;
 
@@ -21,9 +24,17 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
     @Autowired
     @Qualifier("rockwillTaskExecutor")
     private Executor taskExecutor;
+    @Autowired
+    RockwillKnowledgeService knowledgeService;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
+        knowledgeService.getSiteMenu(brandConfig.getDomain());
+        if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
+            for (String domain : brandConfig.getDomainList()) {
+                knowledgeService.getSiteMenu(domain);
+            }
+        }
         if (brandConfig.getExecuteOnStart()) {
             taskExecutor.execute(() -> {
                 log.info("Start asynchronous execution of static page generation tasks");

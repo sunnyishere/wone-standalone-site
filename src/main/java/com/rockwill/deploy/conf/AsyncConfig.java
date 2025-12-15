@@ -17,7 +17,7 @@ public class AsyncConfig {
         int cpuCores = Runtime.getRuntime().availableProcessors();
         executor.setCorePoolSize(cpuCores * 2);
         executor.setMaxPoolSize(cpuCores * 4);
-        executor.setQueueCapacity(100);
+        executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("rockwill-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);

@@ -83,6 +83,8 @@ public class StaticPageService {
     Map<String, List<WebSitemapUrl>> webSitemapUrls = new ConcurrentHashMap<>();
 
 
+    Map<String, List<String>> detailUrlNap = new ConcurrentHashMap<>();
+
     @Async("rockwillTaskExecutor")
     public void triggerGenPages(String domain) {
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
@@ -124,6 +126,7 @@ public class StaticPageService {
             log.error("需提供独立部署域名配置: brand.domain");
             return;
         }
+        detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
         try {
             generateIndexPage(domain);
@@ -199,10 +202,10 @@ public class StaticPageService {
                     addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 0.8, domain);
                     continue;
                 }
-                CompletableFuture<Void> pageTask = CompletableFuture.runAsync(() -> {
-                    processPagination(sitePage, null, domainHtmlVo, false, lang, domain);
-                }, taskExecutor);
-                futures.add(pageTask);
+                List<CompletableFuture<Void>> pageTaskList = processPagination(sitePage, null, domainHtmlVo, false, lang, domain);
+                if (!pageTaskList.isEmpty()) {
+                    futures.addAll(pageTaskList);
+                }
                 if (sitePage.getPageType() == SitePage.SitePageType.PRODUCTS
                         || sitePage.getPageType() == SitePage.SitePageType.DOCUMENTS) {
                     CompletableFuture<Void> menuTask = CompletableFuture.runAsync(() -> {
@@ -228,7 +231,8 @@ public class StaticPageService {
         log.info("End of generating  menu html files,site: {},lang:{}", domain, lang);
     }
 
-    private void processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain) {
+    private List<CompletableFuture<Void>> processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain) {
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         if (domainHtmlVo.getTotalPages() != null && domainHtmlVo.getTotalPages() > 1) {
             for (int p = 1; p <= domainHtmlVo.getTotalPages(); p++) {
                 String menuName = sitePage.getPageName() + "-" + p;
@@ -246,11 +250,15 @@ public class StaticPageService {
                 if (p >= 2 && !isSubMenu) {
                     if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                             && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-                        processDetailPages(sitePage, menuPageVo, lang, domain);
+                        CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
+                            processDetailPages(sitePage, menuPageVo, lang, domain);
+                        }, taskExecutor);
+                        futures.add(detailTask);
                     }
                 }
             }
         }
+        return futures;
     }
 
 
@@ -328,6 +336,10 @@ public class StaticPageService {
         }
         List<String> detailUrlList = getDetailLinkFromPage(domainHtmlVo.getHtmlContent(), cssQuery);
         for (String detailUrl : detailUrlList) {
+            if (detailUrlNap.get(domain).contains(detailUrl)){
+                continue;
+            }
+            detailUrlNap.get(domain).add(detailUrl);
             DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
             saveHtml(domain, detailUrl, subVo.getHtmlContent());
             addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8, domain);
