@@ -62,7 +62,7 @@ public class UnifiedRouterController {
     @Autowired
     StaticPageService staticPageService;
 
-    @RequestMapping(value = "/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/page/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> routeRequest(HttpServletRequest request) throws IOException {
         String realUri = "";
         if (request.getAttribute("X-Original-URI") != null) {
@@ -70,6 +70,7 @@ public class UnifiedRouterController {
         } else {
             realUri = request.getHeader("X-Original-URI");
         }
+        realUri = realUri.substring(5);
         String host = request.getHeader("Host");
         log.info("request url : {}", realUri);
         Object patternType = request.getAttribute("patternType");
