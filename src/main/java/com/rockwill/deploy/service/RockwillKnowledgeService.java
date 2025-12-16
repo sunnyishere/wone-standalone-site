@@ -10,6 +10,7 @@ import com.rockwill.deploy.vo.DomainHtmlVo;
 import com.rockwill.deploy.vo.SitePage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -125,8 +126,8 @@ public class RockwillKnowledgeService {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
                 if (model != null) {
-                    handleSchemaJson(model);
                     handleDateKey(model);
+                    String websiteUrl= "";
                     if (model.containsKey("suffix")) {
                         Object suffix = model.get("suffix");
                         Object pageName = model.get("pageName");
@@ -138,8 +139,10 @@ public class RockwillKnowledgeService {
                         } else {
                             website += "" + pageName + suffix;
                         }
+                        websiteUrl= website.toString();
                         model.put("websiteUrl", website);
                     }
+                    handleSchemaJson(model,websiteUrl, host);
                     if (!model.isEmpty()) {
                         String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
@@ -163,12 +166,38 @@ public class RockwillKnowledgeService {
         return new DomainHtmlVo();
     }
 
-    private void handleSchemaJson(Map<String, Object> model) {
+    private void handleSchemaJson(Map<String, Object> model, String websiteUrl, String host) {
         for (String key : model.keySet()) {
             if (key.toLowerCase().endsWith("schemajson") &&
                     (model.get(key) instanceof Map || model.get(key) instanceof List)) {
                 String newVal = JSON.toJSONString(model.get(key));
+                if (newVal.startsWith("{")){
+                    JSONObject object = JSON.parseObject(newVal);
+                    if (StringUtils.isNotEmpty(websiteUrl)) {
+                        if (object.containsKey("offers")) {
+                            object.getJSONObject("offers").put("url", websiteUrl);
+                        } else if (object.get("@type").toString().toLowerCase().contains("article")) {
+                            JSONObject mainEntityOfPage = object.getJSONObject("mainEntityOfPage");
+                            if (mainEntityOfPage != null) {
+                                mainEntityOfPage.put("@id", websiteUrl);
+                            }
+                        }
+                    }
+                    newVal = object.toJSONString();
+                }
                 model.put(key, newVal);
+            } else if (key.toLowerCase().contains("breadcrumb") && model.get(key) instanceof String) {
+                Object lang = model.get("currentPathLang");
+                if (lang != null && !lang.toString().isEmpty()) {
+                    JSONObject object = JSON.parseObject(model.get(key).toString());
+                    JSONArray itemListElement = object.getJSONArray("itemListElement");
+                    for (int i = 0; i < itemListElement.size(); i++) {
+                        JSONObject item = itemListElement.getJSONObject(i);
+                        item.put("item", item.getString("item").replace(host, host + lang));
+                    }
+                    model.put(key, object.toJSONString());
+                }
+
             }
         }
     }
