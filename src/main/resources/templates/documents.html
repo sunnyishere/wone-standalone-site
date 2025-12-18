@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang}">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -85,20 +85,20 @@
                     <!-- 面板标题添加展开图标切换 -->
                     <a class="am-text-bold"
                        data-am-collapse="{parent: '#collapase-nav-1', target: '#a1'}">
-                        <span th:text="${advanced['sort.by.time']}"></span>
+                        <span th:text="${advanced['document.type']}"></span>
                         <i class="am-fr am-margin-right"
-                           th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![name], selectValue)}
+                           th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![i18nName], selectValue)}
                ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
                     </a>
                     <!-- 子列表：根据是否包含选中项添加am-in类 -->
                     <ul class="am-list am-collapse admin-sidebar-sub"
                         id="a1"
                         th:if="${not #lists.isEmpty(association)}"
-                        th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![name], selectValue)}
+                        th:classappend="${not #lists.isEmpty(association) and #lists.contains(association.![i18nName], selectValue)}
             ? 'am-in' : ''">
                         <li th:each="index : ${association}"
-                            th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a th:title="${index.i18nName}" aria-hidden="false" th:aria-label="${index.i18nName}" th:style="${selectValue == index.name} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                            th:style="${selectValue == index.i18nName} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
+                            <a th:title="${index.i18nName}" aria-hidden="false" th:aria-label="${index.i18nName}" th:style="${selectValue == index.i18nName} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
                                th:text="${index.i18nName}"
                                th:href="${currentPathLang} +
                                ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?

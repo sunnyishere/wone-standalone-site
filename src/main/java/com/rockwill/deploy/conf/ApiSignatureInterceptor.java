@@ -101,14 +101,14 @@ public class ApiSignatureInterceptor implements HandlerInterceptor {
         // 1. 检查1小时内次数是否超过1次
         int countLastHour = record.getCountInWindow(ONE_HOUR);
         if (countLastHour >= 1) {
-            buildErrorResponse(response, "Frequency limit exceeded: maximum 1 request per hour");
+            buildErrorResponse(response, "Publishing frequency limit reached: You can publish your site only once per hour. Please try again in one hour.");
             return false;
         }
 
         // 2. 检查24小时内次数是否超过5次
         int countLastDay = record.getCountInWindow(ONE_DAY);
         if (countLastDay >= 5) {
-            buildErrorResponse(response, "Frequency limit exceeded: maximum 5 requests per day");
+            buildErrorResponse(response, "Daily publish quota exhausted: You can publish up to 5 times per day. Please try again tomorrow.");
             return false;
         }
         record.addRecord();
@@ -119,6 +119,6 @@ public class ApiSignatureInterceptor implements HandlerInterceptor {
     private void buildErrorResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(403);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{\"code\": 403, \"message\": \"" + message + "\"}");
+        response.getWriter().write( message );
     }
 }

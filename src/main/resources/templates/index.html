@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang}">
+<html class="no-js" th:lang="${currentLang != null? currentLang:'en'}">
 
 <head>
     <meta charset="utf-8">
@@ -37,6 +37,7 @@
 </head>
 
 <body class="body-bg">
+<h1 class="sr-only" th:text="${title}"> </h1>
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
     <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='Home')"></th:block>
@@ -106,7 +107,7 @@
         <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
             <div class="am-text-center">
                 <div class="am-u-sm-12">
-                    <span class="am-text-xl am-text-bold" th:text="${prodBrand.eName} + '   ' + ${advanced['products']}"></span>
+                    <h2 class="inline-header"><span class="am-text-xl am-text-bold" th:text="${prodBrand.eName} + '   ' + ${advanced['products']}"></span></h2>
                 </div>
 
             </div>
@@ -262,10 +263,10 @@
                         <div class="am-u-sm-3 am-padding-top-xs">
                         </div>
                         <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
-                            <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
+                            <h2 class="inline-header"><div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
                                  th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].i18nName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div> </h2>
                         </div>
                         <div class="am-u-sm-3 am-text-right am-padding-top-xs">
                             <a th:title="${advanced['view.all']}"  aria-hidden="false" th:aria-label="${advanced['view.all']}"
@@ -340,10 +341,10 @@
                     <div class="am-u-sm-3 am-padding-top-xs">
                     </div>
                     <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
-                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
+                        <h2 class="inline-header"><div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
                              th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].i18nName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div> </h2>
                     </div>
                     <div class="am-u-sm-3 am-text-right am-padding-top-xs">
 
@@ -450,10 +451,10 @@
                     <div class="am-u-sm-3 am-padding-top-xs">
                     </div>
                     <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
-                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
+                        <h2 class="inline-header"><div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
                              th:text="${#lists.isEmpty(filtered) ?
                                 '' :
-                                (filtered[0].i18nName ?: '')}"></div>
+                                (filtered[0].i18nName ?: '')}"></div> </h2>
                     </div>
                     <div class="am-u-sm-3 am-text-right am-padding-top-xs">
                         <a th:title="${advanced['view.all']}"  aria-hidden="false"

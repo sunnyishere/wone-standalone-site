@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="en-US">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 
 <head>
     <meta charset="utf-8">
@@ -8,7 +8,7 @@
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <th:block th:with="
-    base = ${websitePath + pageName},
+    base = ${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
     slug = ${category != null ?
         #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
         : ''},
@@ -21,7 +21,7 @@
     <meta property="og:description" th:content="${pageContent}"/>
 
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="en_US"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
@@ -57,7 +57,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${pageName}"></h2>
+            <h1 th:text="${i18nName}"></h1>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -65,27 +65,31 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li>
-                <a th:href="'/' + ${pageName}" th:text="${pageName}" th:title="${pageName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+                <a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
             <li th:each="item : ${association}"
                 th:if="${category != null and category.parentId != null and item.id == category.parentId}">
-                <a th:title="${item.name}" aria-hidden="false" th:aria-label="${item.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                <a th:title="${item.name}" aria-hidden="false" th:aria-label="${item.name}" th:href="
+                ${currentPathLang} +
+                (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                    ${#strings.toLowerCase(#strings.replace(#strings.trim(item.name), ' ', '-'))} + '-' +
                    ${item.id}"
-                   th:text="${item.name}">
+                   th:text="${item.i18nName}">
                 </a>
             </li>
             <li th:if="${category != null}">
-                <a th:title="${category.name}" aria-hidden="false" th:aria-label="${category.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                <a th:title="${category.i18nName}" aria-hidden="false" th:aria-label="${category.i18nName}" th:href="
+                ${currentPathLang} +
+                (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                    ${#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-'))} + '-' +
                    ${category.id}"
-                   th:text="${category.name}"></a>
+                   th:text="${category.i18nName}"></a>
             </li>
         </ol>
     </div>
@@ -106,14 +110,14 @@
                     class="am-list admin-sidebar-list"
                     style="background-color: #FFFFFF; border-radius: 8px; min-height: 300px;" th:if="${association != null and #lists.size(association) > 0}">
 
-                <div class="am-padding am-text-lg am-text-bold">Product Category</div>
+                <div class="am-padding am-text-lg am-text-bold" >   <h2 class="inline-header" th:text="${advanced['product.category']}"></h2></div>
                 <li class="am-panel am-padding-left"
                     th:each="cate, stat : ${association}"
                     th:with="hasSelectedChild=${#lists.contains(cate.children.![name], selectValue)}">
 
                     <a th:title="${cate.name}" aria-hidden="false" th:aria-label="${cate.name}" class="am-text-bold"
                        th:attr="'data-am-collapse' = '{parent: &quot;#collapase-nav-1&quot;, target: &quot;#a_' + ${stat.index} + '&quot;}'">
-                        <span th:text="${cate.name}"></span>
+                        <h3 class="inline-header"><span th:text="${cate.i18nName}"></span></h3>
                         <i class="am-fr am-margin-right"
                            th:if="${cate.children != null and not cate.children.empty}"
                            th:class="${hasSelectedChild} ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
@@ -125,15 +129,18 @@
                         th:classappend="${hasSelectedChild} ? 'am-in' : ''" >
                         <li th:each="subCategory : ${cate.children}"
                             th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a th:title="${subCategory.name}" aria-hidden="false" th:aria-label="${subCategory.name}" th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:href="${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
+                            <a th:title="${subCategory.i18nName}" aria-hidden="false" th:aria-label="${subCategory.i18nName}" th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
+                               th:href="
+                               ${currentPathLang} +
+                               ${#lists.isEmpty(topNavPages.?[pageType == 2]) ?
            '/' :
            '/' +
            #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
            '/' +
            #strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-') +
-           '-' + subCategory.id}"
-                               th:text="${subCategory.name}"></a>
+           '-' + subCategory.id}">
+                                <span th:text="${subCategory.i18nName}"></span>
+                            </a>
                         </li>
                     </ul>
             </div>
@@ -159,7 +166,10 @@
                     style="margin: 0 0;">
                     <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                         th:each="index : ${pageData.rows}">
-                        <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                        <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}"
+                           th:href="
+                           ${currentPathLang} +
+                           (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
@@ -171,10 +181,10 @@
                                 </div>
                                 <div class="dd-clamp-text-2 am-text-lg">
                                     <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 14px;"></span>
-                                    <span class="am-text-bold" style="color: #07C160;font-size: 14px">Whole life care manager</span>
+                                    <span class="am-text-bold" style="color: #07C160;font-size: 14px"  th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
                                 </div>
                                 <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
-                                      th:text="${index.pName}"></span>
+                                      th:text="${index.i18nName}"></span>
                             </div>
                         </a>
 
@@ -220,7 +230,7 @@
 <th:block th:replace="right-menu :: right-menu(param1='Products')"></th:block>
 
 <!-- app端显示的下载按钮 -->
-<th:block th:replace="phone-down :: phone-down"></th:block>
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

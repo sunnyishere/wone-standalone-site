@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang}">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 
 <head>
     <meta charset="utf-8">
@@ -49,7 +49,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: 'https://oss.iwone.cn/standalone/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${i18nName}"></h2>
+            <h1 th:text="${i18nName}"></h1>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -87,7 +87,7 @@
                             <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" alt="" class="image-square">
                         </div>
                         <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
-                            <div th:text="${index.i18nTitle}"></div>
+                            <div ><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
                         </div>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" th:text="${index.content}"></span>
                         <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">

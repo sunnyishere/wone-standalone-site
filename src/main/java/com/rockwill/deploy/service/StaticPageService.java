@@ -87,6 +87,7 @@ public class StaticPageService {
 
     @Async("rockwillTaskExecutor")
     public void triggerGenPages(String domain) {
+        detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
         int state = 0;
         String reason = "";
