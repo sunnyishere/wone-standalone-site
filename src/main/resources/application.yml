@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
   servlet:
     context-path: /
   tomcat:
@@ -37,3 +37,7 @@ brand:
   secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c
 
 
+google-tag:
+  id: G-0HKGZJNMN6
+  domains:
+     www.rockwill.com: G-MB2YBKF1WG

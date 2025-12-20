@@ -38,19 +38,17 @@
     <div class="am-show-sm-only" style="height: 130px;background-color: #000000">
         <div style="opacity: 0;">空白</div>
     </div>
+    <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${gaTrackingId}"></script>
+    <script th:inline="javascript">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', /*[[${gaTrackingId}]]*/ 'G-0HKGZJNMN6');
+    </script>
 </footer>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-0HKGZJNMN6"></script>
-<script>
-    window.dataLayer = window.dataLayer || [];
 
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-0HKGZJNMN6');
-</script>
 <script>
     echo.init({
         offset: 500,

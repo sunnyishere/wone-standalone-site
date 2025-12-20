@@ -3,6 +3,7 @@ package com.rockwill.deploy.service;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.rockwill.deploy.conf.GoogleTagProperties;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
 import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.vo.AjaxResult;
@@ -42,6 +43,9 @@ public class RockwillKnowledgeService {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @Autowired
+    GoogleTagProperties googleTagProperties;
 
     @Resource
     TemplateEnginePageRenderer templateEnginePageRenderer;
@@ -142,6 +146,11 @@ public class RockwillKnowledgeService {
                         websiteUrl= website.toString();
                         model.put("websiteUrl", website);
                     }
+                    String tagId = googleTagProperties.getId();
+                    if (googleTagProperties.getDomains().containsKey(host)) {
+                        tagId = googleTagProperties.getDomains().get(host);
+                    }
+                    model.put("gaTrackingId", tagId);
                     handleSchemaJson(model,websiteUrl, host);
                     if (!model.isEmpty()) {
                         String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
