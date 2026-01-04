@@ -33,9 +33,13 @@ brand:
   scheduler-enable: true #定时任务开启
   cron: "0 0 0,12 * * ?"
   execute-on-start: true #启动时执行页面静态化
+  execute-on-domain: www.test-static.com
   domain-list:
   secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c
 
+cdn:
+  enabled: true
+  prefix: "https://oss.iwone.cn"
 
 google-tag:
   id: G-0HKGZJNMN6

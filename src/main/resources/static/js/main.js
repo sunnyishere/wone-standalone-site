@@ -66,9 +66,9 @@
     // 返回顶部按钮
     function initBackToTop() {
         var $backTop = $('<div class="m-top-cbbfixed">' +
-            '<a class="m-top-go m-top-cbbtn">' +
+            '<div class="m-top-go m-top-cbbtn">' +
             '<span class="m-top-goicon"></span>' +
-            '</a>' +
+            '</div>' +
             '</div>');
 
         $('body').append($backTop);

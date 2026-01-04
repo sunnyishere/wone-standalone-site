@@ -5,14 +5,22 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title th:text="${pageTitle}"></title>
-    <meta name="description" th:content="${description} ?: ''"/>
+    <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <!-- Open Graph 标签 -->
     <meta property="og:title"  th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${description}"/>
-    <link rel="canonical" th:href="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}" />
-    <meta property="og:url"
-          th:content="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '-' + (pageData?.pageNum ?: 1)}" />
+    <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
+basePath = ${websitePath + pageName}">
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
+        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
+    </th:block>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}"
+              th:with="pn=${pageData?.pageNum ?: 1}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}" />
+    </th:block>
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
@@ -78,16 +86,6 @@
             <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
                  th:if="${not #lists.isEmpty(pageData.rows)}"
                  th:each="index : ${pageData.rows}">
-                <a th:href="${currentPathLang} + ${
-    (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
-        '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
-    ) +
-    #uris.escapePath(
-        #strings.toLowerCase(
-            #strings.replace(#strings.trim(index.slugTitle), ' ', '-')
-        )
-    ) + '-' + index.id
-}">
                     <div class="" style="background-color: #FFFFFF;border-radius: 12px;">
                         <div class="am-g dd-hover4 am-padding" style="width: 100%;">
                             <div style="am-cf">
@@ -98,14 +96,27 @@
                                     </div>
                                 </div>
                                 <div class="" style="height: 100px;">
+                                    <a style="display: block; text-decoration: none; color: inherit;"
+                                       th:aria-label="${index.i18nTitle}" th:title="${index.i18nTitle}"
+                                            th:href="${currentPathLang} + ${
+    (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
+        '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
+    ) +
+    #uris.escapePath(
+        #strings.toLowerCase(
+            #strings.replace(#strings.trim(index.slugTitle), ' ', '-')
+        )
+    ) + '-' + index.id
+}">
                                     <div class="dd-clamp-text-1 am-text-bold">
                                         <h2 class="inline-header" th:text="${index.i18nTitle}"></h2>
                                     </div>
                                     <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                          th:text="${index.content}">
                                     </div>
+                                    </a>
                                     <div class="am-padding-top-xs am-cf am-text-sm">
-                                        <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                        <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
                                             <span class="am-icon-user"></span>
                                             <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
                                                th:href="${brandUrl}" style="border: none">
@@ -121,7 +132,7 @@
                             </div>
                         </div>
                     </div>
-                </a>
+
             </div>
             <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
                  th:if="${#lists.isEmpty(pageData.rows)}"

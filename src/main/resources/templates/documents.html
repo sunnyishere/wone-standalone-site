@@ -3,16 +3,25 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title th:text="${pageTitle}"></title>
-    <meta name="description" th:content="${description} ?: ''"/>
+    <title th:if="selectLabel == pageName"  th:text="${pageTitle}"></title>
+    <title th:if="selectLabel != pageName"  th:text="${selectLabel} +' | ' +${prodBrand.eName}+ ' Factory Document Library'"></title>
+    <meta th:if="selectLabel == pageName" name="description" th:content="${description} ?: ''"/>
+    <meta th:if="selectLabel != pageName" name="description" th:content="'Official '+${selectLabel} +' from '+ ${prodBrand.eName} +', Download from our factory technical document library—no agents, full engineering transparency'"/>
+
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
-    <link rel="canonical"
-          th:if="${selectLabel != null and selectLabel != ''}"
-          th:href="${websitePath  + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') +  pageName + '/' + selectLabel + '-' + (pageData?.pageNum ?: 1)}" />
 
     <meta property="og:title" th:content="${title}" />
     <meta property="og:description" th:content="${description}"/>
-    <meta property="og:url" th:content="${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName + '/' + selectLabel  + '-' + (pageData?.pageNum ?: 1)}" />
+    <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName +  (selectLabel == pageName?'':'/' + selectLabel)},basePath =${websitePath +pageName +(selectLabel == pageName?'':'/' + selectLabel)}">
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
+        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
+    </th:block>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}"
+              th:with="pn=${pageData?.pageNum ?: 1}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'')  + pageName +  (selectLabel == pageName?'':'/' + selectLabel) + (pn > 1 ? '-' + pn : '')}" />
+    </th:block>
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
@@ -49,7 +58,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${i18nName}"></h2>
+            <h1 th:text="${i18nName}"></h1>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -79,7 +88,7 @@
 
         <div class="am-u-md-3 am-u-sm-12 ">
             <ul class="am-list admin-sidebar-list" id="collapase-nav-1" style="background-color: #FFFFFF;">
-                <div class="am-padding am-text-lg am-text-bold" th:text="${advanced['filters']}">Filters</div>
+                <div class="am-padding am-text-lg am-text-bold" ><h2 class="inline-header" th:text="${advanced['filters']}">Filters</h2></div>
                 <!-- Document king 面板 -->
                 <li class="am-panel am-padding-left">
                     <!-- 面板标题添加展开图标切换 -->
@@ -106,7 +115,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.replace(#strings.trim(index.name), ' ', '-') +
+                    #strings.toLowerCase(#strings.replace(#strings.trim(index.name), ' ', '-')) +
                     '-' +
                     index.id}">
                             </a>
@@ -238,9 +247,9 @@
                                                 <div class="dd-clamp-text-2 am-padding-top-sm am-text-bold"
                                                      style="min-height: 5rem;" th:text="${item.name}">
                                                 </div>
-<!--                                                <div class="dd-clamp-text-2 am-padding-top-sm"-->
-<!--                                                     style="min-height: 5rem;" th:text="${item.content}">-->
-<!--                                                </div>-->
+                                                <!--                                                <div class="dd-clamp-text-2 am-padding-top-sm"-->
+                                                <!--                                                     style="min-height: 5rem;" th:text="${item.content}">-->
+                                                <!--                                                </div>-->
                                                 <div class=" dd-clamp-text-1 am-text-sm">
                                                     <span class="am-padding-right"
                                                           style="color: #5C779F; " th:text="${item.eName}"></span>

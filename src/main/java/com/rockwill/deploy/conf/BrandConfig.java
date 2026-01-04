@@ -13,6 +13,7 @@ public class BrandConfig {
     private String staticOutput;
     private Boolean schedulerEnable;
     private Boolean executeOnStart;
+    private List<String> executeOnDomain;
     private List<String> languages;
     private List<String> domainList;
     private String secret;

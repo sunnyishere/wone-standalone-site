@@ -2,24 +2,31 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="commonHead">
     <meta http-equiv="Cache-Control" content="no-siteapp"/>
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="http://m.iwone.cn/"/>
-    <link rel="stylesheet" th:href="@{https://oss.iwone.cn/standalone/css/amazeui.min.css(v=${version})}">
-    <link rel="stylesheet" th:href="@{https://oss.iwone.cn/standalone/css/iconfont2.css(v=${version})}">
-    <link rel="stylesheet" th:href="@{https://oss.iwone.cn/standalone/css/iconfont.css(v=${version})}">
-    <link rel="stylesheet" th:href="@{https://oss.iwone.cn/standalone/css/style.css(v=${version})}">
 
-    <!-- JavaScript 资源 -->
-    <script src="https://oss.iwone.cn/standalone/js/jquery.min.js"></script>
-    <script src="https://oss.iwone.cn/standalone/js/amazeui.min.js"></script>
-    <script src="https://oss.iwone.cn/standalone/js/jquery.qrcode.min.js"></script>
-    <script src="https://oss.iwone.cn/standalone/js/echo.min.js"></script>
-    <script src="https://oss.iwone.cn/standalone/js/main.js"></script>
+    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+        <!-- CSS  -->
+        <link rel="stylesheet" th:href="@{${basePath + '/css/amazeui.min.css?v=' + version}}">
+        <link rel="stylesheet" th:href="@{${basePath + '/css/iconfont2.css?v='+ version}}">
+        <link rel="stylesheet" th:href="@{${basePath + '/css/iconfont.css?v='+ version}}">
+        <link rel="stylesheet" th:href="@{${basePath + '/css/style.css?v='+ version}}">
+
+        <!-- JavaScript  -->
+        <script th:src="@{${basePath + '/js/jquery.min.js'}}"></script>
+        <script th:src="@{${basePath + '/js/amazeui.min.js'}}"></script>
+        <script th:src="@{${basePath + '/js/jquery.qrcode.min.js'}}"></script>
+        <script th:src="@{${basePath + '/js/echo.min.js'}}"></script>
+        <script th:src="@{${basePath + '/js/main.js'}}"></script>
+    </th:block>
     <script src="https://oss.iwone.cn/landing/js/appDownload.js"></script>
     <link rel="icon" type="image/x-icon" th:href="${prodBrand.icon}">
     <link rel="icon" type="image/png" th:href="${prodBrand.icon}">
     <link rel="shortcut icon" th:href="${prodBrand.icon}">
+    <style>
+        .m-hd .am-sticky {
+            opacity: 1  !important;
+        }
+    </style>
     <script th:inline="javascript">
         $(function () {
             // 1. 解析Thymeleaf变量（带默认值）

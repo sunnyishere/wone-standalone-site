@@ -5,11 +5,11 @@
         <ul class="am-pagination">
             <!-- 上一页 -->
             <li th:class="${currentPage == 1} ? 'disabled' : ''">
-                <a th:if="${currentPage > 1}"
+                <a th:if="${currentPage > 1}" aria-label="Previous Page"
                    th:href="@{${requestUrl} + ${'-'} + ${currentPage - 1}}"
-                class="tn-icon-left"></a>
-                <a th:unless="${currentPage > 1}"
-                   class="tn-icon-left disabled"></a>
+                class="tn-icon-left"><span style="display:none;">Previous</span></a>
+                <a th:unless="${currentPage > 1}" aria-label="Previous Page"
+                   class="tn-icon-left disabled"><span style="display:none;">Previous</span></a>
             </li>
 
             <!-- 动态页码（含省略号逻辑） -->
@@ -29,17 +29,17 @@
 
                 <!-- 后省略号 -->
                 <li th:if="${endPage < totalPages}">
-                    <a href="#" class="disabled">···</a>
+                    <span href="#" class="disabled">···</span>
                 </li>
             </th:block>
 
             <!-- 下一页 -->
             <li th:class="${currentPage == totalPages} ? 'disabled' : ''">
-                <a th:if="${currentPage < totalPages}"
+                <a th:if="${currentPage < totalPages}" aria-label="Next Page"
                    th:href="@{${requestUrl} + ${'-'} + ${currentPage + 1}}"
-                class="tn-icon-right"></a>
-                <a th:unless="${currentPage < totalPages}"
-                   class="tn-icon-right disabled"></a>
+                class="tn-icon-right"><span style="display:none;">Next</span></a>
+                <a th:unless="${currentPage < totalPages}" aria-label="Next Page"
+                   class="tn-icon-right disabled">   <span style="display:none;">Next</span></a>
             </li>
         </ul>
     </div>

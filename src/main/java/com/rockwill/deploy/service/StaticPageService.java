@@ -4,10 +4,7 @@ import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
 import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
-import com.rockwill.deploy.utils.SiteMenuUtils;
-import com.rockwill.deploy.utils.SiteSitemapUtils;
-import com.rockwill.deploy.utils.PathMatchUtils;
-import com.rockwill.deploy.utils.RobotsUtils;
+import com.rockwill.deploy.utils.*;
 import com.rockwill.deploy.vo.DomainHtmlVo;
 import com.rockwill.deploy.vo.SitePage;
 import lombok.extern.slf4j.Slf4j;
@@ -101,8 +98,6 @@ public class StaticPageService {
             }
             generateMenuAndDetailPage("", domain);
             copyStaticResources(domain);
-            siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
-            RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
             state = 2;
         } catch (Exception e) {
             log.error("triggerGenPages exception: {}", domain, e);
@@ -164,7 +159,6 @@ public class StaticPageService {
             saveHtml(domain, "index", htmlContent);
             saveHtml(domain, "Home", htmlContent);
             addWebSitemap(htmlContent, "", 1.0, domain);
-            addWebSitemap(htmlContent, "/Home", 1.0, domain);
             log.info("End of generating index html files,site: {}", domain);
         } catch (Exception e) {
             log.error("generate index html files exception，site: {}", domain, e);
@@ -245,7 +239,9 @@ public class StaticPageService {
                 }
                 DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName), domain);
                 saveHtml(domain, menuName, menuPageVo.getHtmlContent());
-                addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
+                if (p != 1) {
+                    addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
+                }
 
                 //仅对菜单根列表页面进行处理详情采集
                 if (p >= 2 && !isSubMenu) {
@@ -276,7 +272,7 @@ public class StaticPageService {
             List<LinkedHashMap<String, Object>> categories = (List<LinkedHashMap<String, Object>>) domainHtmlVo.getModelMap().get("association");
             for (LinkedHashMap<String, Object> category : categories) {
                 SitePage cate = new SitePage();
-                cate.setPageName(category.get("name").toString().toLowerCase());
+                cate.setPageName(category.get("name").toString().toLowerCase().trim());
                 cate.setId(Long.parseLong(category.get("id").toString()));
                 processSubCategory(sitePage, cate, lang, domain);
                 if (category.containsKey("children")) {
@@ -284,7 +280,7 @@ public class StaticPageService {
                     if (!childs.isEmpty()) {
                         for (LinkedHashMap<String, Object> child : childs) {
                             SitePage sub = new SitePage();
-                            sub.setPageName(child.get("name").toString().toLowerCase());
+                            sub.setPageName(child.get("name").toString().toLowerCase().trim());
                             sub.setId(Long.parseLong(child.get("id").toString()));
                             processSubCategory(sitePage, sub, lang, domain);
                         }
@@ -348,15 +344,12 @@ public class StaticPageService {
                 if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
                     List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
                     for (LinkedHashMap<String, Object> model : modelList) {
-                        String modelName = sitePage.getPageName()+"/" + model.get("name").toString().trim()
-                                .toLowerCase().replace("/", "-")
-                                .replace(" ", "-") + "-" + model.get("prodId") + "-series" + model.get("id");
+                        String modelName = sitePage.getPageName()+subVo.getModelMap().get("suffix").toString().replace("/detail","")+ "-series" + model.get("id");
                         if (!ObjectUtils.isEmpty(lang)) {
                             modelName = lang + "/" + modelName;
                         }
                         DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName), domain);
                         saveHtml(domain, modelName, modelVo.getHtmlContent());
-                        addWebSitemap(modelVo.getHtmlContent(), "/" + modelName, 0.9, domain);
                     }
                 }
             }

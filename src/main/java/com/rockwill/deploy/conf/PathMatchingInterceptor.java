@@ -39,7 +39,7 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
                 .getQueryParams().get("name");
         if (menuName != null && !menuName.isEmpty() && !menuName.get(0).startsWith("search")) {
             boolean isNormalMenu = SiteMenuUtils.getMenuPages().stream().map(SitePage::getPageName).collect(Collectors.toList()).contains(menuName.get(0));
-            if (!isNormalMenu) {
+            if (!isNormalMenu && !menuName.get(0).startsWith("home")) {
                 log.error("illegal request:{}", path);
                 response.sendRedirect("/");
                 return false;

@@ -95,11 +95,14 @@ public class PathMatchUtils {
             if (normalizedPath.startsWith("/" + sLang)) {
                 lang = sLang;
                 normalizedPath=normalizedPath.substring(sLang.length()+1);
+                if (normalizedPath.isEmpty()) {
+                    normalizedPath = "/";
+                }
                 break;
             }
         }
         if (normalizedPath.equals("/") || normalizedPath.equals("/Home")) {
-            matchResult.setPatternType(PathPatternType.DEFAULT);
+            matchResult.setPatternType(PathPatternType.MENU_WITHOUT_PAGE);
             if (ObjectUtils.isEmpty(lang)){
                 matchResult.setForwardTarget("/");
             }else{
@@ -131,11 +134,11 @@ public class PathMatchUtils {
                     }
                 }
                 if (params.get("menuName") != null) {
-                    Optional<SitePage> optional = SiteMenuUtils.getMenuPages().stream()
-                            .filter(sitePage -> sitePage.getPageName().toLowerCase()
-                                    .equals(params.get("menuName")))
-                            .findAny();
-                    if (optional.isPresent()) {
+                    boolean isLegal =  SiteMenuUtils.getMenuPages().stream()
+                            .filter(sitePage -> sitePage.getPageName() != null)
+                            .anyMatch(sitePage -> sitePage.getPageName()
+                                    .equalsIgnoreCase(params.get("menuName").trim()));
+                    if (!isLegal) {
                         matchResult.setIllegal(true);
                     }
                 }

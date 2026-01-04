@@ -6,10 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
+    <meta name="description" th:content="${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+
     <link rel="canonical" th:href="${websiteUrl}" />
     <meta property="og:title" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta property="og:description" th:attr="content=${news.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}" >
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
+    </th:block>
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:image" th:attr="content=${news.iconUrl}" />
@@ -107,16 +114,9 @@
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
                          th:if="${not #lists.isEmpty(newList)}"
                          th:each="news : ${newList}">
-                        <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}" th:href="
-                        ${currentPathLang} +
-                        (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
-           '/' :
-           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(news.slugTitle), ' ', '-'))} + '-' +
-           ${news.id}">
                             <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
                                 <div class="am-g dd-hover4 am-padding" style="width: 100%;">
-                                    <div style="am-cf">
+                                    <div>
                                         <div class="am-fl am-margin-right">
                                             <div class="phone-bottom" style="width: 100px;height: 100px;">
                                                 <img th:src="${news.iconUrl}" th:alt="${news.i18nTitle}" class="am-img-responsive"
@@ -124,13 +124,22 @@
                                             </div>
                                         </div>
                                         <div class="" style="height: 100px;">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${news.i18nTitle}">Resistance
+                                            <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}"
+                                               style="display: block; text-decoration: none; color: inherit;" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(news.slugTitle), ' ', '-'))} + '-' +
+           ${news.id}">
+                                            <span class="dd-clamp-text-1 am-text-bold" th:text="${news.i18nTitle}">Resistance
                                                 and
                                                 Leakage
-                                            </div>
+                                            </span>
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                                  th:text="${news.content}">
                                             </div>
+                                            </a>
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
@@ -144,10 +153,11 @@
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
-                        </a>
+
                     </div>
 
 

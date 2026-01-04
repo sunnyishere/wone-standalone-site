@@ -9,7 +9,13 @@
 
     <!-- 链接标签优化 -->
     <link rel="canonical" th:href="${websiteUrl}" />
-
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath + pageName + suffix}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}" >
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
+    </th:block>
+    <meta name="description"
+          th:content="${successCase.title} + '-' + ${prodBrand.eName}"/>
     <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="${currentLang}" />
@@ -116,13 +122,6 @@
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
                          th:if="${not #lists.isEmpty(successCases)}"
                          th:each="scate : ${successCases}">
-                        <a th:title="${scate.i18nTitle}" aria-hidden="false" th:aria-label="${scate.i18nTitle}" th:href="
-                        ${currentPathLang} +
-                        (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
-           '/' :
-           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(scate.slugTitle), ' ', '-'))} + '-' +
-           ${scate.id}">
                             <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
                                 <div class="am-g dd-hover4 am-padding" style="width: 100%;">
                                     <div style="am-cf">
@@ -133,6 +132,14 @@
                                             </div>
                                         </div>
                                         <div class="" style="height: 100px;">
+                                            <a style="display: block; text-decoration: none; color: inherit;"
+                                                    th:title="${scate.i18nTitle}" aria-hidden="false" th:aria-label="${scate.i18nTitle}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(scate.slugTitle), ' ', '-'))} + '-' +
+           ${scate.id}">
                                             <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.i18nTitle}">
                                                 Resistance and
                                                 Leakage
@@ -140,6 +147,7 @@
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                                  th:text="${scate.content}">
                                             </div>
+                                            </a>
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
@@ -156,7 +164,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+
                     </div>
 
 

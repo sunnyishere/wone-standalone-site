@@ -7,7 +7,7 @@
                      class="am-u-sm-6 am-u-md-3 am-u-lg-3 am-padding-bottom-lg am-padding-top-lg">
 
                 <!-- 渲染顶级导航标题 -->
-                <h2 class="am-text-sm" th:text="${section.title}"></h2>
+                <h3 class="am-text-sm" th:text="${section.title}"></h3>
 
                 <!-- 循环渲染子导航项 -->
                 <div style="display: flex;flex-direction: column;gap:10px;">
@@ -118,9 +118,9 @@
         },
         _initBackTop: function () {
             var $backTop = this.$backTop = $('<div class="m-top-cbbfixed">' +
-                '<a class="m-top-go m-top-cbbtn">' +
+                '<div class="m-top-go m-top-cbbtn">' +
                 '<span class="m-top-goicon"></span>' +
-                '</a>' +
+                '</div>' +
                 '</div>');
             $('body').append($backTop);
 

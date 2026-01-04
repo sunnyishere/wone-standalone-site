@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" xmlns:myu="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -12,10 +12,18 @@
     slug = ${category != null ?
         #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
         : ''},
-    canonical = ${base + (slug != '' ? '/' + slug : '')}
-    ">
-        <link rel="canonical" th:href="${canonical + '-' + (pageData?.pageNum ?: 1)}" />
-        <meta property="og:url" th:content="${canonical + '-' + (pageData?.pageNum ?: 1)}"/>
+    canonical = ${base + (slug != '' ? '/' + slug : '')},pn=${pageData?.pageNum ?: 1},
+    basePath = ${websitePath +pageName+ (slug != '' ? '/' + slug : '')}">
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <link th:if="${langList != null and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
+    </th:block>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}"
+              th:with="pn=${pageData?.pageNum ?: 1},slug = ${category != null ?
+        '/' + #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
+        : ''}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName +slug+ (pn > 1 ? '-' + pn : '')}" />
     </th:block>
     <meta property="og:title" th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${pageContent}"/>
@@ -173,7 +181,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(index.pName), '/', '-'), ' ', '-'))} +
+           ${#normalizer.normalizeString(index.pName)} +
            '-'+${index.pid}">
                             <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
                                 <div class="image-box">

@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }"  xmlns:myu="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,7 +9,11 @@
 
     <!-- Canonical URL -->
     <link rel="canonical" th:href="${websiteUrl}"/>
-
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}" >
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
+    </th:block>
     <!-- Robots -->
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
@@ -67,7 +71,7 @@
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${i18nName}"></h2>
+            <span style="font-size: 40px;margin: 0;font-weight: 100;" th:text="${i18nName}"></span>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -85,7 +89,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.replace(#strings.trim(category1.name), ' ', '-') +
+                    #strings.toLowerCase(#strings.replace(#strings.trim(category1.name), ' ', '-')) +
                     '-' + category1.id}"
                    th:text="${category1.i18nName}">Sub Category</a>
             </li>
@@ -96,7 +100,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.replace(#strings.trim(category2.name), ' ', '-') +
+                    #strings.toLowerCase(#strings.replace(#strings.trim(category2.name), ' ', '-')) +
                     '-' + category2.id}"
                    th:text="${category2.i18nName}">Sub Category</a>
             </li>
@@ -157,11 +161,11 @@
                     <div class="" style="border-bottom: 1px solid #E6E6E6;padding-bottom: 10px;">
                         <div class="am-text-lg am-text-bold border-active">
                             <a class="am-margin-right-lg" data-offset="240" href="#target1"
-                               onclick="scrollToTarget(event)" ><h3 class="inline-header"  th:text="${advanced['attributes']}"></h3></a>
+                               onclick="scrollToTarget(event)" ><h2 class="inline-header"  th:text="${advanced['attributes']}"></h2></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target2"
-                               onclick="scrollToTarget(event)" ><h3 class="inline-header" th:text="${advanced['description']}"> </h3></a>
+                               onclick="scrollToTarget(event)" ><h2 class="inline-header" th:text="${advanced['description']}"> </h2></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target4"
-                               onclick="scrollToTarget(event)" ><h3 class="inline-header"  th:text="${advanced['documentation.library']}"></h3></a>
+                               onclick="scrollToTarget(event)" ><h2 class="inline-header"  th:text="${advanced['documentation.library']}"></h2></a>
                         </div>
                     </div>
                 </div>
@@ -632,9 +636,8 @@
 
             <!-- Related Products -->
             <div th:if="${prodOther != null and #lists.size(prodOther) > 0}" class="am-g am-margin-top-xl">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
-                     th:text="${advanced['related.products']}">
-                    Related Products
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
+                    <h2 class="inline-header" th:text="${advanced['related.products']}"></h2>
                 </div>
                 <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
                     <div th:with="pageName=${topNavPages.?[pageType == 2][0]?.pageName}">
@@ -667,7 +670,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           ${#normalizer.normalizeString(prod.name)} +
            '-'+${prod.id}"
                                style="border: none">
                                 <div style="padding: 0 15px 0 0; border-radius: 12px;">
@@ -685,12 +688,12 @@
 
 
             <div class="am-g">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
-                     th:text="${advanced['related.solutions']}">
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;" >
+                    <h2 class="inline-header" th:text="${advanced['related.solutions']}"></h2>
 
                 </div>
                 <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
-                    <a th:title="${advanced['more']}" aria-hidden="false" :aria-label="${advanced['more']}"
+                    <a th:title="${advanced['more']}" aria-hidden="false" th:aria-label="${advanced['more']}"
                        th:href="
                     ${currentPathLang} +
                     (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
@@ -706,13 +709,6 @@
                 <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-3 am-thumbnails phone-clear-padding">
                     <li class="" style="padding: 0 8px 20px 8px !important;"
                         th:each="item : ${knowList}">
-                        <a th:href="
-                        ${currentPathLang} +
-                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
-           '/' :
-           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
-           ${item.id}">
                             <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
                                 <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">
                                     <div style="am-cf">
@@ -723,11 +719,20 @@
                                             </div>
                                         </div>
                                         <div class="am-padding-right" style="height: 100px;">
+                                            <a style="display: block; text-decoration: none; color: inherit;"
+                                               th:aria-label="${item.i18nTitle}" th:title="${item.i18nTitle}" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
+           ${item.id}">
                                             <div class="dd-clamp-text-1 am-text-bold" th:text="${item.i18nTitle}"></div>
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
                                                  th:text="${item.content}"></div>
+                                            </a>
                                             <div class="am-padding-top-xs am-cf am-text-sm">
-                                                <div class="am-fl dd-clamp-text-1" style="width: 30%; color: #5C779F;">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 40%; color: #5C779F;">
                                                     <span class="am-icon-user"></span>
                                                     <a class="device-aware-link" aria-hidden="false" th:aria-label="${item.author}" th:title="${item.author}"
                                                        th:href="${brandUrl}" style="border: none">
@@ -743,7 +748,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </a>
+
                     </li>
                 </ul>
             </div>
@@ -802,6 +807,12 @@
 </script>
     <script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
 <script>
+    $(document).ready(function() {
+        $('.am-direction-nav .am-prev').append('<span style="display:none;">Previous Slide</span>');
+        $('.am-direction-nav .am-next').append('<span style="display:none;">Next Slide</span>');
+        $('.am-direction-nav .am-prev').attr('aria-label', 'Previous Page');
+        $('.am-direction-nav .am-next').attr('aria-label', 'Next Page');
+    });
     // 全局变量存储 CKEditor 实例，避免重复创建
     let editorInstance = null;
 

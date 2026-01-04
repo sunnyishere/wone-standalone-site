@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang}">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 
 <head>
     <meta charset="utf-8">
@@ -10,6 +10,11 @@
 
     <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
     <meta property="og:url" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath} + ${pageName}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath +  (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName}" />
+    </th:block>
 
     <meta property="og:type" th:content="${pageName}"/>
     <meta property="og:locale" th:content="${currentLang}"/>
@@ -48,7 +53,7 @@
 <div class="m-header-banner m-header-1" th:style="'background-image: url(' + ${pageIcon} + ')'">
     <section class="am-container am-text-center wone-text">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${i18nName}"></h2>
+            <h1 th:text="${i18nName}"></h1>
             <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -88,7 +93,7 @@
 
     <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding">
         <div class="">
-            <div class="am-text-lg am-text-bold am-margin-top-sm"  th:text="${advanced['about.us']}">
+            <div class="am-text-lg am-text-bold am-margin-top-sm" > <h2 class="inline-header"  th:text="${advanced['about.us']}"></h2>
             </div>
         </div>
         <p th:text="${brand.profile}">
@@ -102,10 +107,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" th:text="${advanced['verified.profile']}"></span>
+                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" th:text="${advanced['verified.profile']}"></span>
+                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></span>
             </div>
 
         </div>
@@ -185,10 +190,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" th:text="${advanced['certifcations']}"></span>
+                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" th:text="${advanced['certifcations']}"></span>
+                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></span>
             </div>
 
         </div>
@@ -226,10 +231,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" th:text="${advanced['members']}"></span>
+                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" th:text="${advanced['members']}"></span>
+                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></span>
             </div>
 
         </div>
@@ -292,10 +297,10 @@
 
         <div class="am-text-center">
             <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" th:text="${advanced['organization.structure']}"></span>
+                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></span>
             </div>
             <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" th:text="${advanced['organization.structure']}"></span>
+                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></span>
             </div>
 
         </div>

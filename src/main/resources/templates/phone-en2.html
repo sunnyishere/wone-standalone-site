@@ -27,8 +27,8 @@
                                         <!-- 无后缀的情况 -->
                                         <a th:unless="${suffix != null}"
                                            th:href="${item.lang == 'en'} ?
-                                                        ('/' + ${pageName}) :
-                                                        ('/' + ${item.lang} + '/' + ${pageName})"
+                                                        ( ${pageName!='Home'?'/'+pageName:''}) :
+                                                        ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
                                            th:text="${item.langName}"
                                            th:title="${item.langName}"
                                            th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">

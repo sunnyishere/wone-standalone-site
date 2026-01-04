@@ -2,6 +2,8 @@ package com.rockwill.deploy.render;
 
 import com.rockwill.deploy.conf.BrandConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,9 @@ public class TemplateEnginePageRenderer {
             }
             WebContext context = getWebContext(variables);
             String htmlContent = templateEngine.process(templateName, context);
+            if (htmlContent.contains("http://oss.iwone.cn")) {
+                htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iwone.cn");
+            }
             log.info("Template rendering completed: {}, size: {}KB", templateName, htmlContent.length() / 1024);
             return htmlContent;
         } catch (Exception e) {

@@ -5,7 +5,9 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.rockwill.deploy.conf.GoogleTagProperties;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
+import com.rockwill.deploy.utils.PathMatchUtils;
 import com.rockwill.deploy.utils.SiteMenuUtils;
+import com.rockwill.deploy.utils.ThymeleafUtils;
 import com.rockwill.deploy.vo.AjaxResult;
 import com.rockwill.deploy.vo.DomainHtmlVo;
 import com.rockwill.deploy.vo.SitePage;
@@ -59,7 +61,11 @@ public class RockwillKnowledgeService {
         }
     }
 
+    @Value("${cdn.enabled:true}")
+    private boolean cdnEnabled;
 
+    @Value("${cdn.prefix:https://oss.iwone.cn}")
+    private String cdnPrefix;
     /**
      * 查询网页菜单
      *
@@ -130,8 +136,14 @@ public class RockwillKnowledgeService {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
                 if (model != null) {
+                    model.put("cdnEnabled", cdnEnabled);
+                    model.put("cdnPrefix", cdnPrefix);
                     handleDateKey(model);
                     String websiteUrl= "";
+                    if (model.containsKey("websitePath")){
+                        String websitePath = model.get("websitePath").toString();
+                        model.put("indexPath",websitePath.substring(0,websitePath.length()-1));
+                    }
                     if (model.containsKey("suffix")) {
                         Object suffix = model.get("suffix");
                         Object pageName = model.get("pageName");
@@ -184,8 +196,10 @@ public class RockwillKnowledgeService {
                     JSONObject object = JSON.parseObject(newVal);
                     if (StringUtils.isNotEmpty(websiteUrl)) {
                         if (object.containsKey("offers")) {
+                            //修改产品url
                             object.getJSONObject("offers").put("url", websiteUrl);
                         } else if (object.get("@type").toString().toLowerCase().contains("article")) {
+                            //修改文章、解决方案url
                             JSONObject mainEntityOfPage = object.getJSONObject("mainEntityOfPage");
                             if (mainEntityOfPage != null) {
                                 mainEntityOfPage.put("@id", websiteUrl);
@@ -193,6 +207,17 @@ public class RockwillKnowledgeService {
                         }
                     }
                     newVal = object.toJSONString();
+                } else if (newVal.startsWith("[") && model.containsKey("templateName") && model.get("templateName").equals("index")) {
+                    //修改首页website类型添加name
+                    JSONArray array = JSON.parseArray(newVal);
+                    for (int i = 0; i < array.size(); i++) {
+                        if (array.getJSONObject(i).containsKey("@type")
+                                && array.getJSONObject(i).getString("@type").equals("WebSite")
+                                && !array.getJSONObject(i).containsKey("name")) {
+                            array.getJSONObject(i).put("name", host);
+                        }
+                    }
+                    newVal = array.toJSONString();
                 }
                 model.put(key, newVal);
             } else if (key.toLowerCase().contains("breadcrumb") && model.get(key) instanceof String) {

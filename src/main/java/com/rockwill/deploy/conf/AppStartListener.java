@@ -36,12 +36,8 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
             }
         }
         if (brandConfig.getExecuteOnStart()) {
-            taskExecutor.execute(() -> {
-                log.info("Start asynchronous execution of static page generation tasks");
-                staticPageService.generateAllPages(brandConfig.getDomain());
-            });
-            if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
-                for (String domain : brandConfig.getDomainList()) {
+            if (brandConfig.getExecuteOnDomain() != null && !brandConfig.getExecuteOnDomain().isEmpty()) {
+                for (String domain : brandConfig.getExecuteOnDomain()) {
                     staticPageService.generateAllPages(domain);
                 }
             }
