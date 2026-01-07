@@ -24,7 +24,7 @@
     <meta property="og:description" th:content="${prod.description}"/>
     <meta property="og:url" th:content="${websiteUrl}"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="${currentLang}"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <!-- Twitter Card -->
@@ -41,7 +41,6 @@
     <meta property="product:modified_time" th:content="${prod.updated}"/>
 
     <!-- Viewport & UX -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
 
@@ -79,7 +78,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
             <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
             <li th:if="${category1 != null}">
                 <a th:title="${category1.i18nName}" aria-hidden="false" th:aria-label="${category1.i18nName}" th:href="
@@ -325,7 +324,7 @@
                                                 <div
                                                         data-trigger="modal-1"
                                                         data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                        th:data-biz-id="'documents-'+${item.id}"
+                                                        th:data-biz-id="'site-documents-'+${item.id}"
                                                         style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
                                                     <span th:text="${advanced['consulting']}">Consulting</span>
                                                     <span class="p-icon-a-0041 am-padding-left-sm"></span>
@@ -362,7 +361,8 @@
                                 <!-- 手机端：公开 + 视频 -->
                                 <div th:if="${item.isShow == 1 and item.type == 2 and item.url != null}"
                                      style="width: 100%;display: inline-flex;justify-content: center;">
-                                    <div class="am-text-center"
+                                    <div class="am-text-center" id="playVideoBtnMobile"
+                                         th:data-video-iframe="${#strings.replace(#strings.replace(#strings.replace(item.url, '&', '&amp;'), '<', '&lt;'), '>', '&gt;')}"
                                          style="margin-bottom: 10px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 120px;">
                                         <span>MP4</span>
                                         <span class="p-icon-a-0051 am-padding-left-sm"></span>
@@ -374,7 +374,7 @@
                                     <div class="am-text-center"
                                          data-trigger="modal-1"
                                          data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                         th:data-biz-id="'documents-'+${item.id}"
+                                         th:data-biz-id="'site-documents-'+${item.id}"
                                          style="margin-bottom: 10px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
                                         <span  th:text="${advanced['consulting']}">Consulting</span>
                                         <span class="p-icon-a-0041 am-padding-left-sm"></span>
@@ -477,11 +477,8 @@
                                         <a aria-hidden="false"
                                            th:aria-label="${item.modelName}"
                                            th:title="${item.modelName}"
-                                           th:href="${currentPathLang +
-         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
-           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
-         #strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-')) +
-         '-' + item.prodId + '-series' + item.id}"
+                                           th:href="${
+         #strings.replace(websiteUrl, '/detail', '')  + '-series' + item.id}"
                                            th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
                                             <div style="padding: 10px 20px;">
                                                 <span th:text="${item.modelName}"></span>
@@ -565,7 +562,7 @@
                            class="rfq-trigger"
                            data-trigger="modal-1"
                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                           th:data-biz-id="'prods-'+${prod.id}"
+                           th:data-biz-id="'site-prods-'+${prod.id}"
                         >
                             <button type="button" class="am-btn am-round am-margin-sm"
                                     style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
@@ -592,7 +589,7 @@
                            title="Send inquiry"
                            data-trigger="modal-1"
                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                           th:data-biz-id="'prods-'+${prod.id}">
+                           th:data-biz-id="'site-prods-'+${prod.id}">
                             <button type="button" class="am-btn am-round am-margin-sm"
                                     style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
                                 Send inquiry
@@ -719,7 +716,7 @@
                                             </div>
                                         </div>
                                         <div class="am-padding-right" style="height: 100px;">
-                                            <a style="display: block; text-decoration: none; color: inherit;"
+                                            <a class="inline-a-link"
                                                th:aria-label="${item.i18nTitle}" th:title="${item.i18nTitle}" th:href="
                         ${currentPathLang} +
                         (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
@@ -763,7 +760,7 @@
                title="Send inquiry"
                data-trigger="modal-1"
                data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-               th:data-biz-id="'prods-'+${prod.id}">
+               th:data-biz-id="'site-prods-'+${prod.id}">
                 <button type="button" class="am-btn am-round am-margin-sm"
                         style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
                     Send inquiry
@@ -778,106 +775,21 @@
         </div>
     </div>
 </div>
+<div class="video-modal" id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; padding: 40px 20px;">
+    <div class="video-container" style="width: 90%; max-width: 1200px; height: auto; max-height: 90vh; position: relative;">
+        <div class="close-video" id="closeVideo" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; text-align: center; line-height: 40px;">×</div>
+        <div style="position: relative; width: 100%; padding-top: 56.25%;">
+            <div id="videoIframeContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+        </div>
+    </div>
+</div>
     <!-- 搜索弹窗-->
     <th:block th:replace="search :: search"></th:block>
 
-    <!-- 弹窗-->
     <th:block th:replace="inquiry :: inquiry"></th:block>
-
-    <!-- PC端的右侧按钮 -->
     <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
-
-    <!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
-    <!-- 底部导航   -->
     <th:block th:replace="footer :: footer"></th:block>
-
-<script>
-    function scrollToTarget(event) {
-        event.preventDefault();
-        var anchor = event.currentTarget;
-        var targetId = anchor.getAttribute('href').substring(1);
-        var offset = parseInt(anchor.dataset.offset, 10);
-        var target = document.getElementById(targetId);
-        window.scrollTo({
-            top: target.offsetTop + offset,
-            behavior: 'smooth'
-        });
-    }
-</script>
-    <script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
-<script>
-    $(document).ready(function() {
-        $('.am-direction-nav .am-prev').append('<span style="display:none;">Previous Slide</span>');
-        $('.am-direction-nav .am-next').append('<span style="display:none;">Next Slide</span>');
-        $('.am-direction-nav .am-prev').attr('aria-label', 'Previous Page');
-        $('.am-direction-nav .am-next').attr('aria-label', 'Next Page');
-    });
-    // 全局变量存储 CKEditor 实例，避免重复创建
-    let editorInstance = null;
-
-    // 初始化函数（确保只执行一次）
-    async function initCKEditor() {
-        // 如果已有实例，先销毁
-        if (editorInstance) {
-            await editorInstance.destroy();
-        }
-
-        try {
-            editorInstance = await ClassicEditor.create(document.querySelector('#editor'), {
-                readOnly: true,
-                toolbar: [],
-                plugins: [
-                    'HorizontalRule',
-                    'GeneralHtmlSupport'
-                ],
-                htmlSupport: {
-                    allow: [{
-                        name: /.*/,
-                        attributes: true,
-                        classes: true,
-                        styles: true,
-                        allowEmpty: true
-                    }]
-                }
-            });
-            console.log('CKEditor 初始化成功');
-        } catch (error) {
-            // 只忽略「插件未找到」的误报，其他错误正常打印
-            if (error.name === 'CKEditorError') {
-                if (error.message.includes('plugin-not-found')) {
-                    console.log('忽略插件声明警告（功能正常）：', error.plugin);
-                } else if (error.message.includes('duplicated-modules')) {
-                    console.error('CKEditor 模块重复加载，请检查脚本引入是否重复：', error);
-                } else {
-                    console.error('CKEditor 初始化失败：', error);
-                }
-            }
-        }
-    }
-
-    // 确保 DOM 加载完成后再初始化（避免找不到 #editor 元素）
-    document.addEventListener('DOMContentLoaded', initCKEditor);
-</script>
-
-
-<script>
-    const stickyBar = document.querySelector('.sticky-bar');
-    const bottomBlock = document.querySelector('.sticky-bottom');
-    function handleScroll() {
-        const bottomBlockTop = bottomBlock.getBoundingClientRect().top;
-
-        const stickyBarHeight = stickyBar.offsetHeight;
-
-        if (bottomBlockTop <= stickyBarHeight) {
-            stickyBar.style.top = `-${stickyBarHeight - bottomBlockTop}px`;
-        } else {
-            stickyBar.style.top = '0';
-        }
-    }
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-</script>
+    <script th:src="@{${'/js/product.js?v=' + version}}"></script>
 </body>
 
 </html>

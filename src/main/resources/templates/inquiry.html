@@ -69,38 +69,37 @@
 
             <div class="am-container">
                 <div class="am-text-center am-text-xl am-avg-sm-3" style="margin: 10px 0;">
-                    <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
-                        <img src="https://oss.iwone.cn/standalone/img/down/01.png"  data-src="https://oss.iwone.cn/standalone/img/down/01.png"  loading="lazy" alt="Google Play"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
-                        <img src="https://oss.iwone.cn/standalone/img/down/02.png"  data-src="https://oss.iwone.cn/standalone/img/down/02.png" loading="lazy" alt="App Store"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
-                        <img src="https://oss.iwone.cn/standalone/img/down/03.png"  data-src="https://oss.iwone.cn/standalone/img/down/03.png"  loading="lazy" alt="HUAWEI"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
-                        <img src="https://oss.iwone.cn/standalone/img/down/04.png" data-src="https://oss.iwone.cn/standalone/img/down/04.png" loading="lazy" alt="XIAOMI"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <span title="VIVO" aria-hidden="false" aria-label="VIVO">
-                        <img src="https://oss.iwone.cn/standalone/img/down/05.png" data-src="https://oss.iwone.cn/standalone/img/down/05.png" loading="lazy" alt="VIVO"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+                        <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
+                            <img th:src="@{${basePath +'/img/down/01.png'}}"   th:data-src="@{${basePath +'/img/down/01.png'}}"  loading="lazy" alt="Google Play"
+                                 class="store-img">
+                        </a>
+                        <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
+                            <img th:src="@{${basePath +'/img/down/02.png'}}"   th:data-src="@{${basePath +'/img/down/02.png'}}" loading="lazy" alt="App Store"
+                                 class="store-img">
+                        </a>
+                        <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
+                            <img th:src="@{${basePath +'/img/down/03.png'}}"   th:data-src="@{${basePath +'/img/down/03.png'}}"  loading="lazy" alt="HUAWEI"
+                                 class="store-img">
+                        </a>
+                        <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
+                            <img th:src="@{${basePath +'/img/down/04.png'}}"   th:data-src="@{${basePath +'/img/down/04.png'}}" loading="lazy" alt="XIAOMI"
+                                 class="store-img">
+                        </a>
+                        <span title="VIVO" aria-hidden="false" aria-label="VIVO">
+                        <img th:src="@{${basePath +'/img/down/05.png'}}"   th:data-src="@{${basePath +'/img/down/05.png'}}" loading="lazy" alt="VIVO"
+                             class="store-img">
                     </span>
-                    <span title="OPPO" aria-hidden="false" aria-label="OPPO">
-                        <img src="https://oss.iwone.cn/standalone/img/down/06.png"  data-src="https://oss.iwone.cn/standalone/img/down/06.png" loading="lazy" alt="OPPO"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                        <span title="OPPO" aria-hidden="false" aria-label="OPPO">
+                        <img th:src="@{${basePath +'/img/down/06.png'}}"   th:data-src="@{${basePath +'/img/down/06.png'}}" loading="lazy" alt="OPPO"
+                             class="store-img">
                     </span>
-                    <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
-                        <img src="https://oss.iwone.cn/standalone/img/down/07.png" data-src="https://oss.iwone.cn/standalone/img/down/07.png" loading="lazy" alt="Palm Store"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                        <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
+                        <img th:src="@{${basePath +'/img/down/07.png'}}"   th:data-src="@{${basePath +'/img/down/07.png'}}" loading="lazy" alt="Palm Store"
+                             class="store-img">
                     </span>
-<!--                    <a href="https://galaxy.store/wone" title="SAMSUNG" aria-hidden="false" aria-label="SAMSUNG">-->
-<!--                        <img src="https://oss.iwone.cn/standalone/img/down/08.png" data-src="https://oss.iwone.cn/standalone/img/down/08.png" loading="lazy" alt="SAMSUNG"-->
-<!--                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">-->
-<!--                    </a>-->
+                    </th:block>
+
                 </div>
             </div>
 
@@ -134,38 +133,36 @@
 
             <div class="am-container">
                 <div class="am-text-center am-text-xl am-avg-sm-3" style="margin: 10px 0;">
-                    <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
-                        <img src="https://oss.iwone.cn/standalone/img/down/01.png" alt="Google Play"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
-                        <img src="https://oss.iwone.cn/standalone/img/down/02.png" alt="App Store"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
-                        <img src="https://oss.iwone.cn/standalone/img/down/03.png" alt="HUAWEI"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
-                        <img src="https://oss.iwone.cn/standalone/img/down/04.png" alt="XIAOMI"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
-                    </a>
-                    <span title="VIVO" aria-hidden="false" aria-label="VIVO">
-                        <img src="https://oss.iwone.cn/standalone/img/down/05.png" alt="VIVO"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+                        <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
+                            <img th:src="@{${basePath +'/img/down/01.png'}}"   th:data-src="@{${basePath +'/img/down/01.png'}}"  loading="lazy" alt="Google Play"
+                                 class="store-img">
+                        </a>
+                        <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
+                            <img th:src="@{${basePath +'/img/down/02.png'}}"   th:data-src="@{${basePath +'/img/down/02.png'}}" loading="lazy" alt="App Store"
+                                 class="store-img">
+                        </a>
+                        <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
+                            <img th:src="@{${basePath +'/img/down/03.png'}}"   th:data-src="@{${basePath +'/img/down/03.png'}}"  loading="lazy" alt="HUAWEI"
+                                 class="store-img">
+                        </a>
+                        <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
+                            <img th:src="@{${basePath +'/img/down/04.png'}}"   th:data-src="@{${basePath +'/img/down/04.png'}}" loading="lazy" alt="XIAOMI"
+                                 class="store-img">
+                        </a>
+                        <span title="VIVO" aria-hidden="false" aria-label="VIVO">
+                        <img th:src="@{${basePath +'/img/down/05.png'}}"   th:data-src="@{${basePath +'/img/down/05.png'}}" loading="lazy" alt="VIVO"
+                             class="store-img">
                     </span>
-                    <span title="OPPO" aria-hidden="false" aria-label="OPPO">
-                        <img src="https://oss.iwone.cn/standalone/img/down/06.png" alt="OPPO"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                        <span title="OPPO" aria-hidden="false" aria-label="OPPO">
+                        <img th:src="@{${basePath +'/img/down/06.png'}}"   th:data-src="@{${basePath +'/img/down/06.png'}}" loading="lazy" alt="OPPO"
+                             class="store-img">
                     </span>
-                    <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
-                        <img src="https://oss.iwone.cn/standalone/img/down/07.png" alt="Palm Store"
-                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                        <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
+                        <img th:src="@{${basePath +'/img/down/07.png'}}"   th:data-src="@{${basePath +'/img/down/07.png'}}" loading="lazy" alt="Palm Store"
+                             class="store-img">
                     </span>
-<!--                    <a href="https://galaxy.store/wone" title="SAMSUNG" aria-hidden="false" aria-label="SAMSUNG">-->
-<!--                        <img src="https://oss.iwone.cn/standalone/img/down/08.png" alt="SAMSUNG"-->
-<!--                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">-->
-<!--                    </a>-->
+                    </th:block>
                 </div>
             </div>
 

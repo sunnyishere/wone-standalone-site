@@ -1,9 +1,12 @@
 package com.rockwill.deploy.conf;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -26,38 +29,55 @@ public class RestTemplateConfig {
 
     @Bean("realTimeRestTemplate")
     public RestTemplate realTimeRestTemplate(RestTemplateBuilder builder) {
-        return restTemplate(builder,10);
+        return restTemplatePool(builder, 10);
     }
 
     @Bean("jobRestTemplate")
     @Primary
     public RestTemplate jobRestTemplate(RestTemplateBuilder builder) {
-        return restTemplate(builder,120);
+        return restTemplatePool(builder, 120);
     }
 
-    private RestTemplate restTemplate(RestTemplateBuilder builder,int timeout) {
-        RestTemplate restTemplate = builder
-                .setConnectTimeout(Duration.ofSeconds(timeout))
-                .setReadTimeout(Duration.ofSeconds(timeout))
-                .build();
+    private RestTemplate restTemplatePool(RestTemplateBuilder builder, int timeout) {
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(100);
+        connectionManager.setDefaultMaxPerRoute(20);
 
-        restTemplate.setInterceptors(Collections.singletonList(restTemplateHeaderInterceptor));
-        TrustStrategy acceptingTrustStrategy = (x509Certificates, s) -> true;
-        SSLContext sslContext = null;
         try {
-            sslContext = org.apache.http.ssl.SSLContexts.custom()
+            TrustStrategy acceptingTrustStrategy = (x509Certificates, s) -> true;
+            SSLContext sslContext = SSLContexts.custom()
                     .loadTrustMaterial(null, acceptingTrustStrategy)
                     .build();
-            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(
+                    sslContext,
+                    new NoopHostnameVerifier()
+            );
+
             CloseableHttpClient httpClient = HttpClients.custom()
                     .setSSLSocketFactory(csf)
+                    .setConnectionManager(connectionManager)
+                    .setDefaultRequestConfig(RequestConfig.custom()
+                            .setConnectTimeout(timeout * 1000)
+                            .setSocketTimeout(timeout * 1000)
+                            .build())
                     .build();
-            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-            requestFactory.setHttpClient(httpClient);
+
+            HttpComponentsClientHttpRequestFactory factory =
+                    new HttpComponentsClientHttpRequestFactory(httpClient);
+            factory.setConnectTimeout(timeout * 1000);
+            factory.setReadTimeout(timeout * 1000);
+
+            RestTemplate restTemplate = builder
+                    .requestFactory(() -> factory)
+                    .setConnectTimeout(Duration.ofSeconds(timeout))
+                    .setReadTimeout(Duration.ofSeconds(timeout))
+                    .build();
+            restTemplate.setInterceptors(Collections.singletonList(restTemplateHeaderInterceptor));
+
+            return restTemplate;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return restTemplate;
     }
 }

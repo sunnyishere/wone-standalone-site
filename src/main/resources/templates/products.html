@@ -29,7 +29,7 @@
     <meta property="og:description" th:content="${pageContent}"/>
 
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="${currentLang}"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
@@ -42,8 +42,6 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <!--防某度-->
@@ -73,7 +71,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li>
                 <a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
@@ -236,9 +234,6 @@
 
 <!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='Products')"></th:block>
-
-<!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

@@ -15,7 +15,6 @@
                             <nav class="lang-list-container">
                                 <ul class="am-menu-nav am-avg-sm-1">
                                     <li class="am-parent" th:each="item : ${langList}">
-                                        <!-- 有后缀的情况 -->
                                         <a th:if="${suffix != null}"
                                            th:href="${item.lang == 'en'} ?
                                                         ('/' + ${pageName} + ${suffix}) :
@@ -24,7 +23,6 @@
                                            th:title="${item.langName}"
                                            th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
                                         </a>
-                                        <!-- 无后缀的情况 -->
                                         <a th:unless="${suffix != null}"
                                            th:href="${item.lang == 'en'} ?
                                                         ( ${pageName!='Home'?'/'+pageName:''}) :
@@ -42,7 +40,7 @@
             </ul>
 
             <p>
-                <a th:href="${currentPathLang} + '/Home'" title="logo" aria-hidden="false" aria-label="logo"><span class="logo"></span></a>
+                <a th:href="${currentPathLang!=''? currentPathLang:'/'}" title="logo" aria-hidden="false" aria-label="logo"><span class="logo"></span></a>
             </p>
             <p th:each="navItem : ${topNavPages.?[pageType == 1]}"
                th:if="${navItem.pageType}">
@@ -57,168 +55,4 @@
     </div>
 </div>
 
-<style>
-    /* 动画样式 */
-    .lang-dropdown {
-        position: relative;
-    }
 
-    .lang-trigger {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 0;
-        user-select: none;
-    }
-
-    .dropdown-arrow {
-        transition: transform 0.3s ease;
-        font-size: 12px;
-    }
-
-    .lang-dropdown.active .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-
-    /* 语言列表样式 - 向上撑开 */
-    .lang-list {
-        position: absolute;
-        bottom: 100%; /* 从底部向上展开 */
-        left: 0;
-        right: 0;
-        max-height: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        margin: 0 !important;
-        opacity: 0;
-        transform: translateY(10px);
-        background-color: inherit; /* 继承父元素背景色 */
-        z-index: 1000;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); /* 向上展开的阴影 */
-    }
-
-    .lang-dropdown.active .lang-list {
-        max-height: 200px;
-        opacity: 1;
-        transform: translateY(0);
-        bottom: calc(100% + 5px); /* 向上展开的位置 */
-    }
-
-    .lang-list-container {
-        width: 100%;
-        max-height: 200px;
-        overflow-y: auto;
-        background-color: var(--theme-header-bg, #FFFFFF);
-    }
-
-    .lang-list .am-menu-nav {
-        background-color: inherit; /* 继承背景色 */
-        margin: 0;
-        padding: 0;
-    }
-
-    .lang-list .am-parent {
-        border-bottom: 1px solid #4F4F4F;
-    }
-
-    .lang-list .am-parent:last-child {
-        border-bottom: none;
-    }
-
-    .lang-list .am-parent a {
-        display: block;
-        padding: 10px 15px;
-        color: #000000 !important;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        background-color: inherit;
-    }
-
-    .lang-list .am-parent a:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-        padding-left: 20px;
-    }
-
-    /* 移动端侧边栏内的特殊样式 */
-    .phone-menu-p .lang-dropdown .lang-list {
-        position: relative;
-        bottom: auto;
-        margin-top: 10px !important;
-    }
-
-    .phone-menu-p .lang-dropdown.active .lang-list {
-        bottom: auto;
-        margin-top: 10px !important;
-    }
-
-    .am-offcanvas-content .lang-dropdown.active .lang-list {
-        bottom: auto;
-        margin-top: 10px !important;
-    }
-    .am-padding-sm {
-        padding: 0 !important;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const langTrigger = document.getElementById('langTrigger');
-        const langDropdown = document.querySelector('.lang-dropdown');
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const sidebar = document.getElementById('r-nav');
-        const status = document.getElementById('status');
-
-        // 语言下拉菜单切换
-        langTrigger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            langDropdown.classList.toggle('active');
-            updateStatus();
-        });
-
-        // 点击侧边栏外部区域关闭下拉菜单
-        document.addEventListener('click', function(e) {
-            if (!langDropdown.contains(e.target)) {
-                langDropdown.classList.remove('active');
-                updateStatus();
-            }
-        });
-
-        // 切换侧边栏显示/隐藏
-        toggleSidebar.addEventListener('click', function() {
-            if (sidebar.classList.contains('am-active')) {
-                sidebar.classList.remove('am-active');
-                status.textContent = '状态: 侧边栏已关闭';
-            } else {
-                sidebar.classList.add('am-active');
-                status.textContent = '状态: 侧边栏已打开';
-            }
-        });
-
-        // 更新状态显示
-        function updateStatus() {
-            const isOpen = langDropdown.classList.contains('active');
-            const sidebarStatus = sidebar.classList.contains('am-active') ? '打开' : '关闭';
-            status.textContent = `状态: 侧边栏已${sidebarStatus}, 语言下拉菜单${isOpen ? '展开' : '收起'}`;
-        }
-
-        // 语言选项点击事件
-        const langOptions = document.querySelectorAll('.lang-list a');
-        langOptions.forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.preventDefault();
-                const selectedLang = this.textContent;
-                document.querySelector('.lang-trigger .am-padding-left-0').textContent = selectedLang;
-
-                // 更新激活状态
-                langOptions.forEach(opt => opt.classList.remove('am-active'));
-                this.classList.add('am-active');
-
-                // 关闭下拉菜单
-                langDropdown.classList.remove('active');
-                updateStatus();
-            });
-        });
-    });
-</script>

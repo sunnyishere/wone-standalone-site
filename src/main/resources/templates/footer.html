@@ -38,6 +38,15 @@
     <div class="am-show-sm-only" style="height: 130px;background-color: #000000">
         <div style="opacity: 0;">空白</div>
     </div>
+    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+        <script th:src="@{${basePath + '/js/jquery.min.js?v=' + version}}"></script>
+        <script th:src="@{${basePath + '/js/amazeui.min.js?v=' + version}}"></script>
+        <script th:src="@{${basePath + '/js/jquery.qrcode.min.js?v=' + version}}"></script>
+        <script th:src="@{${basePath + '/js/echo.min.js?v=' + version}}"></script>
+        <script th:src="@{${basePath + '/js/main.js?v=' + version}}"></script>
+    </th:block>
+    <script src="https://oss.iwone.cn/landing/js/appDownload.js"></script>
+    <script th:src="@{${'/js/common.js?v=' + version}}"></script>
     <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${gaTrackingId}"></script>
     <script th:inline="javascript">
         window.dataLayer = window.dataLayer || [];
@@ -59,90 +68,4 @@
         }
     });
     // 图片赖加载
-</script>
-<script type="text/javascript">
-    $(function () {
-        //选项卡切换
-        $('.category ul li').click(function () {
-            indexC = $(this).index();
-            $(this).addClass('pc-active').siblings().removeClass('pc-active');
-            $('.cont').eq(indexC).addClass('pc-active').siblings().removeClass('pc-active');
-        })
-        //按钮箭头
-        var catew = $('.category').width() - 150;
-        var cateLiw = 0;
-        $('.category ul li').each(function () {
-            cateLiw += $(this).outerWidth();
-        })
-        var i = 0;
-        $('.next').click(function () {
-            $('.category ul').animate({
-                "margin-left": -catew + 'px'
-            }, 500)
-            i++;
-            if ((catew + 150) * i + (catew + 150) >= cateLiw) {
-                $('.prev').show();
-                $('.next').hide();
-            }
-        })
-        $('.prev').click(function () {
-            $('.category ul').animate({
-                "margin-left": 0 + 'px'
-            }, 500)
-            $(this).hide();
-            $('.next').show();
-        })
-    })
-</script>
-
-<script type="text/javascript">
-    // $(function () {
-    //     var str = "http://www.saitolia.com";
-    //     $("#code").qrcode({
-    //         render: "table",
-    //         width: 100,
-    //         height: 100,
-    //         text: str
-    //     });
-    // })
-    // 二维码生成
-    //返回顶部
-    function imj2() {
-        this.init();
-    }
-
-    imj2.prototype = {
-        constructor: imj2,
-        init: function () {
-            this._initBackTop();
-        },
-        _initBackTop: function () {
-            var $backTop = this.$backTop = $('<div class="m-top-cbbfixed">' +
-                '<div class="m-top-go m-top-cbbtn">' +
-                '<span class="m-top-goicon"></span>' +
-                '</div>' +
-                '</div>');
-            $('body').append($backTop);
-
-            $backTop.click(function () {
-                $("html, body").animate({
-                    scrollTop: 0
-                }, 800);
-            });
-
-            var timmer = null;
-            $(window).bind("scroll", function () {
-                var d = $(document).scrollTop(),
-                    e = $(window).height();
-                0 < d ? $backTop.css("bottom", "10px") : $backTop.css("bottom", "-90px");
-                clearTimeout(timmer);
-                timmer = setTimeout(function () {
-                    clearTimeout(timmer)
-                }, 100);
-            });
-        }
-
-    }
-    var imj2 = new imj2();
-    //end返回顶部
 </script>

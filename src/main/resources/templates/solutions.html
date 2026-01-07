@@ -22,7 +22,7 @@ basePath = ${websitePath + pageName}">
         <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}" />
     </th:block>
     <meta property="og:type" content="website" />
-    <meta property="og:locale" th:content="${currentLang}" />
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'" />
     <meta property="og:site_name"  th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -35,8 +35,6 @@ basePath = ${websitePath + pageName}">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <meta name="format-detection" content="telephone=no"/>
     <meta name="renderer" content="webkit"/>
     <!--防某度-->
@@ -66,7 +64,7 @@ basePath = ${websitePath + pageName}">
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
@@ -96,7 +94,7 @@ basePath = ${websitePath + pageName}">
                                     </div>
                                 </div>
                                 <div class="" style="height: 100px;">
-                                    <a style="display: block; text-decoration: none; color: inherit;"
+                                    <a class="inline-a-link"
                                        th:aria-label="${index.i18nTitle}" th:title="${index.i18nTitle}"
                                             th:href="${currentPathLang} + ${
     (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :

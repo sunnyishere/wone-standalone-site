@@ -67,7 +67,7 @@ public class TemplateEnginePageRenderer {
             WebContext context = getWebContext(variables);
             String htmlContent = templateEngine.process(templateName, context);
             if (htmlContent.contains("http://oss.iwone.cn")) {
-                htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iwone.cn");
+                htmlContent = htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iwone.cn");
             }
             log.info("Template rendering completed: {}, size: {}KB", templateName, htmlContent.length() / 1024);
             return htmlContent;

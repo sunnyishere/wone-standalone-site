@@ -33,7 +33,6 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <!--防某度-->
@@ -68,7 +67,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
                 <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${pageName}"></a>
             </li>
@@ -125,7 +124,7 @@
                                         </div>
                                         <div class="" style="height: 100px;">
                                             <a th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}"
-                                               style="display: block; text-decoration: none; color: inherit;" th:href="
+                                               class="inline-a-link" th:href="
                         ${currentPathLang} +
                         (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
@@ -209,60 +208,12 @@
 <!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='News_'+${news.id})"></th:block>
 
-<!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
-
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
 
 <script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
-<script>
-    // 全局变量存储 CKEditor 实例，避免重复创建
-    let editorInstance = null;
+<script th:src="@{${'/js/detail.js?v=' + version}}"></script>
 
-    // 初始化函数（确保只执行一次）
-    async function initCKEditor() {
-        // 如果已有实例，先销毁
-        if (editorInstance) {
-            await editorInstance.destroy();
-        }
-
-        try {
-            editorInstance = await ClassicEditor.create(document.querySelector('#editor'), {
-                readOnly: true,
-                toolbar: [],
-                plugins: [
-                    'HorizontalRule',
-                    'GeneralHtmlSupport'
-                ],
-                htmlSupport: {
-                    allow: [{
-                        name: /.*/,
-                        attributes: true,
-                        classes: true,
-                        styles: true,
-                        allowEmpty: true
-                    }]
-                }
-            });
-            console.log('CKEditor 初始化成功');
-        } catch (error) {
-            // 只忽略「插件未找到」的误报，其他错误正常打印
-            if (error.name === 'CKEditorError') {
-                if (error.message.includes('plugin-not-found')) {
-                    console.log('忽略插件声明警告（功能正常）：', error.plugin);
-                } else if (error.message.includes('duplicated-modules')) {
-                    console.error('CKEditor 模块重复加载，请检查脚本引入是否重复：', error);
-                } else {
-                    console.error('CKEditor 初始化失败：', error);
-                }
-            }
-        }
-    }
-
-    // 确保 DOM 加载完成后再初始化（避免找不到 #editor 元素）
-    document.addEventListener('DOMContentLoaded', initCKEditor);
-</script>
 </body>
 
 </html>

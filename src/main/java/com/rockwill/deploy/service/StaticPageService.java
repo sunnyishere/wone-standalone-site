@@ -89,6 +89,7 @@ public class StaticPageService {
         int state = 0;
         String reason = "";
         try {
+            copyStaticResources(domain);
             generateIndexPage(domain);
             knowledgeService.getSiteMenu(domain);
             String domainPath = staticOutputPath;
@@ -97,7 +98,6 @@ public class StaticPageService {
                 new File(domainPath).mkdirs();
             }
             generateMenuAndDetailPage("", domain);
-            copyStaticResources(domain);
             state = 2;
         } catch (Exception e) {
             log.error("triggerGenPages exception: {}", domain, e);
@@ -125,6 +125,7 @@ public class StaticPageService {
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
         try {
+            copyStaticResources(domain);
             generateIndexPage(domain);
             knowledgeService.getSiteMenu(domain);
             String domainPath = staticOutputPath;
@@ -136,7 +137,6 @@ public class StaticPageService {
             for (String lang : SiteMenuUtils.getLangList()) {
                 generateMenuAndDetailPage(lang, domain);
             }
-            copyStaticResources(domain);
 
             siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
             RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
@@ -157,7 +157,7 @@ public class StaticPageService {
                 return;
             }
             saveHtml(domain, "index", htmlContent);
-            saveHtml(domain, "Home", htmlContent);
+//            saveHtml(domain, "Home", htmlContent);
             addWebSitemap(htmlContent, "", 1.0, domain);
             log.info("End of generating index html files,site: {}", domain);
         } catch (Exception e) {
@@ -171,6 +171,7 @@ public class StaticPageService {
      */
     public void generateMenuAndDetailPage(String lang, String domain) {
         log.info("Start generating menu  html files,site:{},lang:{}", domain, lang);
+        long start=System.currentTimeMillis();
         if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages())) {
             log.error("Failed to request menu data: {}", domain);
             return;
@@ -210,10 +211,13 @@ public class StaticPageService {
                 }
                 if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                         && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-                    CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-                        processDetailPages(sitePage, domainHtmlVo, lang, domain);
-                    }, taskExecutor);
-                    futures.add(detailTask);
+//                    CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
+//                        processDetailPages(sitePage, domainHtmlVo, lang, domain);
+//                    }, taskExecutor);
+                    List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, domainHtmlVo, lang, domain);
+                    if (!detailTasks.isEmpty()) {
+                        futures.addAll(detailTasks);
+                    }
                 }
             }
         }
@@ -223,7 +227,8 @@ public class StaticPageService {
         } catch (Exception e) {
             log.error("waiting menu and detail result exception", e);
         }
-        log.info("End of generating  menu html files,site: {},lang:{}", domain, lang);
+
+        log.info("End of generating  menu html files,site: {},lang:{},cost time:{}", domain, lang,(System.currentTimeMillis()-start)/1000);
     }
 
     private List<CompletableFuture<Void>> processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain) {
@@ -247,10 +252,13 @@ public class StaticPageService {
                 if (p >= 2 && !isSubMenu) {
                     if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                             && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-                        CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-                            processDetailPages(sitePage, menuPageVo, lang, domain);
-                        }, taskExecutor);
-                        futures.add(detailTask);
+//                        CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
+//                            processDetailPages(sitePage, menuPageVo, lang, domain);
+//                        }, taskExecutor);
+                        List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, menuPageVo, lang, domain);
+                        if (!detailTasks.isEmpty()) {
+                            futures.addAll(detailTasks);
+                        }
                     }
                 }
             }
@@ -302,13 +310,13 @@ public class StaticPageService {
                 SitePage sub = new SitePage();
                 sub.setPageName(sort.substring(0, sort.lastIndexOf("-")));
                 sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-") + 1)));
-                processPagination(sitePage, sub, subVo, true, lang, domain);
+                List<CompletableFuture<Void>> futures= processPagination(sitePage, sub, subVo, true, lang, domain);
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());
     }
 
-    private void processSubCategory(SitePage menu, SitePage sitePage, String lang, String domain) {
+    private List<CompletableFuture<Void>>  processSubCategory(SitePage menu, SitePage sitePage, String lang, String domain) {
         String docName = menu.getPageName() + "/" + sitePage.getPageName() + "-" + sitePage.getId();
         if (!ObjectUtils.isEmpty(lang)) {
             docName = lang + "/" + docName;
@@ -316,45 +324,51 @@ public class StaticPageService {
         DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
         saveHtml(domain, docName, categoryVo.getHtmlContent());
         addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64, domain);
-        processPagination(menu, sitePage, categoryVo, true, lang, domain);
+        List<CompletableFuture<Void>> futures = processPagination(menu, sitePage, categoryVo, true, lang, domain);
+        return futures;
     }
 
-    public void processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain) {
+    public List<CompletableFuture<Void>> processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain) {
         log.info("Start generating details html files,detail:{}", sitePage.getPageName());
+        List<CompletableFuture<Void>> futureList = new ArrayList<>();
         String cssQuery = "";
         if (sitePage.getPageType() == 3) {
-            cssQuery = "div.am-u-sm-12 > a";
+            cssQuery = "a.inline-a-link";
         } else if (sitePage.getPageType() == 2 || sitePage.getPageType() == 5 || sitePage.getPageType() == 7) {
             cssQuery = "li.dd-hover4 > a";
         }
         if (ObjectUtils.isEmpty(cssQuery)) {
             log.error("Currently, only products, news, solutions, and Success Reference are supported for static details.");
-            return;
+            return new ArrayList<>();
         }
         List<String> detailUrlList = getDetailLinkFromPage(domainHtmlVo.getHtmlContent(), cssQuery);
         for (String detailUrl : detailUrlList) {
-            if (detailUrlNap.get(domain).contains(detailUrl)){
+            if (detailUrlNap.get(domain).contains(detailUrl)) {
                 continue;
             }
             detailUrlNap.get(domain).add(detailUrl);
-            DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
-            saveHtml(domain, detailUrl, subVo.getHtmlContent());
-            addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8, domain);
-            if (detailUrl.contains(sitePage.getPageName()+"/detail")) {
-                if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
-                    List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
-                    for (LinkedHashMap<String, Object> model : modelList) {
-                        String modelName = sitePage.getPageName()+subVo.getModelMap().get("suffix").toString().replace("/detail","")+ "-series" + model.get("id");
-                        if (!ObjectUtils.isEmpty(lang)) {
-                            modelName = lang + "/" + modelName;
+            CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
+                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
+                saveHtml(domain, detailUrl, subVo.getHtmlContent());
+                addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8, domain);
+                if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
+                    if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
+                        List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
+                        for (LinkedHashMap<String, Object> model : modelList) {
+                            String modelName = sitePage.getPageName() + subVo.getModelMap().get("suffix").toString().replace("/detail", "") + "-series" + model.get("id");
+                            if (!ObjectUtils.isEmpty(lang)) {
+                                modelName = lang + "/" + modelName;
+                            }
+                            DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName), domain);
+                            saveHtml(domain, modelName, modelVo.getHtmlContent());
                         }
-                        DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName), domain);
-                        saveHtml(domain, modelName, modelVo.getHtmlContent());
                     }
                 }
-            }
+            }, taskExecutor);
+            futureList.add(detailTask);
         }
         log.info("End of generating details html files,detail: {}", sitePage.getPageName());
+        return futureList;
     }
 
     private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {

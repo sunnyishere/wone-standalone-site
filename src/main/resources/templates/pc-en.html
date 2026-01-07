@@ -18,7 +18,6 @@
                                         <nav class="" style="width: 100%;height: auto; max-height: 200px;overflow-y: scroll;">
                                             <ul class="am-menu-nav am-avg-sm-1" style="background-color: var(--theme-header-bg)">
                                                 <li class="am-parent" th:each="item : ${langList}">
-                                                    <!-- 有后缀的情况 -->
                                                     <a th:if="${suffix != null}"
                                                        th:href="${item.lang == 'en'} ?
                                                         ('/' + ${pageName} + ${suffix}) :
@@ -27,7 +26,6 @@
                                                        th:title="${item.langName}"
                                                        th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
                                                     </a>
-                                                    <!-- 无后缀的情况 -->
                                                     <a th:unless="${suffix != null}"
                                                        th:href="${item.lang == 'en'} ?
                                                         ( ${pageName!='Home'?'/'+pageName:''}) :
@@ -45,7 +43,7 @@
                             </li>
 
                             <li>
-                                <button title="RFQ" aria-hidden="false" aria-label="RFQ" data-trigger="modal-1" style="background: none; border: none;color: var(--theme-menu-font-color) !important;" th:data-biz-id="${param1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
+                                <button title="RFQ" aria-hidden="false" aria-label="RFQ" data-trigger="modal-1" style="background: none; border: none;color: var(--theme-menu-font-color) !important;" th:data-biz-id="'site-'+${param1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
                                     <span class="p-icon-a-019"></span>
                                     <span class="">RFQ</span>
                                 </button>
@@ -53,10 +51,8 @@
 
                         </ul>
                     </div>
-                </div><!-- <br><br> -->
-
+                </div>
             </div>
-
         </div>
     </div>
     <div class="am-container" style="padding-top: 10px;">
@@ -96,29 +92,4 @@
 
         </div>
     </div>
-    <style>
-        .inline-header {
-            display: inline;
-            margin: 0;
-            padding: 0;
-            font-size: inherit;
-            font-weight: inherit;
-        }
-        .m-header-banner h1{
-            font-size: 50px;
-            margin: 0;
-            font-weight: 100;
-        }
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-    </style>
 </section>

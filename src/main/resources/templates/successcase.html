@@ -20,7 +20,7 @@
         <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}" />
     </th:block>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="${currentLang}"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
@@ -33,9 +33,7 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="format-detection" content="telephone=no">
+     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
@@ -65,7 +63,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}"  aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}  " th:title="${advanced['home.button']}"  aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>

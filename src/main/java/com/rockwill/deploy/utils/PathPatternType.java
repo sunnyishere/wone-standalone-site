@@ -14,7 +14,7 @@ public enum PathPatternType {
     MENU_WITHOUT_PAGE("/menu/topNavPages"),
     
     // 默认路径
-    DEFAULT("/home");
+    DEFAULT("/");
     
     private final String forwardTarget;
     
