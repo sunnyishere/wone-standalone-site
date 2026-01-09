@@ -434,9 +434,9 @@ public class StaticPageService {
                         continue;
                     }
                     String target = staticOutputPath;
-                    if (!domain.equals(brandConfig.getDomain())) {
-                        target += "/" + domain;
-                    }
+//                    if (!domain.equals(brandConfig.getDomain())) {
+//                        target += "/" + domain;
+//                    }
                     Path targetFile = Paths.get(target + "/static", resourcePath);
                     Files.createDirectories(targetFile.getParent());
 

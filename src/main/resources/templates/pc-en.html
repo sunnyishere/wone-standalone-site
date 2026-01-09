@@ -28,7 +28,7 @@
                                                     </a>
                                                     <a th:unless="${suffix != null}"
                                                        th:href="${item.lang == 'en'} ?
-                                                        ( ${pageName!='Home'?'/'+pageName:''}) :
+                                                        ( ${pageName!='Home'?'/'+pageName:'/'}) :
                                                         ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
                                                        th:text="${item.langName}"
                                                        th:title="${item.langName}"
@@ -61,7 +61,7 @@
                 <nav class="am-fl" style="margin-top: -5px;">
                     <a class="am-fl am-padding-right" th:href="${currentPathLang} + '/'" >
                         <img th:alt="${prodBrand.name}" th:src="${prodBrand.icon}"
-                             class="logo-square" style="width: auto">
+                             class="logo-square">
                     </a>
                     <ul class="m-nav am-nav am-nav-pills am-fl" style="margin-top: 10px;">
                         <li th:each="navItem : ${topNavPages.?[pageType == 1]}"

@@ -4,13 +4,9 @@
     <meta http-equiv="content-type" content="no-siteapp"/>
     <meta name="author" content="https://m.iwone.cn/"/>
     <link rel="preconnect" href="https://oss.iwone.cn">
-    <link rel="preload" th:href="@{${ '/css/amazeui.min.css?v=' + version}}" as="style">
-    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
-        <link rel="preload" th:href="@{${basePath + '/css/iconfont2.css?v=' + version}}" as="style">
-        <link rel="preload" th:href="@{${basePath + '/css/iconfont.css?v=' + version}}" as="style">
-        <link rel="stylesheet" th:href="@{${basePath + '/css/iconfont2.css?v='+ version}}">
-        <link rel="stylesheet" th:href="@{${basePath + '/css/iconfont.css?v='+ version}}">
-    </th:block>
+    <link rel="preload" th:href="@{${'/css/amazeui.min.css?v=' + version}}" as="style">
+    <link rel="preload" th:href="@{${'/css/mini_iconfont.css?v=' + version}}" as="style">
+    <link rel="stylesheet" th:href="@{${'/css/mini_iconfont.css?v='+ version}}">
     <link rel="stylesheet" th:href="@{${'/css/amazeui.min.css?v=' + version}}">
     <link rel="stylesheet" th:href="@{${'/css/style.css?v='+ version}}">
     <link rel="icon" type="image/x-icon" th:href="${prodBrand.icon}">
@@ -32,5 +28,13 @@
             document.documentElement.style.setProperty("--theme-header-color", headColor);
             document.documentElement.style.setProperty("--theme-menu-font-color", otherHeadFontColor);
     </script>
+    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+        <script th:src="@{${basePath + '/js/jquery.min.js?v=' + version}}" defer></script>
+        <script th:src="@{${basePath + '/js/amazeui.min.js?v=' + version}}" defer></script>
+        <script th:src="@{${basePath + '/js/jquery.qrcode.min.js?v=' + version}}" defer></script>
+        <script th:src="@{${basePath + '/js/echo.min.js?v=' + version}}" defer></script>
+    </th:block>
+    <script src="https://oss.iwone.cn/landing/js/appDownload.js" defer></script>
+    <script th:src="@{${'/js/main.js?v=' + version}}" defer></script>
 </head>
 </html>

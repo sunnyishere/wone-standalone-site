@@ -52,14 +52,31 @@
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height">占位边距</div>
-<div class="m-header-banner m-header-1"
-     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
-    <section class="am-container am-text-center wone-text">
+
+<div class="am-hide-sm-only m-header-banner m-header-1"
+     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
+             + '; height: 300px; display: flex; align-items: center; justify-content: center;'
+             + 'background-size: cover; background-position: center; ' ">
+    <section class="am-container wone-text"
+             style="text-align: center;">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h1 th:text="${i18nName}"></h1>
-            <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
+            <p class="dd-clamp-text-3 dd-clamp-text-3-left" style="font-size: 30px;font-weight: bold; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.5; position: relative; top: 60px;"
+               th:text="${pageDescription}"></p>
         </hgroup>
     </section>
+</div>
+<div class="am-show-sm-only m-header-banner-other m-header-1-other"
+     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + '); ' +
+
+               'height: 150px; width: 100%; position: relative;'">
+    <div style="position: absolute; top: 20%; left: 0; width: 100%; padding: 0 15px;
+                transform: translateY(-9%); text-align: center;">
+        <p class="dd-clamp-text-3"
+           style="font-size: 20px; font-weight: bold; color: #FFF;
+                  line-height: 1.4; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);"
+           th:text="${pageDescription}">
+        </p>
+    </div>
 </div>
 <nav class="m-cat-nav">
     <div class="am-container">

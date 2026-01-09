@@ -56,14 +56,6 @@
 
 </header>
 <div class="header-height">占位边距</div>
-<div class="m-header-banner m-header-1" th:style="'background-image: url(' + ${pageIcon} + ')'">
-    <section class="am-container am-text-center wone-text">
-        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <h2 th:text="${i18nName}"></h2>
-            <p class="dd-clamp-text-1" th:text="${pageDescription}"></p>
-        </hgroup>
-    </section>
-</div>
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
@@ -201,19 +193,11 @@
 </div>
 <!-- 搜索弹窗-->
 <th:block th:replace="search :: search"></th:block>
-
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
 
-<!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='News_'+${news.id})"></th:block>
 
-<!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
-
-<script src="https://oss.iwone.cn/standalone/js/ckeditor.js"></script>
-<script th:src="@{${'/js/detail.js?v=' + version}}"></script>
-
 </body>
 
 </html>

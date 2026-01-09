@@ -38,15 +38,6 @@
     <div class="am-show-sm-only" style="height: 130px;background-color: #000000">
         <div style="opacity: 0;">空白</div>
     </div>
-    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
-        <script th:src="@{${basePath + '/js/jquery.min.js?v=' + version}}"></script>
-        <script th:src="@{${basePath + '/js/amazeui.min.js?v=' + version}}"></script>
-        <script th:src="@{${basePath + '/js/jquery.qrcode.min.js?v=' + version}}"></script>
-        <script th:src="@{${basePath + '/js/echo.min.js?v=' + version}}"></script>
-        <script th:src="@{${basePath + '/js/main.js?v=' + version}}"></script>
-    </th:block>
-    <script src="https://oss.iwone.cn/landing/js/appDownload.js"></script>
-    <script th:src="@{${'/js/common.js?v=' + version}}"></script>
     <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${gaTrackingId}"></script>
     <script th:inline="javascript">
         window.dataLayer = window.dataLayer || [];
