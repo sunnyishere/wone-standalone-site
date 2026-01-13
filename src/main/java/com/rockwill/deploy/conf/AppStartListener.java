@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.concurrent.Executor;
 
 @Component
@@ -29,6 +30,11 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
+        try {
+            staticPageService.copyStaticResources("");
+        } catch (IOException e) {
+            log.warn("copy static error:{}",e.getMessage());
+        }
         knowledgeService.getSiteMenu(brandConfig.getDomain());
         if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
             for (String domain : brandConfig.getDomainList()) {

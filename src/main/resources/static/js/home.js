@@ -7,6 +7,17 @@ document.querySelectorAll('.am-slider-images').forEach(function (slider) {
         }
     });
 });
+function loadImages(container) {
+    const images = container.querySelectorAll('img[data-src]');
+    if (images.length === 0) return;
+    images.forEach(img => {
+        const realSrc = img.getAttribute('data-src');
+        if (realSrc && img.src.includes('/img/space.png')) {
+            img.src = realSrc;
+            img.removeAttribute('data-src');
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', function () {
     const topNavPageName = document.getElementById('topNavPageName').value || '';
     const cateItems = document.querySelectorAll('.category li');
@@ -16,6 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
         cateItem.addEventListener('click', function () {
             cateItems.forEach(item => item.classList.remove('pc-active'));
             this.classList.add('pc-active');
+            const tabIndex = this.getAttribute('data-tab-index')
+            if (tabIndex){
+                const targetCont = document.querySelector(`.cont[data-content-index="${tabIndex}"]`);
+                requestAnimationFrame(() => {
+                    loadImages(targetCont)
+                });
+            }
         });
     });
 

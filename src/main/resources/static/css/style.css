@@ -558,10 +558,3 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .inline-a-link{display:block;text-decoration:none;color:inherit}
 .am-slider-images{position:relative}
 .banner-link{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;text-decoration:none;color:transparent}
-.am-slider.am-slider-a1{height:680px!important;min-height:680px;overflow:hidden}
-.am-slides{height:680px!important}
-.am-slider-images{height:680px!important}
-.slider-placeholder{height:680px;visibility:hidden}
-@media screen and (max-width:768px){
-    .am-slider.am-slider-a1,.am-slides,.am-slides li{height:300px!important;min-height:300px}
-}

@@ -138,7 +138,11 @@ public class RockwillKnowledgeService {
                 if (model != null) {
                     model.put("cdnEnabled", cdnEnabled);
                     model.put("cdnPrefix", cdnPrefix);
-                    model.put("version", "1.0.5");
+                    model.put("version", "1.0.9");
+                    if (model.containsKey("brandUrl")){
+                        String brandUrl = model.get("brandUrl").toString();
+                        model.put("brandUrl",brandUrl.toLowerCase());
+                    }
                     handleDateKey(model);
                     String websiteUrl= "";
                     if (model.containsKey("websitePath")){

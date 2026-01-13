@@ -34,13 +34,19 @@
           th:href="${banner.get(0).imgUrl}"
           as="image"
           fetchpriority="high">
-
-
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
+    <style>
+        .am-slider.am-slider-a1{height:680px!important;min-height:680px;overflow:hidden}
+        .am-slides{height:680px!important}
+        .am-slider-images{height:680px!important}
+        @media screen and (max-width:768px){
+            .am-slider.am-slider-a1,.am-slides,.am-slides li{height:300px!important;min-height:300px}
+        }
+    </style>
     <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
@@ -107,18 +113,18 @@
                 </div>
 
                 <!-- 按钮：左对齐 -->
-                <div th:if="${index.fontPosition == 'left'}" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
-                     <span class="dd-clamp-text-1"
-                           style="border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);">
-                          <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="${index.jumpUrl}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                   </span>
+                <div th:if="${index.fontPosition == 'left'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
+                    <span class="dd-clamp-text-1"
+                          style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
+                        <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
+                    </span>
                 </div>
                 <!-- 按钮：居中 -->
-                <div th:if="${index.fontPosition == 'center'}" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
-                        <span class="dd-clamp-text-1"
-                          style="border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);">
-                            <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" th:href="${index.jumpUrl}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                          </span>
+                <div th:if="${index.fontPosition == 'center'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
+                    <span class="dd-clamp-text-1"
+                          style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
+                        <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
+                    </span>
                 </div>
             </div>
         </li>
@@ -153,7 +159,8 @@
                                 <li class="pc-active" th:text="${advanced['all']}">
                                     All
                                 </li>
-                                <li th:each="category : ${categories}">
+                                <li th:each="category,stat : ${categories}"
+                                    th:data-tab-index="${stat.index + 1}">
                                     <span th:text="${category.i18nName}"></span>
                                 </li>
                             </ul>
@@ -186,7 +193,7 @@
            '-'+${prod.id}">
                                         <div class="image-box">
                                             <img th:alt="${prod.i18nName}" th:data-echo="${prod.url}"
-                                                 th:src="${prod.url}" src="images/fuwu.jpg" class="image-square">
+                                                 th:src="${prod.url}"  class="image-square">
                                         </div>
                                         <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
                                               th:text="${prod?.i18nName ?: ''}"></span>
@@ -225,7 +232,7 @@
                             </a>
                         </div>
                     </div>
-                    <div class="cont" th:each="category : ${cateProd}">
+                    <div class="cont" th:each="category,stat : ${cateProd}" th:data-content-index="${stat.index + 1}">
                         <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                             style="margin: 0 0;">
                             <!-- 产品列表循环 -->
@@ -245,8 +252,8 @@
         '-' +
         ${product.id}">
                                         <div class="image-box">
-                                            <img th:data-echo="${product.url}" th:alt="${product.i18nName}"
-                                                 th:src="${product.url}" class="image-square">
+                                            <img th:data-src="${product.url}" th:alt="${product.i18nName}"
+                                                 src="/img/space.png" class="image-square">
                                         </div>
                                         <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
                                               th:text="${product.i18nName ?: ''}"></span>
