@@ -66,6 +66,8 @@ public class RockwillKnowledgeService {
 
     @Value("${cdn.prefix:https://oss.iwone.cn}")
     private String cdnPrefix;
+    @Value("${cdn.version}")
+    private String version;
     /**
      * 查询网页菜单
      *
@@ -138,7 +140,7 @@ public class RockwillKnowledgeService {
                 if (model != null) {
                     model.put("cdnEnabled", cdnEnabled);
                     model.put("cdnPrefix", cdnPrefix);
-                    model.put("version", "1.0.9");
+                    model.put("version", version);
                     if (model.containsKey("brandUrl")){
                         String brandUrl = model.get("brandUrl").toString();
                         model.put("brandUrl",brandUrl.toLowerCase());
@@ -339,13 +341,13 @@ public class RockwillKnowledgeService {
      *
      * @return 返回首页html
      */
-    public String getHome(RestTemplate restTemplate,String host) {
+    public DomainHtmlVo getHome(RestTemplate restTemplate,String host) {
         log.info("request Home data");
         try {
-            return getFromApi(restTemplate, "home",host).getHtmlContent();
+            return getFromApi(restTemplate, "home",host);
         } catch (Exception e) {
             log.error("request Home data exception", e);
-            return "";
+            return null;
         }
     }
 }

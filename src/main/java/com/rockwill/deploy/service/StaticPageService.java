@@ -151,15 +151,16 @@ public class StaticPageService {
     public void generateIndexPage(String domain) {
         try {
             log.info("Start generating index  html files,site:{}", domain);
-            String htmlContent = knowledgeService.getHome(jobRestTemplate, domain);
-            if (ObjectUtils.isEmpty(htmlContent)) {
+            com.rockwill.deploy.vo.DomainHtmlVo domainHtmlVo = knowledgeService.getHome(jobRestTemplate, domain);
+            if (domainHtmlVo==null || ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 log.info("Failed to request index content");
                 return;
             }
-            saveHtml(domain, "index", htmlContent);
-//            saveHtml(domain, "Home", htmlContent);
-            addWebSitemap(htmlContent, "", 1.0, domain);
+            saveHtml(domain, "index", domainHtmlVo.getHtmlContent());
+            addWebSitemap(domainHtmlVo.getHtmlContent(), "", 1.0, domain);
             log.info("End of generating index html files,site: {}", domain);
+            String content404=templateEnginePageRenderer.renderPage("404",domainHtmlVo.getModelMap());
+            saveHtml(domain, "404", content404);
         } catch (Exception e) {
             log.error("generate index html files exception，site: {}", domain, e);
         }
@@ -391,9 +392,13 @@ public class StaticPageService {
         }
         String siteDir = new File(baseStaticPath).getAbsolutePath();
         if (!"index.html".equals(fileName)) {
-            String baseName = fileName.replace(".html", "");
-            siteDir = new File(siteDir, baseName).getAbsolutePath();
-            fileName = "index.html";
+            if (namePrefix.equals("404")){
+                fileName = "404.html";
+            }else{
+                String baseName = fileName.replace(".html", "");
+                siteDir = new File(siteDir, baseName).getAbsolutePath();
+                fileName = "index.html";
+            }
         }
         String menuPagePath = new File(siteDir, fileName).getAbsolutePath();
         try {

@@ -662,7 +662,7 @@
             </div>
 
 
-            <div class="am-g">
+            <div th:if="${not #lists.isEmpty(knowList)}" class="am-g">
                 <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;" >
                     <h2 class="inline-header" th:text="${advanced['related.solutions']}"></h2>
 
@@ -689,7 +689,7 @@
                                     <div style="am-cf">
                                         <div class="am-fl am-margin-right am-padding-left phone-clear-padding-min">
                                             <div class="phone-bottom" style="width: 100px; height: 100px;">
-                                                <img th:src="${item.iconUrl}" alt="" class="am-img-responsive"
+                                                <img th:src="${item.iconUrl}" th:alt="${item.i18nTitle}" class="am-img-responsive"
                                                      style="object-fit: cover; width: 100px; height: 100px; border-radius: 12px;">
                                             </div>
                                         </div>

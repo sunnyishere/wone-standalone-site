@@ -532,7 +532,7 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .tabs-new .cont{display:none}
 .tabs-new .cont.pc-active{display:block}
 .logo-box{width:100%;max-width:100px;margin:0 auto;position:relative;padding-top:10%;border-radius:6px;border:1px solid #f9f9f9;background-color:#f9f9f9}
-.logo-square{width:100px;height:58px}
+.logo-square{width:58px;height:58px;object-fit:cover}
 .sticky-bar{position:sticky;top:130px!important}
 .nav-hover a{color:var(--theme-wone)!important}
 .store-img{height:50px;margin:10px;overflow:hidden;object-fit:cover}

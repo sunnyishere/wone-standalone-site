@@ -138,56 +138,6 @@
                     </ul>
                 </li>
 
-                <!-- Language 面板 -->
-                <li class="am-panel am-padding-left">
-                    <a class="am-text-bold" data-am-collapse="{parent: '#collapase-nav-1', target: '#a2'}">
-                        <span th:text="${advanced['language']}"></span>
-                        <i class="am-fr am-margin-right"
-                           th:classappend="${#lists.contains({'Chinese','English','French'}, selectValue)}
-               ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
-                    </a>
-                    <!-- 子列表：根据是否包含选中项添加am-in类 -->
-                    <ul class="am-list am-collapse admin-sidebar-sub"
-                        id="a2"
-                        th:classappend="${#lists.contains({'Chinese','English','French'}, selectValue)} ? 'am-in' : ''">
-                        <li th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a title="Chinese" aria-hidden="false" aria-label="Chinese" th:style="${selectValue == 'Chinese'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="'Chinese'"
-                               th:href="${currentPathLang} +
-                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
-                    '/' :
-                    '/' +
-                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
-                    '/' +
-                    #strings.replace(#strings.trim('chinese'), ' ', '-') } +'-3686323'">
-                            </a>
-                        </li>
-                        <li th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a title="English" aria-hidden="false" aria-label="English" th:style="${selectValue == 'English'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="'english'"
-                               th:href="${currentPathLang} +
-                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
-                    '/' :
-                    '/' +
-                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
-                    '/' +
-                    #strings.replace(#strings.trim('english'), ' ', '-') + '-3259826' }">
-                            </a>
-                        </li>
-                        <li th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a title="French" aria-hidden="false" aria-label="French" th:style="${selectValue == 'French'} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:text="'French'"
-                               th:href="${currentPathLang} +
-                               ${#lists.isEmpty(topNavPages.?[pageType == 4]) ?
-                    '/' :
-                    '/' +
-                    #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
-                    '/' +
-                    #strings.replace(#strings.trim('french'), ' ', '-') + '-443636'}">
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
                 <!-- Sort By 面板 -->
                 <li class="am-panel am-padding-left">
@@ -308,6 +258,10 @@
                                                 <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="dd-clamp-text-3 am-padding-top-sm am-padding-right"
+                                         style="color: #6C6C6C;min-height: 80px; overflow-wrap: break-word;word-break: break-all;"
+                                         th:text="${item.content}">
                                     </div>
                                 </div>
                             </div>

@@ -42,7 +42,10 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const targetCateId = this.getAttribute('data-cate-id');
             const targetCateName = this.getAttribute('data-cate-name');
-            const targetLangUrl = this.getAttribute('data-lang-url');
+            let targetLangUrl = this.getAttribute('data-lang-url');
+            if (!targetLangUrl){
+                targetLangUrl = "";
+            }
 
             const baseUrl = topNavPageName ? `/${topNavPageName}` : '';
             const jumpUrl = `${baseUrl}/${targetCateName}-${targetCateId}`;

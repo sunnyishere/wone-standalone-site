@@ -1,0 +1,50 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page not found - IEE-Business toolbox & reference, Electrical Equipment Supply</title>
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="googlebot" content="noindex, nofollow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="noindex, nofollow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="renderer" content="webkit"/>
+    <!--防某度-->
+    <th:block th:replace="head :: commonHead"></th:block>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+    <th:block th:replace="pc-en :: section(param1='about')"></th:block>
+
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height">占位边距</div>
+
+
+<div class="am-container">
+    <div class="more-img" style="margin: 160px 0;">
+        <img src="/img/26.webp" alt="404" class="">
+    </div>
+</div>
+
+
+
+<th:block th:replace="search :: search"></th:block>
+
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<th:block th:replace="right-menu :: right-menu(param1='about')"></th:block>
+
+<th:block th:replace="footer :: footer"></th:block>
+
+
+</body>
+
+</html>
