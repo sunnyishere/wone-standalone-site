@@ -35,7 +35,7 @@
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-    <!--防某度-->
+
     <th:block th:replace="head :: commonHead"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
@@ -46,16 +46,16 @@
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
 
-    <!-- 电脑-->
+
     <th:block th:replace="pc-en :: section(param1='News_'+${news.id})"></th:block>
-    <!-- 手机-->
+
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-    <!-- 侧边栏内容 -->
+
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 
 </header>
-<div class="header-height">占位边距</div>
+<div class="header-height"></div>
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">

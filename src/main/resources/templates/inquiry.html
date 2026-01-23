@@ -1,49 +1,115 @@
+<!-- RFQ弹窗 -->
 <div class="am-modal am-modal-no-btn" tabindex="-1" id="doc-modal-1" th:fragment="inquiry">
-    <div class="am-modal-dialog" style="border-radius: 12px;">
-        <div class="am-modal-hd am-padding-xl am-text-xl">
-            <span th:text="${advanced['send.inquiry']}"></span>
-            <div href="javascript: void(0)" class="am-close am-close-spin tn-icon-close am-margin"
-               style="color: var(--theme-wone);" data-am-modal-close></div>
+    <div class="am-modal-dialog rfq-modal-center"
+         style="border-radius: 12px; margin: 0 auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90vw; width: 500px; max-height: 80vh; overflow-y: auto;">
+        <div class="am-modal-hd am-text-xl" style="display: flex; justify-content: space-between; align-items: center; padding: 24px 24px 16px; position: relative; min-height: 60px;">
+            <span style="font-size: 22px; font-weight: 600; color: #2c3e50; line-height: 1.2;" th:text="${advanced['send.inquiry']}">
+            </span>
+            <div class="am-close am-close-spin tn-icon-close"
+                 style="color: #F75755; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                 data-am-modal-close
+                 onclick="closeModal()"
+                 title="Close"></div>
         </div>
-        <form class="am-form am-form-horizontal am-padding-bottom-lg am-padding-top-lg">
-            <input type="hidden" id="input-biz-id" name="bizId">
-            <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.name']}"></label>
-                <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-name" class="" th:placeholder="${advanced['your.name']}">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.phone']}"></label>
-                <div class="am-u-sm-7 am-u-md-9">
-                    <input type="number" id="input-phone" class="" th:placeholder="${advanced['your.phone']}">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.email']}"></label>
-                <div class="am-u-sm-7 am-u-md-9">
-                    <input type="email" id="input-email" class="" th:placeholder="${advanced['your.email']}">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.country']}"></label>
-                <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-country" class="" th:placeholder="${advanced['your.country']}">
-                </div>
-            </div>
-            <div class="am-form-group">
-                <label for="doc-ipt-3-a" class="am-u-sm-5 am-u-md-3 am-form-label" th:text="${advanced['your.message']}"></label>
-                <div class="am-u-sm-7 am-u-md-9">
-                    <input type="text" id="input-message" class="" th:placeholder="${advanced['your.message']}">
-                </div>
-            </div>
-            <div class="am-form-group am-padding-top-lg">
-                <button type="button" class="am-btn am-btn-default am-round am-margin-sm"
-                        style="background-color: var(--theme-wone) !important;color: #FFFFFF;width: 90%;max-width: 300px;height: 46px;" th:text="${advanced['send.now']}">
 
+        <form class="am-form" id="requestForm" style="margin: 0; padding: 0 24px 20px;">
+            <input type="hidden" id="input-biz-id" name="bizId">
+            <input type="hidden" id="fileName" name="fileName">
+            <input type="hidden" id="fileUrl" name="fileUrl">
+
+            <!-- 姓名 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-230" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <input type="text" id="input-name" name="name" class="form-control" autocomplete="off"
+                           style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
+                           th:placeholder="${advanced['your.name'] ?: 'Your Name'}" required />
+                </div>
+            </div>
+
+            <!-- 邮箱 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-2311" style="position: absolute; left: 12px; top: 55%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <input type="email" id="input-email" name="email" class="form-control" autocomplete="off"
+                           style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
+                           th:placeholder="${advanced['your.email'] ?: 'Your Email'}" maxlength="32" oninput="this.value = this.value.slice(0, 32);" required />
+                </div>
+            </div>
+
+            <!-- 国家 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-232" style="position: absolute; left: 12px; top: 53%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <select id="input-country" name="country" class="form-control"
+                            style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"14\\\" height=\\\"14\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"%23777\\\" stroke-width=\\\"2\\\" stroke-linecap=\\\"round\\\"><polyline points=\\\"6 9 12 15 18 9\\\"></polyline></svg>'); background-repeat: no-repeat; background-position: right 12px center;"
+                    th:placeholder="${advanced['your.country']}" required>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 电话 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="phone-input-container" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-233" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <span class="phone-prefix" id="phonePrefix" style="position: absolute; left: 32px; top: 50%; transform: translateY(-50%); color: #777; font-weight: 500; pointer-events: none;">+86</span>
+                    <input type="tel" id="input-phone" name="phone" class="form-control"
+                           style="width: 100%; padding: 12px 12px 12px 75px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
+                           th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16);"  required />
+                </div>
+            </div>
+
+            <!-- 组织名称 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-234" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <input type="text" id="input-orgName" name="orgName" class="form-control" autocomplete="off"
+                           style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
+                           th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" required />
+                </div>
+            </div>
+
+            <!-- 职位 -->
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-235" style="position: absolute; left: 12px; top: 55%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
+                    <input type="text" id="input-title" name="title" class="form-control" autocomplete="off"
+                           style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
+                           th:placeholder="${advanced['job.title'] ?: 'Your job title'}" required />
+                </div>
+            </div>
+
+            <div class="form-group" style="margin: 8px 0; width: 100%;">
+                <div class="input-with-icon" style="position: relative; width: 100%;">
+                    <span class="input-icon p-icon-a-236" style="position: absolute; left: 12px;top: 18px;color: #777;pointer-events: none;font-size: 15px;"></span>
+                    <textarea id="input-message" name="message" class="form-control" rows="3" style="width: 100%;padding: 18px 12px 18px 40px;border: 1px solid #ddd;border-radius: 8px;font-size: 15px;outline: none;transition: border-color 0.2s;resize: vertical;height: 90px;line-height: 1.4;box-sizing: border-box;"
+                              th:placeholder="${advanced['your.message'] ?: 'Your Message'}"></textarea>
+                </div>
+            </div>
+
+            <!-- 文件上传 -->
+            <div class="am-form-group" style="margin: 16px 0;">
+                <div class="upload-area" id="uploadArea"
+                     style="display: flex; align-items: center; padding: 16px; border: 2px dashed #d1d5db; border-radius: 8px; cursor: pointer; background-color: #fafafa; transition: background-color 0.2s, border-color 0.2s;">
+                    <input type="file" id="attachment" name="attachment"
+                           style="display: none;"
+                           accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.jpg,.jpeg,.png" />
+                    <span class="p-icon-a-237" style="margin-right: 10px; color: #6b7280;"></span>
+                    <span id="uploadText"
+                          style="color: #666; flex: 1; font-size: 14px; overflow: visible; white-space: normal;"
+                          th:text="${advanced['upload.file']}"></span>
+                </div>
+
+                <div id="uploadItemsContainer" style="margin-top: 12px;"></div>
+
+
+            </div>
+
+            <div class="am-form-group" style="margin: 0; width: 100%;">
+                <button type="button" class="submit-btn"
+                        style="background-color: var(--theme-wone) !important;color: #FFFFFF;width: 90%;max-width: 300px;height: 46px;border-radius:8px;border: 0px solid;" th:text="${advanced['send.now']}">
                 </button>
             </div>
-
         </form>
 
     </div>
@@ -55,7 +121,7 @@
         <div class="am-modal-hd am-padding-xl am-text-xl">
             <span th:text="${advanced['download']}"></span>
             <div href="javascript: void(0)" class="am-close am-close-spin tn-icon-close am-margin"
-               style="color: var(--theme-wone);" data-am-modal-close></div>
+                 style="color: var(--theme-wone);" data-am-modal-close></div>
         </div>
         <div class="am-modal-bd am-margin" style="max-height: 440px;overflow-y: scroll;">
             <div class="am-text-bold am-text-left">Experts Electrical is dedicated to serving the personnel in the
@@ -69,37 +135,34 @@
 
             <div class="am-container">
                 <div class="am-text-center am-text-xl am-avg-sm-3" style="margin: 10px 0;">
-                    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
-                        <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
-                            <img th:src="@{${basePath +'/img/down/01.png'}}"   th:data-src="@{${basePath +'/img/down/01.png'}}"  loading="lazy" alt="Google Play"
-                                 class="store-img">
-                        </a>
-                        <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
-                            <img th:src="@{${basePath +'/img/down/02.png'}}"   th:data-src="@{${basePath +'/img/down/02.png'}}" loading="lazy" alt="App Store"
-                                 class="store-img">
-                        </a>
-                        <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
-                            <img th:src="@{${basePath +'/img/down/03.png'}}"   th:data-src="@{${basePath +'/img/down/03.png'}}"  loading="lazy" alt="HUAWEI"
-                                 class="store-img">
-                        </a>
-                        <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
-                            <img th:src="@{${basePath +'/img/down/04.png'}}"   th:data-src="@{${basePath +'/img/down/04.png'}}" loading="lazy" alt="XIAOMI"
-                                 class="store-img">
-                        </a>
-                        <span title="VIVO" aria-hidden="false" aria-label="VIVO">
-                        <img th:src="@{${basePath +'/img/down/05.png'}}"   th:data-src="@{${basePath +'/img/down/05.png'}}" loading="lazy" alt="VIVO"
-                             class="store-img">
+                    <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
+                        <img src="https://oss.iwone.cn/standalone/img/down/01.png"  data-src="https://oss.iwone.cn/standalone/img/down/01.png"  loading="lazy" alt="Google Play"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
+                        <img src="https://oss.iwone.cn/standalone/img/down/02.png"  data-src="https://oss.iwone.cn/standalone/img/down/02.png" loading="lazy" alt="App Store"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
+                        <img src="https://oss.iwone.cn/standalone/img/down/03.png"  data-src="https://oss.iwone.cn/standalone/img/down/03.png"  loading="lazy" alt="HUAWEI"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
+                        <img src="https://oss.iwone.cn/standalone/img/down/04.png" data-src="https://oss.iwone.cn/standalone/img/down/04.png" loading="lazy" alt="XIAOMI"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <span title="VIVO" aria-hidden="false" aria-label="VIVO">
+                        <img src="https://oss.iwone.cn/standalone/img/down/05.png" data-src="https://oss.iwone.cn/standalone/img/down/05.png" loading="lazy" alt="VIVO"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                        <span title="OPPO" aria-hidden="false" aria-label="OPPO">
-                        <img th:src="@{${basePath +'/img/down/06.png'}}"   th:data-src="@{${basePath +'/img/down/06.png'}}" loading="lazy" alt="OPPO"
-                             class="store-img">
+                    <span title="OPPO" aria-hidden="false" aria-label="OPPO">
+                        <img src="https://oss.iwone.cn/standalone/img/down/06.png"  data-src="https://oss.iwone.cn/standalone/img/down/06.png" loading="lazy" alt="OPPO"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                        <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
-                        <img th:src="@{${basePath +'/img/down/07.png'}}"   th:data-src="@{${basePath +'/img/down/07.png'}}" loading="lazy" alt="Palm Store"
-                             class="store-img">
+                    <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
+                        <img src="https://oss.iwone.cn/standalone/img/down/07.png" data-src="https://oss.iwone.cn/standalone/img/down/07.png" loading="lazy" alt="Palm Store"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                    </th:block>
-
                 </div>
             </div>
 
@@ -133,36 +196,34 @@
 
             <div class="am-container">
                 <div class="am-text-center am-text-xl am-avg-sm-3" style="margin: 10px 0;">
-                    <th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
-                        <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
-                            <img th:src="@{${basePath +'/img/down/01.png'}}"   th:data-src="@{${basePath +'/img/down/01.png'}}"  loading="lazy" alt="Google Play"
-                                 class="store-img">
-                        </a>
-                        <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
-                            <img th:src="@{${basePath +'/img/down/02.png'}}"   th:data-src="@{${basePath +'/img/down/02.png'}}" loading="lazy" alt="App Store"
-                                 class="store-img">
-                        </a>
-                        <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
-                            <img th:src="@{${basePath +'/img/down/03.png'}}"   th:data-src="@{${basePath +'/img/down/03.png'}}"  loading="lazy" alt="HUAWEI"
-                                 class="store-img">
-                        </a>
-                        <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
-                            <img th:src="@{${basePath +'/img/down/04.png'}}"   th:data-src="@{${basePath +'/img/down/04.png'}}" loading="lazy" alt="XIAOMI"
-                                 class="store-img">
-                        </a>
-                        <span title="VIVO" aria-hidden="false" aria-label="VIVO">
-                        <img th:src="@{${basePath +'/img/down/05.png'}}"   th:data-src="@{${basePath +'/img/down/05.png'}}" loading="lazy" alt="VIVO"
-                             class="store-img">
+                    <a href="https://play.google.com/store/apps/details?id=cn.iwone.pwuniapp" title="Google Play" aria-hidden="false" aria-label="Google Play">
+                        <img src="https://oss.iwone.cn/standalone/img/down/01.png" alt="Google Play"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://apps.apple.com/zm/app/wone/id6503928704" title="App Store" aria-hidden="false" aria-label="App Store">
+                        <img src="https://oss.iwone.cn/standalone/img/down/02.png" alt="App Store"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://url.cloud.huawei.com/rf51G1mfg4?shareTo=qrcode" title="HUAWEI" aria-hidden="false" aria-label="HUAWEI">
+                        <img src="https://oss.iwone.cn/standalone/img/down/03.png" alt="HUAWEI"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <a href="https://global.app.mi.com/details?lo=ID&la=en_US&id=cn.iwone.pwuniapp" title="XIAOMI" aria-hidden="false" aria-label="XIAOMI">
+                        <img src="https://oss.iwone.cn/standalone/img/down/04.png" alt="XIAOMI"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
+                    </a>
+                    <span title="VIVO" aria-hidden="false" aria-label="VIVO">
+                        <img src="https://oss.iwone.cn/standalone/img/down/05.png" alt="VIVO"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                        <span title="OPPO" aria-hidden="false" aria-label="OPPO">
-                        <img th:src="@{${basePath +'/img/down/06.png'}}"   th:data-src="@{${basePath +'/img/down/06.png'}}" loading="lazy" alt="OPPO"
-                             class="store-img">
+                    <span title="OPPO" aria-hidden="false" aria-label="OPPO">
+                        <img src="https://oss.iwone.cn/standalone/img/down/06.png" alt="OPPO"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                        <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
-                        <img th:src="@{${basePath +'/img/down/07.png'}}"   th:data-src="@{${basePath +'/img/down/07.png'}}" loading="lazy" alt="Palm Store"
-                             class="store-img">
+                    <span title="Palm Store" aria-hidden="false" aria-label="Palm Store">
+                        <img src="https://oss.iwone.cn/standalone/img/down/07.png" alt="Palm Store"
+                             style="height: 50px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </span>
-                    </th:block>
                 </div>
             </div>
 
@@ -173,13 +234,67 @@
                              style="height: 160px;margin: 10px;overflow: hidden;object-fit: cover;">
                     </a>
                     <div class="am-margin-bottom" style="color: #0D6ECF;">
-                        <!--                        Copy Download Link-->
                     </div>
                 </div>
             </div>
-
         </div>
-
-
     </div>
 </div>
+
+<script>
+    $(function() {
+        $('.download-btn').on('click', function(e) {
+            e.preventDefault();
+            $('#doc-modal-2').modal({
+                closeViaDimmer: 0,
+                onOpen: function() {
+                    console.log('下载弹窗已打开');
+                }
+            });
+            $('#doc-modal-2').modal('open');
+        });
+
+        $('[data-am-modal]').modal();
+    });
+</script>
+<script>
+    function closeModal() {
+        $('#doc-modal-1').modal('close');
+        $('.am-modal-backdrop').remove();
+
+        if (typeof UploadForm !== 'undefined') {
+            UploadForm.resetUploadUI('uploadText', 'uploadArea', 'uploadProgress', 'fileUrl');
+        }
+    }
+
+    jQuery(function ($) {
+        if (typeof UploadForm !== 'undefined') {
+            UploadForm.initAll({
+                countrySelectId: 'country',
+                phonePrefixId: 'phonePrefix',
+                uploadOptions: {
+                    uploadAreaId: 'uploadArea',
+                    fileInputId: 'attachment',
+                    uploadTextId: 'uploadText',
+                    uploadProgressId: 'uploadProgress',
+                    progressFillId: 'progressFill',
+                    uploadStatusId: 'uploadStatus',
+                    uploadEndpoint: '/upload'
+                },
+                formOptions: {
+                    formId: 'leaveMessageForm',
+                    submitBtnId: 'leaveMessageBtn',
+                    nameFieldId: 'fullName',
+                    emailFieldId: 'email',
+                    phoneFieldId: 'phone',
+                    submitUrl: '/landing/account/leaveMessage',
+                    modalId: '#doc-modal-1'
+                }
+            });
+        } else {
+            console.error('UploadForm is not defined. Check if upload-form.js is loaded correctly.');
+        }
+
+    });
+</script>
+

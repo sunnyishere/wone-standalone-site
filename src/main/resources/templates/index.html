@@ -47,7 +47,7 @@
             .am-slider.am-slider-a1,.am-slides,.am-slides li{height:300px!important;min-height:300px}
         }
     </style>
-    <!--防某度-->
+
     <th:block th:replace="head :: commonHead"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
@@ -56,16 +56,16 @@
 <body class="body-bg">
 <h1 class="sr-only" th:text="${title} + '|' + ${prodBrand.fullName} "></h1>
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-    <!-- 电脑-->
+
     <th:block th:replace="pc-en :: section(param1='Home')"></th:block>
-    <!-- 手机-->
+
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-    <!-- 侧边栏内容 -->
+
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 
-<div class="header-height">占位边距</div>
+<div class="header-height"></div>
 <!-- 轮播 -->
 <div data-am-widget="slider" class="am-slider am-slider-a1" data-am-slider='{"directionNav":false;slideshow:true,}' >
 
@@ -112,14 +112,14 @@
                      th:styleappend="${index.fontPosition == 'left' ? 'justify-content: flex-start;' : 'justify-content: center;'}">
                 </div>
 
-                <!-- 按钮：左对齐 -->
+
                 <div th:if="${index.fontPosition == 'left'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
                     <span class="dd-clamp-text-1"
                           style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
                         <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
                     </span>
                 </div>
-                <!-- 按钮：居中 -->
+
                 <div th:if="${index.fontPosition == 'center'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
                     <span class="dd-clamp-text-1"
                           style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">

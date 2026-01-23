@@ -12,21 +12,21 @@
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-    <!--防某度-->
+
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-    <!-- 电脑-->
+
     <th:block th:replace="pc-en :: section(param1='serach')"></th:block>
-    <!-- 手机-->
+
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-    <!-- 侧边栏内容 -->
+
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
-<div class="header-height">占位边距</div>
+<div class="header-height"></div>
 
 <nav class="m-cat-nav">
     <div class="am-container">
@@ -112,7 +112,7 @@
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                     'detail/'+
-                   ${#strings.replace(#strings.replace(#strings.trim(index.name), '/', '-'), ' ', '-')} +
+                    ${#normalizer.normalizeString(index.name)}  +
                    '-'+${index.id}">
                                 <div style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">

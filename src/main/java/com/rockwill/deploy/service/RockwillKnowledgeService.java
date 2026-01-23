@@ -1,5 +1,6 @@
 package com.rockwill.deploy.service;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -17,14 +18,22 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -52,6 +61,72 @@ public class RockwillKnowledgeService {
     @Resource
     TemplateEnginePageRenderer templateEnginePageRenderer;
 
+    Map<String, String> languageMap = new HashMap<String, String>() {{
+        put("en", "english");
+        put("fr", "french");
+        put("pl", "polish");
+        put("et", "estonian");
+        put("bn", "bengali");
+        put("id", "indonesian");
+        put("uk", "ukrainian");
+        put("cs", "czech");
+        put("kn", "kannada");
+        put("gl", "galliccian");
+        put("pa", "punjabi");
+        put("sv", "swedish");
+        put("pt", "portuguese");
+        put("no", "norwegian");
+        put("ar", "arabic");
+        put("ku", "kurde");
+        put("hr", "croatian");
+        put("fi", "finnish");
+        put("eu", "basque");
+        put("vi", "vietnamese");
+        put("tr", "turkish");
+        put("sw", "swahili");
+        put("ja", "japanese");
+        put("is", "icelandic");
+        put("lv", "latvian");
+        put("nl", "dutch");
+        put("de", "german");
+        put("hi", "hindi");
+        put("it", "italian");
+        put("hy", "armenian");
+        put("es", "spanish");
+        put("te", "telugu");
+        put("eo", "esperanto");
+        put("ka", "georgian");
+        put("ru", "russian");
+        put("fa", "persian");  // 注意：与fa_AF冲突，需要特殊处理
+        put("uz", "uzbek");
+        put("sl", "slovenian");
+        put("ca", "catalan");
+        put("bg", "bulgarian");
+        put("hu", "hungarian");
+        put("el", "greek");
+        put("he", "hebrew");
+        put("sr", "serbian");
+        put("ps", "pashto");
+        put("ne", "nepali");
+        put("kk", "kazakh");
+        put("az", "Azerbaijani");
+        put("af", "Afrikaans");
+        put("ms", "Malay");
+        put("la", "Latin");
+        put("ko", "Korean");
+        put("mk", "Macedonian");
+        put("mt", "Maltese");
+        put("tl", "Tagalog");
+        put("ur", "Urdu");
+        put("ta", "Tamil");
+        put("si", "Sinhalese");
+        put("ha", "Hausa");
+        put("da", "Danish");
+        put("ga", "Irish");
+        put("ceb", "Cebuano");
+        put("th", "Thai");
+    }};
+
     private String wcmApi = "https://www.iee-business.com/wcm-api/site/static/";
 
     @PostConstruct
@@ -68,6 +143,7 @@ public class RockwillKnowledgeService {
     private String cdnPrefix;
     @Value("${cdn.version}")
     private String version;
+
     /**
      * 查询网页菜单
      *
@@ -116,7 +192,7 @@ public class RockwillKnowledgeService {
      * @param path 请求api路径
      * @return 返回html内容
      */
-    public DomainHtmlVo getFromApi(RestTemplate restTemplate, String path,String host) {
+    public DomainHtmlVo getFromApi(RestTemplate restTemplate, String path, String host) {
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
@@ -141,15 +217,22 @@ public class RockwillKnowledgeService {
                     model.put("cdnEnabled", cdnEnabled);
                     model.put("cdnPrefix", cdnPrefix);
                     model.put("version", version);
-                    if (model.containsKey("brandUrl")){
+                    if (model.containsKey("brandUrl")) {
                         String brandUrl = model.get("brandUrl").toString();
-                        model.put("brandUrl",brandUrl.toLowerCase());
+                        model.put("brandUrl", brandUrl.toLowerCase());
+                    }
+                    if (model.containsKey("currentLang")
+                            && model.get("currentLang") != null && !model.get("currentLang")
+                            .equals("en")) {
+                        model.put("langEName", languageMap.get(model.get("currentLang").toString()).toLowerCase());
+                    } else {
+                        model.put("langEName", "english");
                     }
                     handleDateKey(model);
-                    String websiteUrl= "";
-                    if (model.containsKey("websitePath")){
+                    String websiteUrl = "";
+                    if (model.containsKey("websitePath")) {
                         String websitePath = model.get("websitePath").toString();
-                        model.put("indexPath",websitePath.substring(0,websitePath.length()-1));
+                        model.put("indexPath", websitePath.substring(0, websitePath.length() - 1));
                     }
                     if (model.containsKey("suffix")) {
                         Object suffix = model.get("suffix");
@@ -162,7 +245,7 @@ public class RockwillKnowledgeService {
                         } else {
                             website += "" + pageName + suffix;
                         }
-                        websiteUrl= website.toString();
+                        websiteUrl = website.toString();
                         model.put("websiteUrl", website);
                     }
                     String tagId = googleTagProperties.getId();
@@ -170,7 +253,7 @@ public class RockwillKnowledgeService {
                         tagId = googleTagProperties.getDomains().get(host);
                     }
                     model.put("gaTrackingId", tagId);
-                    handleSchemaJson(model,websiteUrl, host);
+                    handleSchemaJson(model, websiteUrl, host);
                     if (!model.isEmpty()) {
                         String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
@@ -199,7 +282,7 @@ public class RockwillKnowledgeService {
             if (key.toLowerCase().endsWith("schemajson") &&
                     (model.get(key) instanceof Map || model.get(key) instanceof List)) {
                 String newVal = JSON.toJSONString(model.get(key));
-                if (newVal.startsWith("{")){
+                if (newVal.startsWith("{")) {
                     JSONObject object = JSON.parseObject(newVal);
                     if (StringUtils.isNotEmpty(websiteUrl)) {
                         if (object.containsKey("offers")) {
@@ -288,46 +371,101 @@ public class RockwillKnowledgeService {
 
     @SneakyThrows
     public ResponseEntity<String> forwardFormRequest(HttpServletRequest originalRequest, String targetUrl) {
-        StringBuilder formBody = new StringBuilder();
-        Enumeration<String> parameterNames = originalRequest.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            String[] paramValues = originalRequest.getParameterValues(paramName);
-            for (String value : paramValues) {
-                if (formBody.length() > 0) {
-                    formBody.append("&");
-                }
-                formBody.append(URLEncoder.encode(paramName, "UTF-8"))
-                        .append("=")
-                        .append(URLEncoder.encode(value, "UTF-8"));
-            }
-        }
+        List<File> tempFiles = new ArrayList<>(); // 用于跟踪临时文件
+        boolean isMultipart = originalRequest.getContentType() != null
+                && originalRequest.getContentType().startsWith("multipart/form-data");
+        HttpEntity<?> requestEntity = null;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Deploy-Domain", originalRequest.getHeader("Host"));
         headers.add("Premium-Real-IP", originalRequest.getHeader("X-Real-IP"));
-        HttpEntity<String> requestEntity = new HttpEntity<>(formBody.toString(), headers);
-        return restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class);
+        try {
+            if (isMultipart) {
+                MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+                try {
+                    MultipartHttpServletRequest multipartRequest =
+                            (MultipartHttpServletRequest) originalRequest;
+                    for (String paramName : multipartRequest.getFileMap().keySet()) {
+                        MultipartFile file = multipartRequest.getFile(paramName);
+                        if (file != null && !file.isEmpty()) {
+                            File tempFile = File.createTempFile("upload_", "_" + file.getOriginalFilename());
+                            try {
+                                file.transferTo(tempFile);
+                                tempFiles.add(tempFile);
+                                FileSystemResource resource = new FileSystemResource(tempFile);
+                                body.add(paramName, resource);
+                            } catch (IOException e) {
+                                throw new RuntimeException("文件传输失败: " + e.getMessage(), e);
+                            }
+                        }
+                    }
+
+                    // 处理普通表单参数
+                    for (String paramName : multipartRequest.getParameterMap().keySet()) {
+                        String[] values = multipartRequest.getParameterValues(paramName);
+                        for (String value : values) {
+                            body.add(paramName, value);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    // 处理解析异常
+                    return ResponseEntity.badRequest().body("文件解析失败: " + e.getMessage());
+                }
+                requestEntity = new HttpEntity<>(body, headers);
+                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            } else {
+                StringBuilder formBody = new StringBuilder();
+                Enumeration<String> parameterNames = originalRequest.getParameterNames();
+                while (parameterNames.hasMoreElements()) {
+                    String paramName = parameterNames.nextElement();
+                    String[] paramValues = originalRequest.getParameterValues(paramName);
+                    for (String value : paramValues) {
+                        if (formBody.length() > 0) {
+                            formBody.append("&");
+                        }
+                        formBody.append(URLEncoder.encode(paramName, "UTF-8"))
+                                .append("=")
+                                .append(URLEncoder.encode(value, "UTF-8"));
+                    }
+                }
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                requestEntity = new HttpEntity<>(formBody.toString(), headers);
+            }
+            String url = "";
+            if (targetUrl.equals("/upload")) {
+                url = wcmApi.replace("static/", "") + targetUrl;
+            } else {
+                url = wcmApi + targetUrl;
+            }
+            return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        }finally {
+            for (File tempFile : tempFiles) {
+                if (tempFile.exists()) {
+                    FileUtil.clean(tempFile);
+                }
+            }
+        }
     }
 
     /**
      * 主动发起表单请求
      *
      * @param targetUrl 请求path
-     * @param domain 域名
-     * @param params 表单参数
+     * @param domain    域名
+     * @param params    表单参数
      * @return
      */
     @SneakyThrows
-    public ResponseEntity<String> submitForm(String targetUrl,String domain,Map<String, String> params) {
+    public ResponseEntity<String> submitForm(String targetUrl, String domain, Map<String, String> params) {
         StringBuilder formBody = new StringBuilder();
-        for (String key : params.keySet()){
+        for (String key : params.keySet()) {
             if (formBody.length() > 0) {
                 formBody.append("&");
             }
             formBody.append(URLEncoder.encode(key, "UTF-8"))
                     .append("=")
-                    .append(URLEncoder.encode(params.get( key), "UTF-8"));
+                    .append(URLEncoder.encode(params.get(key), "UTF-8"));
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -341,10 +479,10 @@ public class RockwillKnowledgeService {
      *
      * @return 返回首页html
      */
-    public DomainHtmlVo getHome(RestTemplate restTemplate,String host) {
+    public DomainHtmlVo getHome(RestTemplate restTemplate, String host) {
         log.info("request Home data");
         try {
-            return getFromApi(restTemplate, "home",host);
+            return getFromApi(restTemplate, "home", host);
         } catch (Exception e) {
             log.error("request Home data exception", e);
             return null;

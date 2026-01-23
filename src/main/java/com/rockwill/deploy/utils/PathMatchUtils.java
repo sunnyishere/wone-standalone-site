@@ -110,6 +110,11 @@ public class PathMatchUtils {
             }
             return matchResult;
         }
+        if (normalizedPath.equals("/upload")) {
+            matchResult.setPatternType(PathPatternType.UPLOAD);
+            matchResult.setForwardTarget("/upload");
+            return matchResult;
+        }
         //搜索时直接转发请求
         if (normalizedPath.startsWith("/search-")) {
             matchResult.setPatternType(PathPatternType.MENU_WITHOUT_PAGE);

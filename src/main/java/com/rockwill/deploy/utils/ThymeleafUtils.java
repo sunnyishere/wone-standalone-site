@@ -13,7 +13,6 @@ public class ThymeleafUtils {
         if (input == null || input.trim().isEmpty()) {
             return input;
         }
-        
         // 初始处理：转小写，替换斜杠和空格
         String processed = input.toLowerCase().trim();
         

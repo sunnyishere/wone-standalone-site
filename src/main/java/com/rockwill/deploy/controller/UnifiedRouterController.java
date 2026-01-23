@@ -82,6 +82,7 @@ public class UnifiedRouterController {
         PathPatternType pathPatternType = PathPatternType.fromString(patternType.toString());
         switch (pathPatternType) {
             case LEAVE_MESSAGE:
+            case UPLOAD:
                 ResponseEntity<String> response = rockwillKnowledgeService.forwardFormRequest(request, forwardTarget.toString());
                 return ResponseEntity.status(HttpStatus.OK)
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

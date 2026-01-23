@@ -12,7 +12,8 @@ public enum PathPatternType {
     
     MENU_WITH_PAGE("/menu/topNavPages"),
     MENU_WITHOUT_PAGE("/menu/topNavPages"),
-    
+    UPLOAD("/upload"),
+
     // 默认路径
     DEFAULT("/");
     
