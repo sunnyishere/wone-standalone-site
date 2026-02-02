@@ -248,6 +248,7 @@ public class RockwillKnowledgeService {
                         websiteUrl = website.toString();
                         model.put("websiteUrl", website);
                     }
+                    model.put("currentHost",host);
                     String tagId = googleTagProperties.getId();
                     if (googleTagProperties.getDomains().containsKey(host)) {
                         tagId = googleTagProperties.getDomains().get(host);

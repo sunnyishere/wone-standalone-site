@@ -1459,7 +1459,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const langOptions = document.querySelectorAll('.lang-list a');
     langOptions.forEach(option => {
         option.addEventListener('click', function(e) {
-            e.preventDefault();
+            // e.preventDefault();
             const selectedLang = this.textContent;
             document.querySelector('.lang-trigger .am-padding-left-0').textContent = selectedLang;
 

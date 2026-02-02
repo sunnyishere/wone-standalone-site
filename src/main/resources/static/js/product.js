@@ -87,13 +87,30 @@ function scrollToTarget(event) {
     });
 }
 
-$(document).ready(function () {
-    $('.am-direction-nav .am-prev').append('<span style="display:none;">Previous Slide</span>');
-    $('.am-direction-nav .am-next').append('<span style="display:none;">Next Slide</span>');
-    $('.am-direction-nav .am-prev').attr('aria-label', 'Previous Page');
-    $('.am-direction-nav .am-next').attr('aria-label', 'Next Page');
-});
+document.addEventListener('DOMContentLoaded', function() {
+    // 查找所有符合条件的前一个按钮
+    var prevButtons = document.querySelectorAll('.am-direction-nav .am-prev');
+    // 查找所有符合条件的后一个按钮
+    var nextButtons = document.querySelectorAll('.am-direction-nav .am-next');
 
+    // 为前一个按钮添加内容
+    prevButtons.forEach(function(button) {
+        var span = document.createElement('span');
+        span.textContent = 'Previous Slide';
+        span.style.display = 'none';
+        button.appendChild(span);
+        button.setAttribute('aria-label', 'Previous Page');
+    });
+
+    // 为后一个按钮添加内容
+    nextButtons.forEach(function(button) {
+        var span = document.createElement('span');
+        span.textContent = 'Next Slide';
+        span.style.display = 'none';
+        button.appendChild(span);
+        button.setAttribute('aria-label', 'Next Page');
+    });
+});
 const stickyBar = document.querySelector('.sticky-bar');
 const bottomBlock = document.querySelector('.sticky-bottom');
 
