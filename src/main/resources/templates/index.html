@@ -183,7 +183,7 @@
                                 th:each="prod : ${featuredProducts}">
 
                                 <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
-                                    <a th:title="${prod.i18nName}" aria-hidden="false" th:aria-label="${prod.i18nName}"
+                                    <a
                                        class="inline-a-link"
                                        th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
@@ -240,9 +240,9 @@
                                 th:if="${not #lists.isEmpty(cateProd)}" th:each="product : ${category.prod}"
                                 style="padding: 0 10px !important;">
                                 <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
-                                    <a th:title="${product.i18nName}" aria-hidden="false"
+                                    <a
                                        class="inline-a-link"
-                                       th:aria-label="${product.i18nName}"
+
                                        th:href="${currentPathLang} +
                                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
         '/' :
@@ -306,8 +306,7 @@
                         </h2>
                     </div>
                     <div class="am-u-sm-3 am-text-right am-padding-top-xs">
-                        <a th:title="${advanced['view.all']}" aria-hidden="false"
-                           th:aria-label="${advanced['view.all']}"
+                        <a
                            th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
                  '/' :
                  ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==7][0].pageName), ' ', '-')) })">
@@ -322,7 +321,7 @@
                     <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
                         th:if="${not #lists.isEmpty(successCases)}" th:each="success : ${successCases}">
                         <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
-                            <a th:title="${success.title}" aria-hidden="false" th:aria-label="${success.title}"
+                            <a
                                class="inline-a-link"
                                th:href="
                             ${currentPathLang} +
@@ -385,8 +384,7 @@
                 </div>
                 <div class="am-u-sm-3 am-text-right am-padding-top-xs">
 
-                    <a th:title="${advanced['view.all']}" aria-hidden="false"
-                       th:aria-label="${advanced['view.all']}"
+                    <a
                        th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
                  '/' :
                  ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
@@ -417,7 +415,7 @@
                                         </div>
                                     </div>
                                     <div class="" style="height: 100px;">
-                                        <a th:title="${article.title}" aria-hidden="false" th:aria-label="${article.title}"
+                                        <a
                                            class="inline-a-link"
                                            th:href="
                         ${currentPathLang} +
@@ -433,8 +431,7 @@
                                         <div class="am-padding-top-xs am-cf am-text-sm">
                                             <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
                                                 <span class="am-icon-user"></span>
-                                                <a class="device-aware-link" aria-hidden="false"
-                                                   th:aria-label="${article.author}" th:title="${article.author}"
+                                                <a class="device-aware-link"
                                                    th:href="${brandUrl}" style="border: none">
                                                     <span th:text="${article.author}"></span>
                                                 </a>
@@ -516,7 +513,7 @@
                     th:if="${not #lists.isEmpty(news)}" th:each="index : ${news}">
 
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
-                        <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}"
+                        <a
                            class="inline-a-link" th:href="
                         ${currentPathLang} +
                         (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?

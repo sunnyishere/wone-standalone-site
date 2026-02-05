@@ -40,11 +40,11 @@
     </div>
     <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${gaTrackingId}"></script>
     <script th:inline="javascript">
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            dataLayer.push(arguments);
+        if (typeof gtag !== 'function') {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
         }
-        gtag('js', new Date());
         gtag('config', /*[[${gaTrackingId}]]*/ 'G-0HKGZJNMN6');
     </script>
 </footer>

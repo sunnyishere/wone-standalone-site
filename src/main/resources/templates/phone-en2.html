@@ -25,7 +25,7 @@
                                         </a>
                                         <a th:unless="${suffix != null}"
                                            th:href="${item.lang == 'en'} ?
-                                                        ( ${pageName!='Home'?'/'+pageName:''}) :
+                                                        ( ${pageName!='Home'?'/'+pageName:'/'}) :
                                                         ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
                                            th:text="${item.langName}"
                                            th:title="${item.langName}"

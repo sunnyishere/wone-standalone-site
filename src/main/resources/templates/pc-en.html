@@ -23,16 +23,14 @@
                                                         ('/' + ${pageName} + ${suffix}) :
                                                         ('/' + ${item.lang} + '/' + ${pageName} + ${suffix})"
                                                        th:text="${item.langName}"
-                                                       th:title="${item.langName}"
-                                                       th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                        th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
                                                     </a>
                                                     <a th:unless="${suffix != null}"
                                                        th:href="${item.lang == 'en'} ?
                                                         ( ${pageName!='Home'?'/'+pageName:'/'}) :
                                                         ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
                                                        th:text="${item.langName}"
-                                                       th:title="${item.langName}"
-                                                       th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                        th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
                                                     </a>
                                                 </li>
                                             </ul>
@@ -66,12 +64,12 @@
                     <ul class="m-nav am-nav am-nav-pills am-fl" style="margin-top: 10px;">
                         <li th:each="navItem : ${topNavPages.?[pageType == 1]}"
                             th:class="${navItem.pageName == pageName ? 'nav-hover' : ''}">
-                            <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang==''?'/':currentPathLang}" th:text="${navItem.i18nName}"></a>
+                            <a  th:href="${currentPathLang==''?'/':currentPathLang}" th:text="${navItem.i18nName}"></a>
                         </li>
 
                         <li th:each="navItem : ${topNavPages.?[pageType != 1]}"
                             th:class="${navItem.pageName == pageName ? 'nav-hover' : ''}">
-                            <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang} + '/' + ${navItem.pageName}" th:text="${navItem.i18nName}"></a>
+                            <a  th:href="${currentPathLang} + '/' + ${navItem.pageName}" th:text="${navItem.i18nName}"></a>
                         </li>
 
                     </ul>
@@ -84,7 +82,7 @@
                 <button title="Search" aria-hidden="false" aria-label="Search" class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;"  data-am-modal="{target: '#search-modal', closeViaDimmer: 0, }">
                     <span class="tn-icon-search am-text-lg"></span>
                 </button>
-                <button th:title="${advanced['download.the.app']}" aria-hidden="false" th:aria-label="${advanced['download.the.app']}" class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;"  data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+                <button th:title="${advanced['download.the.app']}"   class="am-btn am-btn-sm am-round"  style="background-color: var(--theme-wone);color: var(--theme-menu-font-color) !important;min-width: 50px;"  data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
                     <span class="tn-icon-download am-text-lg"></span>
                     <span class="am-hide-md-only am-padding-left-sm" th:text="${advanced['download.the.app']}"></span>
                 </button>
