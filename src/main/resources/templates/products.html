@@ -99,7 +99,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(item.name), ' ', '-'))} + '-' +
+                   ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), ' ', '-'), '/', '-'))} + '-' +
                    ${item.id}"
                    th:text="${item.i18nName}">
                 </a>
@@ -110,7 +110,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-'))} + '-' +
+                   ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(category.name), ' ', '-'), '/', '-'))} + '-' +
                    ${category.id}"
                    th:text="${category.i18nName}"></a>
             </li>
@@ -160,7 +160,7 @@
            '/' +
            #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
            '/' +
-           #strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-') +
+           #strings.replace(#strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-'), '/', '-') +
            '-' + subCategory.id}">
                                 <span th:text="${subCategory.i18nName}"></span>
                             </a>
@@ -219,7 +219,7 @@
     totalPages=${pageData.totalPages},
     currentPage=${pageData.pageNum},
     requestUrl=${category != null
-        ? (#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id)
+        ? (#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(category.name), ' ', '-'), '/', '-')) + '-' + category.id)
         : pageName}
 )"></th:block>
         </div>

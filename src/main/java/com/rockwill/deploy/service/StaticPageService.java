@@ -289,7 +289,7 @@ public class StaticPageService {
                     if (!childs.isEmpty()) {
                         for (LinkedHashMap<String, Object> child : childs) {
                             SitePage sub = new SitePage();
-                            sub.setPageName(child.get("name").toString().toLowerCase().trim());
+                            sub.setPageName(child.get("name").toString().toLowerCase().trim().replaceAll("/", "-"));
                             sub.setId(Long.parseLong(child.get("id").toString()));
                             processSubCategory(sitePage, sub, lang, domain);
                         }
