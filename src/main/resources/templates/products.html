@@ -59,7 +59,7 @@
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height"></div>
-
+<h1 class="sr-only" th:text="${pageDescription}"></h1>
 <div class="am-hide-sm-only m-header-banner m-header-1"
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
              + '; height: 300px; display: flex; align-items: center; justify-content: center;'
