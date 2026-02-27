@@ -373,10 +373,16 @@ public class StaticPageService {
     }
 
     private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {
-        Document document = Jsoup.parse(htmlContent);
-        Elements directChildLinks = document.select(cssQuery);
-        return directChildLinks.stream().map(element -> element.attr("href"))
-                .filter(s -> s.startsWith("/")).map(link -> link.substring(1)).collect(Collectors.toList());
+        try {
+            Document document = Jsoup.parse(htmlContent);
+            Elements directChildLinks = document.select(cssQuery);
+            return directChildLinks.stream().map(element -> element.attr("href"))
+                    .filter(s -> s.startsWith("/")).map(link -> link.substring(1)).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("getDetailLinkFromPage exception", e);
+        }
+        return new ArrayList<>();
+
     }
 
 

@@ -15,8 +15,8 @@ public class AsyncConfig {
     public ThreadPoolTaskExecutor rockwillTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         int cpuCores = Runtime.getRuntime().availableProcessors();
-        executor.setCorePoolSize(Math.max(10, cpuCores * 5));
-        executor.setMaxPoolSize(Math.max(50, cpuCores * 12));
+        executor.setCorePoolSize(Math.max(5, cpuCores * 5));
+        executor.setMaxPoolSize(Math.max(25, cpuCores * 12));
         executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("rockwill-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
