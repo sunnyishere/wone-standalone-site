@@ -1,5 +1,6 @@
 package com.rockwill.deploy.service;
 
+import cn.hutool.core.io.FileUtil;
 import com.redfin.sitemapgenerator.ChangeFreq;
 import com.redfin.sitemapgenerator.WebSitemapUrl;
 import com.rockwill.deploy.conf.BrandConfig;
@@ -44,6 +45,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -83,7 +86,7 @@ public class StaticPageService {
     Map<String, List<String>> detailUrlNap = new ConcurrentHashMap<>();
 
     @Async("rockwillTaskExecutor")
-    public void triggerGenPages(String domain) {
+    public void triggerGenPages(String domain, Map<Integer, Set<Long>> todayUpdatedIds) {
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
         int state = 0;
@@ -97,7 +100,7 @@ public class StaticPageService {
                 domainPath = staticOutputPath + "/" + domain;
                 new File(domainPath).mkdirs();
             }
-            generateMenuAndDetailPage("", domain);
+            generateMenuAndDetailPage("", domain, todayUpdatedIds);
             state = 2;
         } catch (Exception e) {
             log.error("triggerGenPages exception: {}", domain, e);
@@ -133,9 +136,9 @@ public class StaticPageService {
                 domainPath = staticOutputPath + "/" + domain;
                 new File(domainPath).mkdirs();
             }
-            generateMenuAndDetailPage("", domain);
+            generateMenuAndDetailPage("", domain, null);
             for (String lang : SiteMenuUtils.getLangList()) {
-                generateMenuAndDetailPage(lang, domain);
+                generateMenuAndDetailPage(lang, domain, null);
             }
 
             siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
@@ -170,7 +173,7 @@ public class StaticPageService {
     /**
      * 菜单及详情页面
      */
-    public void generateMenuAndDetailPage(String lang, String domain) {
+    public void generateMenuAndDetailPage(String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {
         log.info("Start generating menu  html files,site:{},lang:{}", domain, lang);
         long start=System.currentTimeMillis();
         if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages())) {
@@ -183,12 +186,22 @@ public class StaticPageService {
                     && ObjectUtils.isEmpty(lang)) {
                 continue;
             }
+            boolean delta = isIncrementalDetailType(sitePage.getPageType(),updatedIdsByType);
+            Set<Long> validIdSet = getUpdatedIdsByPageType(sitePage.getPageType(), updatedIdsByType);
+            if (delta && validIdSet.isEmpty()){
+                log.info("No updated ids for pageType:{}, skip list and detail generation, domain:{}, lang:{}",
+                        sitePage.getPageType(), domain, lang);
+                continue;
+            }
             String pageName = sitePage.getPageName();
             if (!ObjectUtils.isEmpty(pageName)) {
                 pageName = lang + "/" + pageName;
             }
             String menuPath = getApiPath(pageName);
             DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath, domain);
+            if (domainHtmlVo != null &&  domainHtmlVo.getHttpErrCode()==404){
+                deleteSavedHtml(domain, pageName);
+            }
             if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 saveHtml(domain, pageName, domainHtmlVo.getHtmlContent());
                 addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + pageName,
@@ -199,7 +212,7 @@ public class StaticPageService {
                     addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 0.8, domain);
                     continue;
                 }
-                List<CompletableFuture<Void>> pageTaskList = processPagination(sitePage, null, domainHtmlVo, false, lang, domain);
+                List<CompletableFuture<Void>> pageTaskList = processPagination(sitePage, null, domainHtmlVo, false, lang, domain, updatedIdsByType);
                 if (!pageTaskList.isEmpty()) {
                     futures.addAll(pageTaskList);
                 }
@@ -212,10 +225,7 @@ public class StaticPageService {
                 }
                 if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
                         && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-//                    CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-//                        processDetailPages(sitePage, domainHtmlVo, lang, domain);
-//                    }, taskExecutor);
-                    List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, domainHtmlVo, lang, domain);
+                    List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, domainHtmlVo, lang, domain, updatedIdsByType);
                     if (!detailTasks.isEmpty()) {
                         futures.addAll(detailTasks);
                     }
@@ -232,7 +242,7 @@ public class StaticPageService {
         log.info("End of generating  menu html files,site: {},lang:{},cost time:{}", domain, lang,(System.currentTimeMillis()-start)/1000);
     }
 
-    private List<CompletableFuture<Void>> processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain) {
+    private List<CompletableFuture<Void>> processPagination(SitePage sitePage, SitePage catePage, DomainHtmlVo domainHtmlVo, boolean isSubMenu, String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         if (domainHtmlVo.getTotalPages() != null && domainHtmlVo.getTotalPages() > 1) {
             for (int p = 1; p <= domainHtmlVo.getTotalPages(); p++) {
@@ -244,21 +254,23 @@ public class StaticPageService {
                     menuName = lang + "/" + menuName;
                 }
                 DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName), domain);
-                saveHtml(domain, menuName, menuPageVo.getHtmlContent());
-                if (p != 1) {
-                    addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
+                if (menuPageVo!=null && menuPageVo.getHttpErrCode()==404){
+                    deleteSavedHtml(domain, menuName);
                 }
+                if (menuPageVo!=null && !ObjectUtils.isEmpty(menuPageVo.getHtmlContent())){
+                    saveHtml(domain, menuName, menuPageVo.getHtmlContent());
+                    if (p != 1) {
+                        addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
+                    }
 
-                //仅对菜单根列表页面进行处理详情采集
-                if (p >= 2 && !isSubMenu) {
-                    if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
-                            && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
-//                        CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-//                            processDetailPages(sitePage, menuPageVo, lang, domain);
-//                        }, taskExecutor);
-                        List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, menuPageVo, lang, domain);
-                        if (!detailTasks.isEmpty()) {
-                            futures.addAll(detailTasks);
+                    //仅对菜单根列表页面进行处理详情采集
+                    if (p >= 2 && !isSubMenu) {
+                        if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
+                                && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
+                            List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, menuPageVo, lang, domain, updatedIdsByType);
+                            if (!detailTasks.isEmpty()) {
+                                futures.addAll(detailTasks);
+                            }
                         }
                     }
                 }
@@ -311,7 +323,7 @@ public class StaticPageService {
                 SitePage sub = new SitePage();
                 sub.setPageName(sort.substring(0, sort.lastIndexOf("-")));
                 sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-") + 1)));
-                List<CompletableFuture<Void>> futures= processPagination(sitePage, sub, subVo, true, lang, domain);
+                List<CompletableFuture<Void>> futures= processPagination(sitePage, sub, subVo, true, lang, domain, null);
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());
@@ -323,13 +335,23 @@ public class StaticPageService {
             docName = lang + "/" + docName;
         }
         DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
+        if (categoryVo==null){
+            return new ArrayList<>();
+        }
+        if (categoryVo.getHttpErrCode() == 404){
+            deleteSavedHtml(domain, docName);
+            return new ArrayList<>();
+        }
+        if (ObjectUtils.isEmpty(categoryVo.getHtmlContent())){
+            return new ArrayList<>();
+        }
         saveHtml(domain, docName, categoryVo.getHtmlContent());
         addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64, domain);
-        List<CompletableFuture<Void>> futures = processPagination(menu, sitePage, categoryVo, true, lang, domain);
+        List<CompletableFuture<Void>> futures = processPagination(menu, sitePage, categoryVo, true, lang, domain, null);
         return futures;
     }
 
-    public List<CompletableFuture<Void>> processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain) {
+    public List<CompletableFuture<Void>> processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {
         log.info("Start generating details html files,detail:{}", sitePage.getPageName());
         List<CompletableFuture<Void>> futureList = new ArrayList<>();
         String cssQuery = "";
@@ -342,9 +364,20 @@ public class StaticPageService {
             log.error("Currently, only products, news, solutions, and Success Reference are supported for static details.");
             return new ArrayList<>();
         }
+        boolean incrementalEnabled = isIncrementalDetailType(sitePage.getPageType(), updatedIdsByType);
+        Set<Long> validIdSet = getUpdatedIdsByPageType(sitePage.getPageType(), updatedIdsByType);
         List<String> detailUrlList = getDetailLinkFromPage(domainHtmlVo.getHtmlContent(), cssQuery);
         for (String detailUrl : detailUrlList) {
-            if (detailUrlNap.get(domain).contains(detailUrl)) {
+            boolean isDeltaId = false;
+            if (incrementalEnabled) {
+                for (Long id : validIdSet) {
+                    if (detailUrl.contains("-" + id.toString())) {
+                        isDeltaId = true;
+                        break;
+                    }
+                }
+            }
+            if ((incrementalEnabled && !isDeltaId) || detailUrlNap.get(domain).contains(detailUrl)) {
                 continue;
             }
             detailUrlNap.get(domain).add(detailUrl);
@@ -372,6 +405,25 @@ public class StaticPageService {
         return futureList;
     }
 
+    private boolean isIncrementalDetailType(Long pageType, Map<Integer, Set<Long>> updatedIdsByType) {
+        if (updatedIdsByType == null || updatedIdsByType.isEmpty() || pageType == null) {
+            return false;
+        }
+        int type = pageType.intValue();
+        return type == SitePage.SitePageType.PRODUCTS
+                || type == SitePage.SitePageType.SOLUTIONS
+                || type == SitePage.SitePageType.NEWS
+                || type == SitePage.SitePageType.SUCCESS_REFERENCE;
+    }
+
+    private Set<Long> getUpdatedIdsByPageType(Long pageType, Map<Integer, Set<Long>> updatedIdsByType) {
+        if (updatedIdsByType == null || pageType == null) {
+            return Collections.emptySet();
+        }
+        Set<Long> ids = updatedIdsByType.get(pageType.intValue());
+        return ids == null ? Collections.emptySet() : ids;
+    }
+
     private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {
         try {
             Document document = Jsoup.parse(htmlContent);
@@ -385,12 +437,25 @@ public class StaticPageService {
 
     }
 
+    public void deleteSavedHtml(String domain, String namePrefix) {
+        String menuPagePath = getStaticPageFileName(domain, namePrefix);
+        FileUtil.del(new File(menuPagePath));
+    }
 
     public void saveHtml(String domain, String namePrefix, String html) {
         if (ObjectUtils.isEmpty(html)) {
             log.info("Empty html content,uri:{}", namePrefix);
             return;
         }
+        String menuPagePath = getStaticPageFileName(domain, namePrefix);
+        try {
+            templateEnginePageRenderer.saveToFile(html, menuPagePath);
+        } catch (IOException e) {
+            log.error("save {} html file exception", namePrefix, e);
+        }
+    }
+
+    private String getStaticPageFileName(String domain, String namePrefix) {
         String fileName = sanitizeFileName(namePrefix) + ".html";
         String baseStaticPath = staticOutputPath;
         if (!domain.equals(brandConfig.getDomain())) {
@@ -406,12 +471,7 @@ public class StaticPageService {
                 fileName = "index.html";
             }
         }
-        String menuPagePath = new File(siteDir, fileName).getAbsolutePath();
-        try {
-            templateEnginePageRenderer.saveToFile(html, menuPagePath);
-        } catch (IOException e) {
-            log.error("save {} html file exception", namePrefix, e);
-        }
+        return new File(siteDir, fileName).getAbsolutePath();
     }
 
 

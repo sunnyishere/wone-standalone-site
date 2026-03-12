@@ -60,21 +60,16 @@ public class TemplateEnginePageRenderer {
      * @return 渲染后的HTML内容
      */
     public synchronized String renderPage(String templateName, Map<String, Object> variables) {
-        try {
-            if (templateName == null || templateName.trim().isEmpty()) {
-                throw new IllegalArgumentException("Template name cannot be empty");
-            }
-            WebContext context = getWebContext(variables);
-            String htmlContent = templateEngine.process(templateName, context);
-            if (htmlContent.contains("http://oss.iwone.cn")) {
-                htmlContent = htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iwone.cn");
-            }
-            log.info("Template rendering completed: {}, size: {}KB", templateName, htmlContent.length() / 1024);
-            return htmlContent;
-        } catch (Exception e) {
-            log.error("Rendering template failed: {}", templateName, e);
-            return "";
+        if (templateName == null || templateName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Template name cannot be empty");
         }
+        WebContext context = getWebContext(variables);
+        String htmlContent = templateEngine.process(templateName, context);
+        if (htmlContent.contains("http://oss.iwone.cn")) {
+            htmlContent = htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iwone.cn");
+        }
+        log.info("Template rendering completed: {}, size: {}KB", templateName, htmlContent.length() / 1024);
+        return htmlContent;
     }
 
     private WebContext getWebContext(Map<String, Object> variables) {

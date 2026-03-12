@@ -9,5 +9,6 @@ public class DomainHtmlVo {
     private String htmlContent;
     private Integer totalPages;
     private Map<String, Object> modelMap;
+    private int httpErrCode;
 
 }

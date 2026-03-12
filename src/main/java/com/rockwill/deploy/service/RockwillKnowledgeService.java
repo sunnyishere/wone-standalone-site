@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -39,6 +40,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 品牌商服务接口请求
@@ -272,8 +274,12 @@ public class RockwillKnowledgeService {
             }
             log.error("request {} error: {}", path, responseEntity.getStatusCode());
         } catch (Exception e) {
+            DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
             log.error("request {} exception", path, e);
-            return new DomainHtmlVo();
+            if (e instanceof HttpClientErrorException.NotFound){
+                domainHtmlVo.setHttpErrCode(404);
+            }
+            return domainHtmlVo;
         }
         return new DomainHtmlVo();
     }
@@ -487,6 +493,86 @@ public class RockwillKnowledgeService {
         } catch (Exception e) {
             log.error("request Home data exception", e);
             return null;
+        }
+    }
+
+    /**
+     * 主动发布前，查询当天更新的详情页ID（按页面类型分组）。
+     */
+    public Map<Integer, Set<Long>> getTodayUpdatedIds(String domain) {
+        Map<Integer, Set<Long>> resultMap = new HashMap<>();
+        try {
+            ParameterizedTypeReference<AjaxResult<JSONObject>> typeReference =
+                    new ParameterizedTypeReference<AjaxResult<JSONObject>>() {
+                    };
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Deploy-Domain", domain);
+            HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+            ResponseEntity<AjaxResult<JSONObject>> response = restTemplate.exchange(
+                    wcmApi + "publish/todayUpdatedIds",
+                    HttpMethod.GET,
+                    requestEntity,
+                    typeReference
+            );
+            AjaxResult<JSONObject> ajaxResult = response.getBody();
+            if (ajaxResult == null || ajaxResult.getCode() != 200 || ajaxResult.getData() == null) {
+                log.warn("request todayUpdatedIds failed, domain:{}, resp:{}", domain, ajaxResult);
+                return resultMap;
+            }
+            JSONObject data = ajaxResult.getData();
+            resultMap.put(SitePage.SitePageType.PRODUCTS, parseIdSet(data,"prodIds"));
+            resultMap.put(SitePage.SitePageType.SOLUTIONS, parseIdSet(data,"articleIds"));
+            resultMap.put(SitePage.SitePageType.NEWS, parseIdSet(data,"newsIds"));
+            resultMap.put(SitePage.SitePageType.SUCCESS_REFERENCE, parseIdSet(data, "caseIds"));
+            log.info("todayUpdatedIds loaded, domain:{}, products:{}, solutions:{}, news:{}, success:{}",
+                    domain,
+                    resultMap.get(SitePage.SitePageType.PRODUCTS).size(),
+                    resultMap.get(SitePage.SitePageType.SOLUTIONS).size(),
+                    resultMap.get(SitePage.SitePageType.NEWS).size(),
+                    resultMap.get(SitePage.SitePageType.SUCCESS_REFERENCE).size());
+            return resultMap;
+        } catch (Exception e) {
+            log.error("request todayUpdatedIds exception, domain:{}", domain, e);
+            return resultMap;
+        }
+    }
+
+    private Set<Long> parseIdSet(JSONObject data, String key) {
+        LinkedHashSet<Long> ids = new LinkedHashSet<>();
+        if (StringUtils.isBlank(key) || !data.containsKey(key)) {
+            return ids;
+        }
+        Object value = data.get(key);
+        if (value instanceof Collection) {
+            for (Object item : (Collection<?>) value) {
+                appendLongId(ids, item);
+            }
+        } else if (value != null && value.getClass().isArray()) {
+            Object[] arr = (Object[]) value;
+            for (Object item : arr) {
+                appendLongId(ids, item);
+            }
+        } else if (value instanceof String) {
+            return Arrays.stream(value.toString().split(","))
+                    .filter(org.springframework.util.StringUtils::hasText)
+                    .map(Long::parseLong)
+                    .collect(Collectors.toSet());
+        }
+        return ids;
+    }
+
+    private void appendLongId(Set<Long> ids, Object value) {
+        if (value == null) {
+            return;
+        }
+        try {
+            String str = value.toString().trim();
+            if (str.isEmpty()) {
+                return;
+            }
+            ids.add(Long.parseLong(str));
+        } catch (Exception ignore) {
+            // ignore invalid id value
         }
     }
 }

@@ -406,19 +406,120 @@
 
             <!-- FAQ部分 -->
             <th:block th:if="${prodFaqList != null and not prodFaqList.isEmpty()}">
-                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px">
-                    FAQ
-                </span>
+                <div class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px"
+                      th:text="${advanced['faq']} + '&nbsp;' + ${prod.shortKeywords}">
+                </div>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div class="am-margin-bottom-lg" th:each="item : ${prodFaqList}">
                         <div class="am-text-bold">
                             Q: <span th:text="${item.title}"></span>
                         </div>
                         <div>
-                            <span id="faqeditor" class="am-text-bold">A:</span>
+                            <span id="editor" class="am-text-bold">A:</span>
                             <span th:utext="${item.content}"></span>
                         </div>
                     </div>
+                </div>
+            </th:block>
+
+            <!-- 问答部分 -->
+            <th:block th:if="${questionList != null and not #lists.isEmpty(questionList)}">
+                <span class="am-text-bold" style="background-color: #DDDDDD; padding: 6px 10px; display: inline-block;">
+                    <span class="am-text-bold" th:text="${advanced['qa']} + '&nbsp;' + ${prod.shortKeywords}"></span>
+                </span>
+
+                <div style="border-top: 1px solid #E6E6E6; margin-top: 10px; padding: 10px 0; background-color: #FFFFFF;">
+                    <th:block th:each="item : ${questionList}">
+                        <div class="am-margin-bottom-lg">
+                            <div class="am-text-bold" style="margin-bottom: 8px; line-height: 1.5;" th:text="|Q: ${item.title}|"></div>
+
+                            <th:block th:if="${item.articleCommentVo != null}">
+                                <div style="margin-bottom: 12px; display: flex; align-items: flex-start;">
+                                    <span class="am-text-bold" style="flex-shrink: 0; margin-right: 8px; line-height: 24px;">A:</span>
+
+                                    <div style="flex: 1; min-width: 0;">
+
+                                        <div style="margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+
+                                            <a th:href="'https://iee-business.com' + ${item.articleCommentVo.url}"
+                                               style="display: flex; align-items: center; text-decoration: none; max-width: 60%;">
+                                                <img th:src="${item.articleCommentVo.uhead}"
+                                                     style="width: 24px; height: 24px; border-radius: 50%; margin-right: 0; object-fit: cover; flex-shrink: 0;">
+                                                <span style="color: #5C779F; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; margin-left: 6px;"
+                                                      th:text="${item.articleCommentVo.uname}">
+                                                </span>
+                                            </a>
+
+                                            <th:block th:if="${item.articleCommentVo.factoryAuth == true or (item.articleCommentVo.isAuth != null and item.articleCommentVo.isAuth == true)}">
+                                                <span class="am-show-lg-only p-icon-a-0011"
+                                                      style="color: #07C160; font-size: 14px; line-height: 1;"
+                                                      data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+                                                </span>
+
+                                                <span class="am-hide-lg-only p-icon-a-0011 chat-btn-brand"
+                                                      style="color: #07C160; font-size: 14px; line-height: 1;"
+                                                      th:data-details="${prod.brandId}">
+                                                </span>
+                                            </th:block>
+
+                                            <a href="javascript:void(0);"
+                                               class="am-show-lg-only dd-hover-a"
+                                               style="color: #07C160; font-size: 12px; display: inline-flex; align-items: center; white-space: nowrap; text-decoration: none; padding: 0;"
+                                               data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }"
+                                               th:text="|+${advanced['follow']}|">
+                                            </a>
+
+
+                                            <a href="javascript:void(0);"
+                                               class="am-hide-lg-only chat-btn-brand"
+                                               style="color: #07C160; font-size: 12px; display: inline-flex; align-items: center; white-space: nowrap; text-decoration: none; margin: 0; padding: 0; line-height: 1;"
+                                               th:data-details="${prod.brandId}"
+                                               th:text="|+${advanced['follow']}|">
+                                            </a>
+                                        </div>
+
+                                        <div id="editor" style="overflow-wrap: break-word; word-break: break-all; color: #333; font-size: 14px; line-height: 1.6;">
+                                            <div style="width: 100%; overflow-x: auto;" th:utext="${item.articleCommentVo.content}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th:block>
+
+                            <div class="am-hide-lg-only"
+                                 style="padding: 8px 12px; border-radius: 4px; border: 1px solid #e4dfdf; margin-top: 8px; display: flex; align-items: center; gap: 16px; background: #fafafa;"
+                                 th:onclick="|downloadAppHandler(${prod.id})|">
+                                <div style="border: 1px solid #b9b9b9; border-radius: 15px; padding: 2px 8px; display: inline-flex; align-items: center; white-space: nowrap; line-height: 16px; font-size: 12px; color: #666;">
+                                    <span class="am-icon-thumbs-o-up am-padding-right-xs" style="font-size: 14px;"></span>
+                                    <span th:text="${item.likeNum}"></span>
+                                </div>
+                                <span style="color: #999999; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;">
+                                    <span class="p-icon-a-029" style="font-size: 14px;"></span>
+                                    <span th:text="${item.commentNum}"></span>
+                                </span>
+                                <span style="color: #999999; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;">
+                                    <span class="am-icon-share-alt" style="font-size: 14px;"></span>
+                                    <span th:text="${item.shareNum}"></span>
+                                 </span>
+                            </div>
+
+                            <div class="am-show-lg-only"
+                                 style="padding: 8px 12px; border-radius: 4px; border: 1px solid #e4dfdf; margin-top: 8px; display: flex; align-items: center; gap: 16px; background: #fafafa;"
+                                 data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
+                                <div style="border: 1px solid #b9b9b9; border-radius: 15px; padding: 2px 8px; display: inline-flex; align-items: center; white-space: nowrap; line-height: 16px; font-size: 12px; color: #666;">
+                                    <span class="am-icon-thumbs-o-up am-padding-right-xs" style="font-size: 14px;"></span>
+                                    <span th:text="${item.likeNum}"></span>
+                                </div>
+                                <span style="color: #999999; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;">
+                                    <span class="p-icon-a-029" style="font-size: 14px;"></span>
+                                    <span th:text="${item.commentNum}"></span>
+                                </span>
+                                <span style="color: #999999; display: inline-flex; align-items: center; gap: 4px; font-size: 12px;">
+                                    <span class="am-icon-share-alt" style="font-size: 14px;"></span>
+                                    <span th:text="${item.shareNum}"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </th:block>
                 </div>
             </th:block>
         </div>
