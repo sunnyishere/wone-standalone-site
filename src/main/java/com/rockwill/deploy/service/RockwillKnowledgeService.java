@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.conf.GoogleTagProperties;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
 import com.rockwill.deploy.utils.PathMatchUtils;
@@ -40,6 +41,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -59,6 +61,9 @@ public class RockwillKnowledgeService {
 
     @Autowired
     GoogleTagProperties googleTagProperties;
+
+    @Resource
+    BrandConfig brandConfig;
 
     @Resource
     TemplateEnginePageRenderer templateEnginePageRenderer;
@@ -318,17 +323,24 @@ public class RockwillKnowledgeService {
                 }
                 model.put(key, newVal);
             } else if (key.toLowerCase().contains("breadcrumb") && model.get(key) instanceof String) {
-                Object lang = model.get("currentPathLang");
-                if (lang != null && !lang.toString().isEmpty()) {
-                    JSONObject object = JSON.parseObject(model.get(key).toString());
-                    JSONArray itemListElement = object.getJSONArray("itemListElement");
-                    for (int i = 0; i < itemListElement.size(); i++) {
-                        JSONObject item = itemListElement.getJSONObject(i);
-                        item.put("item", item.getString("item").replace(host, host + lang));
+                JSONObject object = JSON.parseObject(model.get(key).toString());
+                JSONArray itemListElement = object.getJSONArray("itemListElement");
+                List<String> mapLang = brandConfig.getMapLang();
+                for (int i = 0; i < itemListElement.size(); i++) {
+                    String itemUrl = itemListElement.getJSONObject(i).getString("item");
+                    for (String mLang : mapLang) {
+                        if (itemUrl.contains(mLang)) {
+                            if (mLang.equals("en_US")){
+                                itemUrl = itemUrl.replace("en_US/", "");
+                            }else{
+                                itemUrl = itemUrl.replace(mLang, mLang.split("_")[0]);
+                            }
+                            itemListElement.getJSONObject(i).put("item", itemUrl);
+                            break;
+                        }
                     }
-                    model.put(key, object.toJSONString());
                 }
-
+                model.put(key, object.toJSONString());
             }
         }
     }

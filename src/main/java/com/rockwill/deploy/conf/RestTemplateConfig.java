@@ -40,8 +40,8 @@ public class RestTemplateConfig {
 
     private RestTemplate restTemplatePool(RestTemplateBuilder builder, int timeout) {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(5);
-        connectionManager.setDefaultMaxPerRoute(5);
+        connectionManager.setMaxTotal(3);
+        connectionManager.setDefaultMaxPerRoute(3);
 
         try {
             TrustStrategy acceptingTrustStrategy = (x509Certificates, s) -> true;

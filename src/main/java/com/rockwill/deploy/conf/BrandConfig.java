@@ -15,6 +15,7 @@ public class BrandConfig {
     private Boolean executeOnStart;
     private List<String> executeOnDomain;
     private List<String> languages;
+    private List<String> mapLang;
     private List<String> domainList;
     private String secret;
 }
