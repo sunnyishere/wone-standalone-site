@@ -87,10 +87,24 @@
                                 gtag('set', 'user_data', {"email": email, "phone_number": phone});
                                 gtag('event', 'conversion', {'send_to': 'AW-656103518/BtnoCMOF-PAbEN6w7bgC'});
                             }
-                            ;
                         });
                     });
                 });
+            </script>
+        </th:block>
+
+        <th:block th:if="${currentHost != null and currentHost.contains('www.vziman.com')}">
+            <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17988767362"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+
+                function gtag() {
+                    dataLayer.push(arguments);
+                }
+
+                gtag('js', new Date());
+
+                gtag('config', 'AW-17988767362');
             </script>
         </th:block>
     </th:block>

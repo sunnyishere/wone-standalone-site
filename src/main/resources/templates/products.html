@@ -147,7 +147,7 @@
                     </a>
 
                     <ul th:if="${cate.children != null and not cate.children.empty}"
-                        class="am-list admin-sidebar-sub am-collapse am-in"
+                        class="am-list admin-sidebar-sub am-collapse"
                         th:id="|a_${stat.index}|"
                         th:classappend="${hasSelectedChild} ? 'am-in' : ''" >
                         <li th:each="subCategory : ${cate.children}"
@@ -200,7 +200,7 @@
            '-'+${index.pid}">
                             <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
                                 <div class="image-box">
-                                    <img th:alt="${index.pName}" th:src="${index.url}" alt="" class="image-square">
+                                    <img th:alt="${index.pName}" th:data-echo="${index.url}" src="https://oss.iwone.cn/landing/img/space.png"  class="image-square">
                                 </div>
                                 <div class="dd-clamp-text-2 am-text-lg">
                                     <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 14px;"></span>
