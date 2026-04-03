@@ -106,6 +106,77 @@
 
                 gtag('config', 'AW-17988767362');
             </script>
+            <script>
+                window.addEventListener('load', function () {
+                    document.querySelectorAll(".submit-btn").forEach(function(e){
+                        e.addEventListener('click', function(b){
+                            var form = b.target.closest('form');
+                            var email = form.querySelector('#input-email').value;
+
+                            if(email){
+                                gtag("set", "user_data", {"email":email});
+                                gtag('event', 'form_submit', {'send_to': 'AW-17988767362'});
+                            }
+                        });
+                    });
+                });
+            </script>
+            <script>
+                const observer = new MutationObserver(function(mutations) {
+                    const texts = ["success", "Soumission","Отправка","Envío","التسليم"];
+                    for (let text of texts) {
+                        if (document.body.textContent.includes(text)) {
+                            gtag('event', 'conversion', {'send_to': 'AW-17988767362/882qCJuOpJQcEIKd24FD'});
+                            observer.disconnect();
+                        }
+                    }
+                });
+                const config = {subtree: true, childList: true};
+                observer.observe(document, config);
+            </script>
+        </th:block>
+
+        <th:block th:if="${currentHost != null and currentHost.contains('www.energy-rw.com')}">
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18052802292"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'AW-18052802292');
+            </script>
+
+            <!-- Event snippet for 提交潜在客户表单 conversion page -->
+            <script>
+                window.addEventListener('load', function () {
+                    document.querySelectorAll(".submit-btn").forEach(function(e){
+                        e.addEventListener('click', function(b){
+                            var form = b.target.closest('form');
+                            var email = form.querySelector('#input-email').value;
+
+                            if(email){
+                                gtag("set", "user_data", {"email":email});
+                                gtag('event', 'form_submit', {'send_to': 'AW-18052802292'});
+                            }
+                        });
+                    });
+                });
+
+            </script>
+            <script>
+                const observer = new MutationObserver(function(mutations) {
+                    const texts = ["success", "Soumission","Отправка","Envío","التسليم","Invio","Einreichung"];
+                    for (let text of texts) {
+                        if (document.body.textContent.includes(text)) {
+                            gtag('event', 'conversion', {'send_to': 'AW-18052802292/wS4uCMOU3JIcEPTNn6BD'});
+                            observer.disconnect();
+                        }
+                    }
+                });
+                const config = {subtree: true, childList: true};
+                observer.observe(document, config);
+            </script>
         </th:block>
     </th:block>
 
