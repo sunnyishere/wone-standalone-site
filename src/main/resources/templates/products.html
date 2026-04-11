@@ -41,6 +41,10 @@
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <link rel="preload"
+          th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
+          as="image"
+          fetchpriority="high">
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">

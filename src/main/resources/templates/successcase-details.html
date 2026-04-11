@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- 使用th:content避免属性值冲突 -->
-    <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
+    <title th:text="${#strings.isEmpty(successCase.seoTitle)?successCase.title:successCase.seoTitle} + '-' + ${prodBrand.eName}"></title>
 
     <!-- 链接标签优化 -->
     <link rel="canonical" th:href="${websiteUrl}" />
@@ -15,20 +15,24 @@
         <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
     </th:block>
     <meta name="description"
-          th:content="${successCase.title} + '-' + ${prodBrand.eName}"/>
+          th:content="${successCase.description} + '-' + ${prodBrand.eName}"/>
     <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="${currentLang}" />
     <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
-    <meta property="og:description" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
+    <meta property="og:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
     <meta property="og:image" th:attr="content=${successCase.iconUrl}" />
     <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName}" />
 
+    <meta name="keywords"
+          th:if="${not #strings.isEmpty(successCase.keywords)}"
+          th:content="${#strings.replace(successCase.keywords, '#', ',')}"/>
+
     <!-- Twitter元数据 - 同样使用th:attr -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
-    <meta name="twitter:description" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
+    <meta name="twitter:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta name="twitter:site" th:attr="content='@' + ${prodBrand.eName}" />
     <meta name="twitter:creator" th:attr="content='@' + ${prodBrand.eName}" />
 
@@ -97,6 +101,24 @@
             <br>
             <div class="am-padding-top am-padding-bottom-xl">
                 <div id="editor" th:utext="${successCase.content}"></div>
+            </div>
+
+            <div class="am-margin-top-xl"
+                 th:if="${not #lists.isEmpty(relatedProducts) or not #lists.isEmpty(relatedSolutions)}">
+                <th:block th:if="${not #lists.isEmpty(relatedProducts)}"
+                          th:replace="section-related-cards :: relatedCards(${relatedProducts}, 'Deployed Equipment', 'Products More', ${productsPagePath})"></th:block>
+                <th:block th:if="${not #lists.isEmpty(relatedSolutions)}"
+                          th:replace="section-related-cards :: relatedCards(${relatedSolutions}, 'Related Solutions', 'Solutions More', ${solutionsPagePath})"></th:block>
+            </div>
+            <div class="am-text-center am-padding-bottom-lg am-margin-lg" style="display:flex;flex-direction:column;align-items:center;text-align:center;font-weight: bold">
+                <div style="width: 100%; height: 1px;background-color: #DDDDDD"></div>
+                <span>Leave your contact information to receive the full technical white paper, equipment list, and energy efficiency report for this case.</span>
+
+                <a title="Request Reference Materials"  class="rfq-trigger" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"  th:data-biz-id="'site-reference-'+${successCase.id}" >
+                    <button class="am-text-center am-margin-top" style="padding:0 10px;color: var(--theme-menu-font-color);background-color: var(--theme-wone);border: none;height:45px;border-radius: 10px">
+                        Request Reference Materials
+                    </button>
+                </a>
             </div>
 
         </div>

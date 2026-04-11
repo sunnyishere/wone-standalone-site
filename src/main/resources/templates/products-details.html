@@ -14,6 +14,10 @@
               th:each="transLang : ${langList}" >
         <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
     </th:block>
+    <link th:if="${not #lists.isEmpty(imageList)}" rel="preload"
+          th:href="${imageList.get(0)}"
+          as="image"
+          fetchpriority="high">
     <!-- Robots -->
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
@@ -46,7 +50,37 @@
 
     <!-- Common Head Fragment -->
     <th:block th:replace="head :: commonHead"></th:block>
+    <style>
 
+        .m-partner .am-slider .am-slides > li > img,
+        .m-partner .am-slider .am-slides > li > video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        #editor {
+            max-width: 100%;
+            min-height: 120px;
+        }
+
+
+        @media screen and (max-width:768px){
+            .m-partner .am-slider .am-slides > li {
+                aspect-ratio: 1 / 1;
+                height: 180px !important;
+                overflow: hidden;
+            }
+            .product-main-slider{
+                height: 240px !important;
+            }
+        }
+        .prod-h2-bg {
+            background-color: #DDDDDD;
+            padding: 6px 10px !important;
+        }
+    </style>
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
     <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
@@ -112,13 +146,13 @@
 
             <!-- 视频+图片 -->
             <div class="m-partner">
-                <div data-am-widget="slider" class="am-slider am-slider-default-2"
-                     data-am-slider='{"animation":"slide","controlNav":"thumbnails"}'>
+                <div data-am-widget="slider" class="am-slider am-slider-default-2 product-main-slider"
+                     data-am-slider='{"directionNav":false,"slideshow": false, "animationLoop": false}'>
                     <ul class="am-slides">
                         <!-- 条件判断：如果 videoUrl 不为空则显示视频 -->
                         <th:block th:if="${videoUrl != null and videoUrl != ''}">
                             <li class="video-product" data-thumb="/images/play.png"
-                                style="border-radius: 0px;width: 100%;object-fit: contain;">
+                                style="height: 432px;border-radius: 0px;width: 100%;object-fit: contain;">
                                 <video class="video-box new-swiper" id="vid" controls preload loop muted playsinline
                                        autoplay
                                        style="height: 100%;width: 100%;border-radius: 0px;background-color: #000000;">
@@ -135,7 +169,7 @@
                         <!-- 循环遍历图片列表 -->
                         <th:block th:each="image : ${imageList}">
                             <li th:attr="data-thumb=${image}"
-                                style="border-radius: 0;max-height: 432px;width: 100%;object-fit: cover;">
+                                style="border-radius: 0;height: 432px;width: auto !important;object-fit: cover;">
                                 <img class="new-swiper" th:src="${image}" th:alt="${prod.name}"
                                      style="background-color: #FFFFFF;">
                             </li>
@@ -151,11 +185,11 @@
                     <div class="" style="border-bottom: 1px solid #E6E6E6;padding-bottom: 10px;">
                         <div class="am-text-lg am-text-bold border-active">
                             <a class="am-margin-right-lg" data-offset="240" href="#target1"
-                               onclick="scrollToTarget(event)" ><h2 class="inline-header"  th:text="${advanced['attributes']}"></h2></a>
+                               onclick="scrollToTarget(event)" ><span  th:text="${advanced['attributes']}"></span></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target2"
-                               onclick="scrollToTarget(event)" ><h2 class="inline-header" th:text="${advanced['description']}"> </h2></a>
+                               onclick="scrollToTarget(event)" ><span th:text="${advanced['description']}"> </span></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target4"
-                               onclick="scrollToTarget(event)" ><h2 class="inline-header"  th:text="${advanced['documentation.library']}"></h2></a>
+                               onclick="scrollToTarget(event)" ><span  th:text="${advanced['documentation.library']}"></span></a>
                         </div>
                     </div>
                 </div>
@@ -163,8 +197,8 @@
 
             <!-- 定位1 -->
             <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg"
-                 th:text="${advanced['key.attributes']}">
-                Key attributes
+                 >
+                <h2 class="inline-header prod-h2-bg" th:text="${advanced['key.attributes']}"></h2>
             </div>
 
             <div class="am-margin-bottom-sm" style="padding: 10px 0;">
@@ -205,24 +239,28 @@
                 </table>
             </div>
 
-            <div class="dd-clamp-text-2 am-text-bold am-text-lg am-margin-bottom-lg"
-                 th:text="${advanced['product.descriptions.supplier']}">
-                Product descriptions from the supplier
+            <div id="target2" class="am-text-bold" >
+                <h2 class="inline-header prod-h2-bg" th:text="${advanced['description']}"></h2>
             </div>
-            <span id="target2" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px;" th:text="${advanced['description']}">
-            Description
-            </span>
             <div id="editor" class="am-margin-bottom"
                  style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                 <div style="width: 100%;overflow-x: auto" th:utext="${prod.detail}">
                 </div>
             </div>
 
+            <div class="am-margin-top-xl"
+                 th:if="${not #lists.isEmpty(relatedSolutions) or not #lists.isEmpty(relatedSuccessCases)}">
+                <th:block th:if="${not #lists.isEmpty(relatedSolutions)}"
+                          th:replace="section-related-cards :: relatedCards(${relatedSolutions}, 'Solutions for ' + ${prod.shortKeywords}, 'Solutions More', ${solutionsPagePath})"></th:block>
+                <th:block th:if="${not #lists.isEmpty(relatedSuccessCases)}"
+                          th:replace="section-related-cards :: relatedCards(${relatedSuccessCases}, 'Reference Projects for ' + ${prod.shortKeywords}, 'Reference Projects More', ${referencesPagePath})"></th:block>
+            </div>
+
             <!-- 文档资源库 -->
             <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}">
-                <span id="target4" class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px" th:text="${advanced['documentation.library']}">
-                    Documentation Resource Library
-                </span>
+                <div id="target4" class="am-text-bold"  >
+                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['documentation.library']}"></h2>
+                </div>
 
                 <div class="am-margin-bottom-sm"
                      style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
@@ -380,10 +418,10 @@
 
             <!-- 证书 -->
             <div th:if="${prCercateList != null and #lists.size(prCercateList) > 0}">
-                <span class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px"
-                      th:text="${advanced['certifications']}">
-                    Certifications
-                </span>
+                <div class="am-text-bold"
+                      >
+                   <h2 class="inline-header prod-h2-bg" th:text="${advanced['certifications']}"></h2>
+                </div>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0 0 0;">
                     <div data-am-widget="slider" class="am-slider am-slider-default"
                          data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":180,"itemMargin":5}'>
@@ -406,8 +444,9 @@
 
             <!-- FAQ部分 -->
             <th:block th:if="${prodFaqList != null and not prodFaqList.isEmpty()}">
-                <div class="am-text-bold" style="background-color: #DDDDDD;padding: 6px 10px"
-                      th:text="${advanced['faq']} + '&nbsp;' + ${prod.shortKeywords}">
+                <div class="am-text-bold"
+                      >
+                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['faq']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
                 </div>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div class="am-margin-bottom-lg" th:each="item : ${prodFaqList}">
@@ -415,7 +454,7 @@
                             Q: <span th:text="${item.title}"></span>
                         </div>
                         <div>
-                            <span id="editor" class="am-text-bold">A:</span>
+                            <span  class="am-text-bold">A:</span>
                             <span th:utext="${item.content}"></span>
                         </div>
                     </div>
@@ -424,9 +463,9 @@
 
             <!-- 问答部分 -->
             <th:block th:if="${questionList != null and not #lists.isEmpty(questionList)}">
-                <span class="am-text-bold" style="background-color: #DDDDDD; padding: 6px 10px; display: inline-block;">
-                    <span class="am-text-bold" th:text="${advanced['qa']} + '&nbsp;' + ${prod.shortKeywords}"></span>
-                </span>
+                <div class="am-text-bold" style="display: inline-block;">
+                    <h2 class="am-text-bold inline-header prod-h2-bg" th:text="${advanced['qa']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
+                </div>
 
                 <div style="border-top: 1px solid #E6E6E6; margin-top: 10px; padding: 10px 0; background-color: #FFFFFF;">
                     <th:block th:each="item : ${questionList}">
@@ -441,7 +480,7 @@
 
                                         <div style="margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
 
-                                            <a th:href="'https://iee-business.com' + ${item.articleCommentVo.url}"
+                                            <a th:href="'https://www.iee-business.com' + ${item.articleCommentVo.url}"
                                                style="display: flex; align-items: center; text-decoration: none; max-width: 60%;">
                                                 <img th:src="${item.articleCommentVo.uhead}"
                                                      style="width: 24px; height: 24px; border-radius: 50%; margin-right: 0; object-fit: cover; flex-shrink: 0;">
@@ -478,7 +517,7 @@
                                             </a>
                                         </div>
 
-                                        <div id="editor" style="overflow-wrap: break-word; word-break: break-all; color: #333; font-size: 14px; line-height: 1.6;">
+                                        <div  style="overflow-wrap: break-word; word-break: break-all; color: #333; font-size: 14px; line-height: 1.6;">
                                             <div style="width: 100%; overflow-x: auto;" th:utext="${item.articleCommentVo.content}"></div>
                                         </div>
                                     </div>
@@ -763,71 +802,7 @@
             </div>
 
 
-            <div th:if="${not #lists.isEmpty(knowList)}" class="am-g">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;" >
-                    <h2 class="inline-header" th:text="${advanced['related.solutions']}"></h2>
 
-                </div>
-                <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
-                    <a th:title="${advanced['more']}" aria-hidden="false" th:aria-label="${advanced['more']}"
-                       th:href="
-                    ${currentPathLang} +
-                    (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
-                 '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
-                        <span style="color: #5C779F;text-decoration: underline;" th:text="${advanced['more']}">More</span>
-                        <span class="p-icon-a-067  am-padding-left-sm" style="color: #5C779F"></span>
-                    </a>
-                </div>
-            </div>
-
-            <div style="margin-bottom:15px;">
-                <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-3 am-thumbnails phone-clear-padding">
-                    <li class="" style="padding: 0 8px 20px 8px !important;"
-                        th:each="item : ${knowList}">
-                            <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
-                                <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">
-                                    <div style="am-cf">
-                                        <div class="am-fl am-margin-right am-padding-left phone-clear-padding-min">
-                                            <div class="phone-bottom" style="width: 100px; height: 100px;">
-                                                <img th:src="${item.iconUrl}" th:alt="${item.i18nTitle}" class="am-img-responsive"
-                                                     style="object-fit: cover; width: 100px; height: 100px; border-radius: 12px;">
-                                            </div>
-                                        </div>
-                                        <div class="am-padding-right" style="height: 100px;">
-                                            <a class="inline-a-link"
-                                               th:aria-label="${item.i18nTitle}" th:title="${item.i18nTitle}" th:href="
-                        ${currentPathLang} +
-                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
-           '/' :
-           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
-           ${item.id}">
-                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${item.i18nTitle}"></div>
-                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
-                                                 th:text="${item.content}"></div>
-                                            </a>
-                                            <div class="am-padding-top-xs am-cf am-text-sm">
-                                                <div class="am-fl dd-clamp-text-1" style="width: 40%; color: #5C779F;">
-                                                    <span class="am-icon-user"></span>
-                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${item.author}" th:title="${item.author}"
-                                                       th:href="${brandUrl}" style="border: none">
-                                                        <span th:text="${item.author}"></span>
-                                                    </a>
-                                                </div>
-                                                <div class="am-fr am-padding-right" style="color: #999999">
-                                    <span th:if="${item.created != null}"
-                                          th:text="${#dates.format(item.created, 'dd/MM-yyyy')}"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                    </li>
-                </ul>
-            </div>
         </div>
     </div>
 

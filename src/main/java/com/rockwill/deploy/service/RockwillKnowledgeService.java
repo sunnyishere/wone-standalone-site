@@ -261,15 +261,19 @@ public class RockwillKnowledgeService {
                         tagId = googleTagProperties.getDomains().get(host);
                     }
                     model.put("gaTrackingId", tagId);
+                    handlePlatformSuccessCaseLink(model);
                     handleSchemaJson(model, websiteUrl, host);
                     if (!model.isEmpty()) {
-                        String content = templateEnginePageRenderer.renderPage(model.get("templateName").toString(), model);
+                        String templateName = model.get("templateName").toString();
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
-                        domainHtmlVo.setHtmlContent(content);
-                        domainHtmlVo.setModelMap(model);
-                        if (model.containsKey("pageData")) {
-                            Map<String, Object> pageMap = (Map<String, Object>) model.get("pageData");
-                            domainHtmlVo.setTotalPages(Integer.parseInt(pageMap.get("totalPages").toString()));
+                        if (StringUtils.isNotEmpty(templateName) && !templateName.equals("404")) {
+                            String content = templateEnginePageRenderer.renderPage(templateName, model);
+                            domainHtmlVo.setHtmlContent(content);
+                            domainHtmlVo.setModelMap(model);
+                            if (model.containsKey("pageData")) {
+                                Map<String, Object> pageMap = (Map<String, Object>) model.get("pageData");
+                                domainHtmlVo.setTotalPages(Integer.parseInt(pageMap.get("totalPages").toString()));
+                            }
                         }
                         return domainHtmlVo;
                     }
@@ -287,6 +291,36 @@ public class RockwillKnowledgeService {
             return domainHtmlVo;
         }
         return new DomainHtmlVo();
+    }
+
+    private void handlePlatformSuccessCaseLink(Map<String, Object> model) {
+        Object currentLang = model.get("currentLang");
+        if (currentLang == null || currentLang.toString().startsWith("en")){
+            return;
+        }
+        if (brandConfig.getCaseTranslateOnline()){
+            return;
+        }
+        Object caseList = model.get("relatedSuccessCases");
+        if (caseList instanceof List ){
+            List<Object> list = (List<Object>) caseList;
+            for (Object item : list){
+                if (item instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> mapInList = (Map<String, Object>) item;
+                    Object cardUrl = mapInList.get("cardUrl");
+                    if (cardUrl != null && cardUrl.toString().contains("www.iee-business.com")){
+                        List<String> mapLang = brandConfig.getMapLang();
+                        for (String lang: mapLang){
+                            if (lang.startsWith(currentLang.toString())){
+                                String newCardUrl = cardUrl.toString().replace("-"+lang,"");
+                                mapInList.put("cardUrl",newCardUrl);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void handleSchemaJson(Map<String, Object> model, String websiteUrl, String host) {

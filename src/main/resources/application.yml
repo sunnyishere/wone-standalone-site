@@ -28,6 +28,7 @@ spring:
 
 brand:
   languages: en,fr,pl,et,bn,id,uk,cs,kn,gl,pa,sv,pt,no,ar,ku,hr,fi,eu,vi,tr,sw,ja,is,lv,nl,de,fa,hi,it,hy,es,te,eo,ka,ru,uz,sl,ca,bg,hu,el,he,sr,ps,ne,kk,az,af,ms,la,ko,mk,mt,tl,ur,ta,si,ha,da,ga,ceb,fil,th
+  mapLang: en_US,fr_FR,pl_PL,et_EE,bn_BD,id_ID,uk_UA,cs_CZ,kn_IN,gl_ES,pa_IN,sv_SE,pt_PT,ar_SA,no_NO,ku_TR,hr_HR,fi_FI,eu_ES,vi_VN,tr_TR,sw_KE,ja_JP,is_IS,lv_LV,nl_NL,de_DE,fa_AF,hi_IN,it_IT,hy_AM,es_ES,te_IN,ka_GE,ru_RU,fa_IR,uz_UZ,sl_SI,ca_ES,bg_BG,hu_HU,el_GR,he_IL,sr_RS,ps_AF,ne_NP,kk_KZ,az_AZ,af_ZA,ms_MY,ko_KR,mk_MK,mt_MT,tl_PH,ur_PK,ta_IN,si_LK,ha_NG,da_DK,ga_IE,th_TH
   domain: www.test-static.com  #品牌商申请的域名
   static-output: ./static-output  #静态文件生成目录，也是Nginx配置的静态目录
   scheduler-enable: true #定时任务开启
@@ -36,6 +37,7 @@ brand:
   execute-on-domain: www.test-static.com
   domain-list:
   secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c
+  caseTranslateOnline: false
 
 cdn:
   enabled: true
@@ -47,3 +49,4 @@ google-tag:
   domains:
      www.rockwill.com: G-MB2YBKF1WG
      www.vziman.com: G-5RZ24PPB14
+     www.energy-rw.com: AW-18052802292

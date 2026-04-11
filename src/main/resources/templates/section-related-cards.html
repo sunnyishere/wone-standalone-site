@@ -1,0 +1,65 @@
+<th:block th:fragment="relatedCards(sectionItems, sectionTitle, sectionMoreAria, sectionMoreHref)"
+          th:if="${sectionItems != null and !#lists.isEmpty(sectionItems)}">
+    <div class="am-g" style="background-color:#FFFFFF;">
+        <div class="am-u-sm-8 am-text-bold am-margin-bottom-lg prod-h2-bg dd-clamp-text-1 am-text-lg" >
+            <h2 class="inline-header" th:text="${sectionTitle}">Section Title</h2>
+        </div>
+        <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding:0 4px;">
+            <a th:aria-label="${sectionMoreAria}"
+               th:href="${currentPathLang + sectionMoreHref}"
+               style="border:none">
+                <span style="color:#5C779F;text-decoration:underline;"
+                      th:text="${advanced['more']}">More</span>
+                <span class="p-icon-a-067 am-padding-left-sm" style="color:#5C779F"></span>
+            </a>
+        </div>
+    </div>
+    <div style="background-color:#FFFFFF;margin-bottom:15px;">
+        <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-1 am-thumbnails phone-clear-padding">
+            <li class="prod-rec-li" th:each="item : ${sectionItems}">
+                <div class="phone-bg-white prod-rec-div">
+                    <div class="am-g dd-hover4 phone-clear-padding" style="padding:15px 0;">
+                        <div>
+                            <div class="am-fl am-margin-right am-padding-left phone-clear-padding-min">
+                                <a th:title="${item.cardTitle}"
+                                   th:href="${item.cardUrl}"
+                                   style="border:none">
+                                    <div class="phone-bottom" style="width:100px;height:100px;">
+                                        <img class="am-img-responsive prod-rec-img"
+                                             th:src="${item.cardImageUrl != null and !#strings.isEmpty(#strings.trim(item.cardImageUrl)) ? item.cardImageUrl : '/landing/img/space.png'}"
+                                             th:alt="${item.cardTitle}">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="am-padding-right" style="height:100px;">
+                                <a th:href="${item.cardUrl}" style="border:none">
+                                    <div class="dd-clamp-text-1 am-text-bold"
+                                         th:text="${item.cardTitle}">Card Title</div>
+                                </a>
+                                <div class="dd-clamp-text-2 am-padding-top-sm"
+                                     style="color:#6C6C6C"
+                                     th:if="${item.cardDescription != null and !#strings.isEmpty(#strings.trim(item.cardDescription))}"
+                                     th:text="${item.cardDescription}">
+                                    Card Description
+                                </div>
+                                <div class="am-padding-top-xs am-cf am-text-sm"
+                                     th:if="${item.cardMetaName != null and !#strings.isEmpty(#strings.trim(item.cardMetaName))}">
+                                    <div class="am-fl dd-clamp-text-1" style="color:#5C779F;">
+                                        <th:block th:if="${item.cardMetaName != null and !#strings.isEmpty(#strings.trim(item.cardMetaName))}">
+                                            <span class="am-icon-user"></span>
+                                            <a class="device-aware-link"
+                                               th:href="${item.cardMetaUrl != null ? item.cardMetaUrl : 'javascript:void(0);'}"
+                                               style="border:none">
+                                                <span th:text="${item.cardMetaName}">Meta Name</span>
+                                            </a>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</th:block>

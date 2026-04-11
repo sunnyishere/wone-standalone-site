@@ -41,11 +41,54 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <style>
-        .am-slider.am-slider-a1{height:680px!important;min-height:680px;overflow:hidden}
-        .am-slides{height:680px!important}
-        .am-slider-images{height:680px!important}
+        .hero-embla {
+            position: relative;
+            background-color: #000;
+        }
+        .hero-embla__viewport {
+            overflow: hidden;
+        }
+        .hero-embla__container {
+            display: flex;
+            touch-action: pan-y pinch-zoom;
+        }
+        .hero-embla__slide {
+            position: relative;
+            flex: 0 0 100%;
+            min-width: 0;
+            height: 680px;
+            overflow: hidden;
+        }
+        .hero-embla__media {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+        .hero-embla__media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .hero-embla__overlay {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+        }
+        .hero-embla__content {
+            width: 80%;
+        }
+        .hero-embla__title {
+            width: 100%;
+        }
+        .hero-embla__description {
+            max-width: 75%;
+        }
         @media screen and (max-width:768px){
-            .am-slider.am-slider-a1,.am-slides,.am-slides li{height:300px!important;min-height:300px}
+            .hero-embla__slide {
+                height: 300px;
+                min-height: 300px;
+            }
         }
     </style>
 
@@ -67,76 +110,101 @@
 </header>
 
 <div class="header-height"></div>
-<!-- 轮播 -->
-<div data-am-widget="slider" class="am-slider am-slider-a1" data-am-slider='{"directionNav":false;slideshow:true,}' >
+<!-- Banner -->
+<div class="hero-embla" id="heroEmbla">
+    <div class="hero-embla__viewport">
+        <div class="hero-embla__container scroll-title">
+            <div th:if="${not #lists.isEmpty(banner)}"
+                 th:each="index, stat : ${banner}"
+                 class="hero-embla__slide">
+                <div class="hero-embla__media">
+                    <img th:if="${stat.index == 0}"
+                         th:src="${index.imgUrl}"
+                         th:alt="${index.title}"
+                         width="1920"
+                         height="680"
+                         fetchpriority="high"
+                         loading="eager">
+                    <img th:unless="${stat.index == 0}"
+                         th:src="${index.imgUrl}"
+                         th:alt="${index.title}"
+                         width="1920"
+                         height="680"
+                         loading="lazy">
+                </div>
 
-    <ul class="am-slides scroll-title" data-am-slider="{autoplay: 5000, loop: true}">
-        <!-- 情况1：后端传递了 bannerImages 数据且非空 -->
-        <li th:if="${not #lists.isEmpty(banner)}"
-            th:each="index : ${banner}"
-            class="am-slider-images"
-            th:style="'background-image: url(' + ${index.imgUrl} + ');background-repeat: no-repeat;background-position: center;background-size: cover'"
-            >
-            <!-- 移动端 -->
-            <div class="am-text-center am-show-sm-only" style="margin: 10% auto; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <div th:style="'font-size: 20px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
-                     th:text="${index.title}"> </div>
-                <div th:style="'font-size: 15px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
-                     th:text="${index.description}" ></div>
-                <div class="am-padding-top"
-                     th:style="'display: flex; justify-content: ' + (${index.fontPosition == 'left' ? 'flex-start' : 'center'}) + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
-                     data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" style="height: 40px; width: 100%;">
-                    <span class="dd-clamp-text-1"
-                          th:style="|  border-radius: 40px; padding: 0px 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone); | + (${index.fontPosition == 'left' ? 'margin-left: 0;' : ''})">
-                            <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; display: inline-block; width: 100%; height: 100%; line-height: 40px;"
-                                th:text="${advanced['contact.us']}"></a>
-                    </span>
+                <div class="hero-embla__overlay">
+                    <div class="am-text-center am-show-sm-only" style="margin: 10% auto; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <div th:style="'font-size: 20px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
+                             th:text="${index.title}"> </div>
+                        <div th:style="'font-size: 15px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
+                             th:text="${index.description}"></div>
+                        <div class="am-padding-top"
+                             th:style="'display: flex; justify-content: ' + (${index.fontPosition == 'left' ? 'flex-start' : 'center'}) + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
+                             data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" style="height: 40px; width: 100%;">
+                            <span class="dd-clamp-text-1"
+                                  th:style="'border-radius: 40px; padding: 0px 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);' + (${index.fontPosition == 'left' ? 'margin-left: 0;' : ''})">
+                                <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; display: inline-block; width: 100%; height: 100%; line-height: 40px;"
+                                   th:text="${advanced['contact.us']}"></a>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="am-hide-sm-only"
+                         style="margin: 10% auto; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <div class="hero-embla__content am-container">
+                            <div class="hero-embla__title"
+                                 th:text="${index.title}"
+                                 th:style="'font-size: 60px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'">
+                            </div>
+
+                            <div class="hero-embla__description"
+                                 th:text="${index.description}"
+                                 th:style="'font-size: 25px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'"
+                                 th:styleappend="${index.fontPosition == 'center' ? 'margin-left: auto; margin-right: auto;' : ''}">
+                            </div>
+                        </div>
+
+                        <div th:if="${index.fontPosition == 'left'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
+                            <span class="dd-clamp-text-1"
+                                  style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
+                                <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
+                            </span>
+                        </div>
+
+                        <div th:if="${index.fontPosition == 'center'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
+                            <span class="dd-clamp-text-1"
+                                  style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
+                                <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 桌面端 -->
-            <div class="am-hide-sm-only"
-                 style="margin: 10% auto; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-
-                <!-- 标题 -->
-                <div th:text="${index.title}"
-                     th:style="'font-size: 60px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'"
-                     th:classappend="${index.fontPosition == 'left' ? 'am-container' : ''}"
-                     th:styleappend="${index.fontPosition == 'left' ? 'justify-content: flex-start;' : 'justify-content: center;'}">
+            <div th:unless="${not #lists.isEmpty(banner)}"
+                 th:each="i : ${#numbers.sequence(1, 3)}"
+                 class="hero-embla__slide">
+                <div class="hero-embla__media">
+                    <img th:if="${i == 1}"
+                         th:src="'/images/banner' + ${i} + '.jpg'"
+                         alt="Banner"
+                         width="1920"
+                         height="680"
+                         fetchpriority="high"
+                         loading="eager">
+                    <img th:unless="${i == 1}"
+                         th:src="'/images/banner' + ${i} + '.jpg'"
+                         alt="Banner"
+                         width="1920"
+                         height="680"
+                         loading="lazy">
                 </div>
-
-                <!-- 描述 -->
-                <div th:text="${index.description}"
-                     th:style="'font-size: 25px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'"
-                     th:classappend="${index.fontPosition == 'left' ? 'am-container' : ''}"
-                     th:styleappend="${index.fontPosition == 'left' ? 'justify-content: flex-start;' : 'justify-content: center;'}">
-                </div>
-
-
-                <div th:if="${index.fontPosition == 'left'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
-                    <span class="dd-clamp-text-1"
-                          style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
-                        <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                    </span>
-                </div>
-
-                <div th:if="${index.fontPosition == 'center'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
-                    <span class="dd-clamp-text-1"
-                          style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
-                        <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                    </span>
-                </div>
+                <a title="No More" aria-hidden="false" aria-label="No More" th:href="@{/}" class="banner-link" style="position: absolute; inset: 0; z-index: 2;">
+                </a>
             </div>
-        </li>
-
-        <li th:unless="${not #lists.isEmpty(banner)}"
-            th:each="i : ${#numbers.sequence(1, 3)}"
-            class="am-slider-images"
-            th:style="'background-image: url(/images/banner' + ${i} + '.jpg)'">
-            <a title="No More" aria-hidden="false" aria-label="No More" th:href="@{/}" class="banner-link">
-            </a>
-        </li>
-    </ul>
+        </div>
+    </div>
 </div>
 
 
@@ -567,6 +635,34 @@
 <th:block th:replace="inquiry :: inquiry"></th:block>
 <th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
 <th:block th:replace="footer :: footer"></th:block>
+<script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+<script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var heroEmblaRoot = document.getElementById('heroEmbla');
+        if (!heroEmblaRoot || typeof EmblaCarousel === 'undefined') {
+            return;
+        }
+
+        var viewportNode = heroEmblaRoot.querySelector('.hero-embla__viewport');
+        var plugins = [];
+        if (typeof EmblaCarouselAutoplay !== 'undefined') {
+            plugins.push(EmblaCarouselAutoplay({
+                delay: 5000
+            }));
+        }
+
+        var emblaApi = EmblaCarousel(viewportNode, {
+            loop: true,
+            align: 'start'
+        }, plugins);
+
+        var autoplay = emblaApi.plugins().autoplay;
+        if (autoplay && typeof autoplay.play === 'function') {
+            autoplay.play();
+        }
+    });
+</script>
 <script th:src="@{${'/js/home.js?v=' + version}}"></script>
 
 </body>

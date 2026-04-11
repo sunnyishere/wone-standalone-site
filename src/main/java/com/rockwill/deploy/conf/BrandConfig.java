@@ -18,4 +18,5 @@ public class BrandConfig {
     private List<String> mapLang;
     private List<String> domainList;
     private String secret;
+    private Boolean caseTranslateOnline;
 }
