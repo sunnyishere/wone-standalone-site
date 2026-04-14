@@ -60,6 +60,12 @@
             display: block;
         }
 
+        .product-main-slider .am-slides > li > img,
+        .product-main-slider .am-slides > li > video {
+            object-position: center center;
+            margin: 0 auto;
+        }
+
         #editor {
             max-width: 100%;
             min-height: 120px;
@@ -73,7 +79,7 @@
                 overflow: hidden;
             }
             .product-main-slider{
-                height: 240px !important;
+                height: 180px !important;
             }
         }
         .prod-h2-bg {
@@ -147,7 +153,7 @@
             <!-- 视频+图片 -->
             <div class="m-partner">
                 <div data-am-widget="slider" class="am-slider am-slider-default-2 product-main-slider"
-                     data-am-slider='{"directionNav":false,"slideshow": false, "animationLoop": false}'>
+                     data-am-slider='{"directionNav":false,"slideshow": false, "animation":"fade", "animationLoop": false}'>
                     <ul class="am-slides">
                         <!-- 条件判断：如果 videoUrl 不为空则显示视频 -->
                         <th:block th:if="${videoUrl != null and videoUrl != ''}">
@@ -169,7 +175,7 @@
                         <!-- 循环遍历图片列表 -->
                         <th:block th:each="image : ${imageList}">
                             <li th:attr="data-thumb=${image}"
-                                style="border-radius: 0;height: 432px;width: auto !important;object-fit: cover;">
+                                style="border-radius: 0;height: 432px;width: 100%;object-fit: cover;">
                                 <img class="new-swiper" th:src="${image}" th:alt="${prod.name}"
                                      style="background-color: #FFFFFF;">
                             </li>
