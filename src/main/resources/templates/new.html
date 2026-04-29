@@ -36,7 +36,10 @@ basePath =${websitePath +pageName}">
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-
+    <link rel="preload"
+          th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
+          as="image"
+          fetchpriority="high">
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 

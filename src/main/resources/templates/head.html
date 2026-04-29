@@ -7,13 +7,25 @@
         <meta http-equiv="Content-Language" th:content="${currentLang != null? currentLang:'en'}">
         <meta name="author" content="https://m.iwone.cn/"/>
         <link rel="preconnect" href="https://oss.iwone.cn">
-        <script>
-            window.addEventListener('DOMContentLoaded', function () {
-                var link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = '/css/mini_iconfont.css';
-                document.head.appendChild(link);
-            });
+        <script data-cfasync="false">
+            (function () {
+                function loadMiniIconfont() {
+                    if (document.querySelector('link[href="/css/mini_iconfont.css"]')) {
+                        return;
+                    }
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = '/css/mini_iconfont.css';
+                    document.head.appendChild(link);
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', loadMiniIconfont);
+                    return;
+                }
+
+                loadMiniIconfont();
+            })();
         </script>
         <link rel="stylesheet" th:href="@{${'/css/amazeui.min.css?v=' + version}}">
         <link rel="stylesheet" th:href="@{${'/css/style.css?v='+ version}}">

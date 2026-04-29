@@ -260,6 +260,7 @@ public class RockwillKnowledgeService {
                     if (googleTagProperties.getDomains().containsKey(host)) {
                         tagId = googleTagProperties.getDomains().get(host);
                     }
+                    model.put("year", Calendar.getInstance().get(Calendar.YEAR));
                     model.put("gaTrackingId", tagId);
                     handlePlatformSuccessCaseLink(model);
                     handleSchemaJson(model, websiteUrl, host);

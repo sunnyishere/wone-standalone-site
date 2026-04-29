@@ -362,10 +362,9 @@
                 </div>
         </div>
 
-            <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
-                    <div class="am-u-sm-3 am-padding-top-xs">
-                    </div>
-                    <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+            <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
+                    <div class="home-section-header__center">
+                    <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
                         <h2 class="inline-header">
                             <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
                                  th:text="${#lists.isEmpty(filtered) ?
@@ -373,7 +372,8 @@
                                 (filtered[0].i18nName ?: '')}"></div>
                         </h2>
                     </div>
-                    <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+                    </div>
+                    <div class="home-section-header__action am-padding-top-xs">
                         <a
                            th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
                  '/' :
@@ -437,12 +437,9 @@
     <!--Rockwill Solutions -->
     <div class="" style="background-color: #FFFFFF;">
 
-        <div class="am-container phone-title" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
-
-            <div class="">
-                <div class="am-u-sm-3 am-padding-top-xs">
-                </div>
-                <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+        <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
+                <div class="home-section-header__center">
+                <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
                     <h2 class="inline-header">
                         <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
                              th:text="${#lists.isEmpty(filtered) ?
@@ -450,7 +447,8 @@
                                 (filtered[0].i18nName ?: '')}"></div>
                     </h2>
                 </div>
-                <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+                </div>
+                <div class="home-section-header__action am-padding-top-xs">
 
                     <a
                        th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
@@ -461,8 +459,6 @@
                         <span class="p-icon-a-067  am-padding-left-sm"></span>
                     </a>
                 </div>
-
-            </div>
 
         </div>
 
@@ -551,10 +547,9 @@
     </div>
 
     <!--Rockwill News -->
-    <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
-                <div class="am-u-sm-3 am-padding-top-xs">
-                </div>
-                <div class="am-u-sm-6 am-text-xl am-text-bold am-text-center">
+    <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
+                <div class="home-section-header__center">
+                <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
                     <h2 class="inline-header">
                         <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
                              th:text="${#lists.isEmpty(filtered) ?
@@ -562,7 +557,8 @@
                                 (filtered[0].i18nName ?: '')}"></div>
                     </h2>
                 </div>
-                <div class="am-u-sm-3 am-text-right am-padding-top-xs">
+                </div>
+                <div class="home-section-header__action am-padding-top-xs">
                     <a th:title="${advanced['view.all']}" aria-hidden="false"
                        th:aria-label="${advanced['view.all']}"
                        th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
@@ -638,30 +634,39 @@
 <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
 <script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var heroEmblaRoot = document.getElementById('heroEmbla');
-        if (!heroEmblaRoot || typeof EmblaCarousel === 'undefined') {
+    (function () {
+        function initHeroEmbla() {
+            var heroEmblaRoot = document.getElementById('heroEmbla');
+            if (!heroEmblaRoot || typeof EmblaCarousel === 'undefined') {
+                return;
+            }
+
+            var viewportNode = heroEmblaRoot.querySelector('.hero-embla__viewport');
+            var plugins = [];
+            if (typeof EmblaCarouselAutoplay !== 'undefined') {
+                plugins.push(EmblaCarouselAutoplay({
+                    delay: 5000
+                }));
+            }
+
+            var emblaApi = EmblaCarousel(viewportNode, {
+                loop: true,
+                align: 'start'
+            }, plugins);
+
+            var autoplay = emblaApi.plugins().autoplay;
+            if (autoplay && typeof autoplay.play === 'function') {
+                autoplay.play();
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHeroEmbla);
             return;
         }
 
-        var viewportNode = heroEmblaRoot.querySelector('.hero-embla__viewport');
-        var plugins = [];
-        if (typeof EmblaCarouselAutoplay !== 'undefined') {
-            plugins.push(EmblaCarouselAutoplay({
-                delay: 5000
-            }));
-        }
-
-        var emblaApi = EmblaCarousel(viewportNode, {
-            loop: true,
-            align: 'start'
-        }, plugins);
-
-        var autoplay = emblaApi.plugins().autoplay;
-        if (autoplay && typeof autoplay.play === 'function') {
-            autoplay.play();
-        }
-    });
+        initHeroEmbla();
+    })();
 </script>
 <script th:src="@{${'/js/home.js?v=' + version}}"></script>
 

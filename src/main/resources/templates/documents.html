@@ -37,7 +37,10 @@
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-
+    <link rel="preload"
+          th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
+          as="image"
+          fetchpriority="high">
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 
@@ -404,10 +407,14 @@
 
 </body>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    (function () {
+        function initVideoModal() {
         const videoModal = document.getElementById('videoModal');
         const closeButton = document.getElementById('closeVideo');
         const iframeContainer = document.getElementById('videoIframeContainer');
+        if (!videoModal || !closeButton || !iframeContainer || !document.body) {
+            return;
+        }
 
         // 处理所有播放按钮（使用事件委托）
         document.body.addEventListener('click', function (event) {
@@ -461,6 +468,14 @@
                 iframeContainer.innerHTML = '';
             }
         });
-    });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initVideoModal);
+            return;
+        }
+
+        initVideoModal();
+    })();
 </script>
 </html>
