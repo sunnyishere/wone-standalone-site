@@ -100,7 +100,7 @@ public class ApiSignatureInterceptor implements HandlerInterceptor {
         AccessRecord record = appAccessRecords.computeIfAbsent(securityReq.getAppId(), k -> new AccessRecord());
         // 1. 检查1小时内次数是否超过1次
         int countLastHour = record.getCountInWindow(ONE_HOUR);
-        if (countLastHour >= 1) {
+        if (countLastHour >= 2) {
             buildErrorResponse(response, "Publishing frequency limit reached: You can publish your site only once per hour. Please try again in one hour.");
             return false;
         }
