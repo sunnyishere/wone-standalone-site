@@ -1,5 +1,6 @@
 package com.rockwill.deploy.conf;
 
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rockwill.deploy.utils.AccessRecord;
 import com.rockwill.deploy.vo.SecurityReq;
@@ -7,7 +8,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class ApiSignatureInterceptor implements HandlerInterceptor {
+
+    private static final String STATICIZE_SYNC_PATH = "/api/staticize/sync";
 
     @Autowired
     BrandConfig brandConfig;
@@ -97,22 +99,30 @@ public class ApiSignatureInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        AccessRecord record = appAccessRecords.computeIfAbsent(securityReq.getAppId(), k -> new AccessRecord());
-        // 1. 检查1小时内次数是否超过1次
-        int countLastHour = record.getCountInWindow(ONE_HOUR);
-        if (countLastHour >= 2) {
-            buildErrorResponse(response, "Publishing frequency limit reached: You can publish your site only once per hour. Please try again in one hour.");
-            return false;
+        if (!STATICIZE_SYNC_PATH.equals(request.getRequestURI())) {
+            AccessRecord record = appAccessRecords.computeIfAbsent(securityReq.getAppId(), k -> new AccessRecord());
+            // 1. 检查1小时内次数是否超过1次
+            int countLastHour = record.getCountInWindow(ONE_HOUR);
+            if (countLastHour >= 2) {
+                buildErrorResponse(response, "Publishing frequency limit reached: You can publish your site only once per hour. Please try again in one hour.");
+                return false;
+            }
+
+            // 2. 检查24小时内次数是否超过5次
+            int countLastDay = record.getCountInWindow(ONE_DAY);
+            if (countLastDay >= 5) {
+                buildErrorResponse(response, "Daily publish quota exhausted: You can publish up to 5 times per day. Please try again tomorrow.");
+                return false;
+            }
+            record.addRecord();
         }
 
-        // 2. 检查24小时内次数是否超过5次
-        int countLastDay = record.getCountInWindow(ONE_DAY);
-        if (countLastDay >= 5) {
-            buildErrorResponse(response, "Daily publish quota exhausted: You can publish up to 5 times per day. Please try again tomorrow.");
-            return false;
+        if (securityReq.getData() != null) {
+            String dataStr = securityReq.getData().toString();
+            if (JSON.isValid(dataStr)) {
+                request.setAttribute("parsedData", JSON.parseObject(dataStr));
+            }
         }
-        record.addRecord();
-
         return true;
     }
 

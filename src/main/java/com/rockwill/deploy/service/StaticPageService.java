@@ -595,7 +595,9 @@ public class StaticPageService {
                     .priority(priority)
                     .changeFreq(ChangeFreq.DAILY)
                     .build();
-            webSitemapUrls.get(domain).add(index);
+            if (webSitemapUrls.containsKey(domain)) {
+                webSitemapUrls.get(domain).add(index);
+            }
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

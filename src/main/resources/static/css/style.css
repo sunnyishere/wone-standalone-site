@@ -11,6 +11,7 @@ body{color:#2b3242;overflow-x:hidden}
 ::-webkit-scrollbar-thumb{background-color:#555}
 a{color:#000}
 a:hover{color:var(--theme-wone)}
+a:focus,a:active {outline: none;box-shadow: none;}
 .am-alert{margin-bottom:0}
 .m-hd ul,.m-header-banner ul{padding:0}
 .m-hd ul li,.m-header-banner ul li{list-style-type:none}
@@ -29,6 +30,7 @@ a:hover{color:var(--theme-wone)}
 .m-hd .am-sticky{background:var(--theme-header-bg);padding:0 0 8px 0;opacity:.96;box-shadow:0 0 10px 0 var(--theme-header-bg)}
 .m-hd .am-header a{color:#fff}
 .m-hd .m-nav a{color:var(--theme-menu-font-color)}
+.m-hd .m-nav>li>a:focus,.m-hd .m-nav>li>a:active{outline:none;box-shadow:none}
 .m-hd .m-nav a:hover{background:var(--theme-wone);border-radius:2px;-webkit-transition:background-color .3s ease-out,border-color .3s ease-out;transition:background-color .3s ease-out,border-color .3s ease-out}
 .min-nav a:hover{background:var(--theme-wone);-webkit-transition:background-color .3s ease-out,border-color .3s ease-out;transition:background-color .3s ease-out,border-color .3s ease-out}
 .m-hd .am-nav>li.am-active>a,.m-hd .am-nav>li.am-active>a:focus,.m-hd .am-nav>li.am-active>a:hover{color:#fff;background-color:var(--theme-wone);cursor:default}
@@ -456,6 +458,11 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .dd-hover3:hover{transform:translateX(6px)}
 .dd-hover4{transition:all .2s}
 .dd-hover4:hover{transform:scale(1.02)}
+.home-section-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.home-section-header__center{flex:1;min-width:0}
+.home-section-header__title h2{margin:0}
+.home-section-header__action{flex-shrink:0;padding-top:0!important}
+.home-section-header__action a{display:inline-flex;align-items:center;white-space:nowrap}
 .dd-active{color:var(--theme-wone)!important;border-bottom:2px solid var(--theme-wone)}
 .auto-align{text-align:center;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .auto-align:not(:first-line){text-align:left}
@@ -568,6 +575,7 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .am-close{transition:all .3s ease}
 .am-modal-hd.am-text-xl{min-height:60px;display:flex;align-items:center}
 @media (max-width:768px){
+    .home-section-header{gap:10px}
     .am-modal-hd.am-text-xl{min-height:50px;padding:16px 20px 12px!important}
     .am-modal-hd.am-text-xl span{font-size:20px!important}
     .am-modal-dialog.rfq-modal-center{max-width:95vw!important;width:95vw!important}

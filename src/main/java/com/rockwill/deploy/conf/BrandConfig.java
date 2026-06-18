@@ -11,6 +11,7 @@ import java.util.List;
 public class BrandConfig {
     private String domain;
     private String staticOutput;
+    private String requestLogDir;
     private Boolean schedulerEnable;
     private Boolean executeOnStart;
     private List<String> executeOnDomain;

@@ -1,45 +1,26 @@
 package com.rockwill.deploy.controller;
 
-import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.service.RockwillKnowledgeService;
 import com.rockwill.deploy.service.StaticPageService;
 import com.rockwill.deploy.utils.PathPatternType;
-import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.vo.DomainHtmlVo;
-import com.rockwill.deploy.vo.SitePage;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 /**
  *
@@ -88,6 +69,10 @@ public class UnifiedRouterController {
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .body(response.getBody());
             case MENU_WITHOUT_PAGE:
+                if (realUri.equals("/")) {
+                    domainHtmlVo = rockwillKnowledgeService.getHome(realTimeRestTemplate, host);
+                    break;
+                }
             case DETAIL:
             case CATEGORY_PAGINATION:
             case MULTI_LEVEL:

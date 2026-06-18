@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -37,7 +36,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -134,14 +137,9 @@ public class RockwillKnowledgeService {
         put("th", "Thai");
     }};
 
-    private String wcmApi = "https://www.iee-business.com/wcm-api/site/static/";
+    @Value("${wcm-api}")
+    private String wcmApi;
 
-    @PostConstruct
-    public void initUrl() {
-        if (devMode.equals("dev")) {
-            wcmApi = "http://192.168.34.62/wcm-api/site/static/";
-        }
-    }
 
     @Value("${cdn.enabled:true}")
     private boolean cdnEnabled;
@@ -382,6 +380,8 @@ public class RockwillKnowledgeService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss+08:00");
+    private static final DateTimeFormatter REQUEST_LOG_DIR_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter REQUEST_LOG_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     List<String> dateList = Arrays.asList("created", "updated");
 
@@ -425,14 +425,18 @@ public class RockwillKnowledgeService {
 
     @SneakyThrows
     public ResponseEntity<String> forwardFormRequest(HttpServletRequest originalRequest, String targetUrl) {
-        List<File> tempFiles = new ArrayList<>(); // 用于跟踪临时文件
+        List<File> tempFiles = new ArrayList<>();
         boolean isMultipart = originalRequest.getContentType() != null
                 && originalRequest.getContentType().startsWith("multipart/form-data");
         HttpEntity<?> requestEntity = null;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.add("Deploy-Domain", originalRequest.getHeader("Host"));
+        String deployDomain = originalRequest.getHeader("Host");
+        headers.add("Deploy-Domain", deployDomain);
         headers.add("Premium-Real-IP", originalRequest.getHeader("X-Real-IP"));
+        String requestId = buildRequestId();
+        Path requestLogDir = prepareRequestLogDir(deployDomain, requestId, targetUrl.contains("leaveMessage"));
+        Map<String, Object> requestLog = buildBaseRequestLog(originalRequest, targetUrl, deployDomain, requestId, isMultipart);
         try {
             if (isMultipart) {
                 MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -454,7 +458,6 @@ public class RockwillKnowledgeService {
                         }
                     }
 
-                    // 处理普通表单参数
                     for (String paramName : multipartRequest.getParameterMap().keySet()) {
                         String[] values = multipartRequest.getParameterValues(paramName);
                         for (String value : values) {
@@ -463,43 +466,123 @@ public class RockwillKnowledgeService {
                     }
 
                 } catch (Exception e) {
-                    // 处理解析异常
+                    requestLog.put("status", "parse_failed");
+                    requestLog.put("error", e.getMessage());
+                    persistRequestLog(requestLogDir, requestLog);
                     return ResponseEntity.badRequest().body("文件解析失败: " + e.getMessage());
                 }
                 requestEntity = new HttpEntity<>(body, headers);
                 headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             } else {
                 StringBuilder formBody = new StringBuilder();
+                Map<String, String[]> parameterMap = new LinkedHashMap<>();
                 Enumeration<String> parameterNames = originalRequest.getParameterNames();
                 while (parameterNames.hasMoreElements()) {
                     String paramName = parameterNames.nextElement();
                     String[] paramValues = originalRequest.getParameterValues(paramName);
+                    parameterMap.put(paramName, paramValues);
                     for (String value : paramValues) {
                         if (formBody.length() > 0) {
                             formBody.append("&");
                         }
+                        String newV = value;
+                        if (paramName.equals("name") &&
+                                value.length() > 32) {
+                            newV = value.substring(0, 32);
+                        }
                         formBody.append(URLEncoder.encode(paramName, "UTF-8"))
                                 .append("=")
-                                .append(URLEncoder.encode(value, "UTF-8"));
+                                .append(URLEncoder.encode(newV, "UTF-8"));
                     }
                 }
+                requestLog.put("formParams", parameterMap);
+                requestLog.put("files", Collections.emptyList());
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 requestEntity = new HttpEntity<>(formBody.toString(), headers);
             }
+            requestLog.put("status", "forwarding");
+            if (targetUrl.contains("leaveMessage")) {
+                persistRequestLog(requestLogDir, requestLog);
+            }
+
             String url = "";
             if (targetUrl.equals("/upload")) {
                 url = wcmApi.replace("static/", "") + targetUrl;
             } else {
                 url = wcmApi + targetUrl;
             }
-            return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-        }finally {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            requestLog.put("status", "forwarded");
+            requestLog.put("responseStatus", response.getStatusCodeValue());
+            if (targetUrl.contains("leaveMessage")) {
+                persistRequestLog(requestLogDir, requestLog);
+            }
+            log.info("forward request logged, requestId:{}, domain:{}, targetUrl:{}, dir:{}",
+                    requestId, deployDomain, targetUrl, requestLogDir.toAbsolutePath());
+            return response;
+        } catch (Exception e) {
+            requestLog.put("status", "forward_failed");
+            requestLog.put("error", e.getMessage());
+            persistRequestLog(requestLogDir, requestLog);
+            throw e;
+        } finally {
             for (File tempFile : tempFiles) {
                 if (tempFile.exists()) {
                     FileUtil.clean(tempFile);
                 }
             }
         }
+    }
+
+    private Map<String, Object> buildBaseRequestLog(HttpServletRequest originalRequest,
+                                                    String targetUrl,
+                                                    String deployDomain,
+                                                    String requestId,
+                                                    boolean isMultipart) {
+        Map<String, Object> requestLog = new LinkedHashMap<>();
+        requestLog.put("requestId", requestId);
+        requestLog.put("loggedAt", REQUEST_LOG_TIME_FORMATTER.format(LocalDateTime.now()));
+        requestLog.put("deployDomain", deployDomain);
+        requestLog.put("targetUrl", targetUrl);
+        requestLog.put("method", originalRequest.getMethod());
+        requestLog.put("contentType", originalRequest.getContentType());
+        requestLog.put("multipart", isMultipart);
+        requestLog.put("requestUri", originalRequest.getRequestURI());
+        requestLog.put("queryString", originalRequest.getQueryString());
+        requestLog.put("realIp", originalRequest.getHeader("X-Real-IP"));
+        requestLog.put("remoteAddr", originalRequest.getRemoteAddr());
+        return requestLog;
+    }
+
+
+    private Path prepareRequestLogDir(String deployDomain, String requestId, boolean isRfq) throws IOException {
+        String requestLogBaseDir = StringUtils.defaultIfBlank(brandConfig.getRequestLogDir(), "./request-logs");
+        String safeDomain = sanitizeLogFileName(StringUtils.defaultIfBlank(deployDomain, "unknown-domain"));
+        Path requestLogDir = Paths.get(requestLogBaseDir, safeDomain,
+                LocalDate.now().format(REQUEST_LOG_DIR_FORMATTER), isRfq ? "leaveMsg" : "uploads", requestId);
+        Files.createDirectories(requestLogDir);
+        return requestLogDir;
+    }
+
+    private void persistRequestLog(Path requestLogDir, Map<String, Object> requestLog) {
+        try {
+            Files.write(requestLogDir.resolve("request.json"),
+                    JSON.toJSONString(requestLog, com.alibaba.fastjson2.JSONWriter.Feature.PrettyFormat).getBytes("UTF-8"));
+        } catch (IOException e) {
+            log.error("persist request log failed, dir:{}", requestLogDir, e);
+        }
+    }
+
+    private String buildRequestId() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"))
+                + "_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+    }
+
+    private String sanitizeLogFileName(String fileName) {
+        if (StringUtils.isBlank(fileName)) {
+            return "unknown";
+        }
+        return fileName.replaceAll("[\\\\/:*?\"<>|]", "_").replaceAll("\\s+", "_");
     }
 
     /**

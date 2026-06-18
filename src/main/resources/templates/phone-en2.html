@@ -39,12 +39,9 @@
                 </li>
             </ul>
 
-            <p>
-                <a th:href="${currentPathLang!=''? currentPathLang:'/'}" title="logo" aria-hidden="false" aria-label="logo"><span class="logo"></span></a>
-            </p>
             <p th:each="navItem : ${topNavPages.?[pageType == 1]}"
                th:if="${navItem.pageType}">
-                <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang} + '/' + ${navItem.pageName}" th:text="${navItem.i18nName}"></a>
+                <a th:title="${navItem.i18nName}" aria-hidden="false" th:aria-label="${navItem.i18nName}" th:href="${currentPathLang == ''?'/': currentPathLang}" th:text="${navItem.i18nName}"></a>
             </p>
 
             <p th:each="navItem : ${topNavPages.?[pageType != 1]}"
