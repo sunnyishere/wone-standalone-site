@@ -434,6 +434,7 @@ public class RockwillKnowledgeService {
         String deployDomain = originalRequest.getHeader("Host");
         headers.add("Deploy-Domain", deployDomain);
         headers.add("Premium-Real-IP", originalRequest.getHeader("X-Real-IP"));
+        headers.add("Referer", originalRequest.getHeader("Referer"));
         String requestId = buildRequestId();
         Path requestLogDir = prepareRequestLogDir(deployDomain, requestId, targetUrl.contains("leaveMessage"));
         Map<String, Object> requestLog = buildBaseRequestLog(originalRequest, targetUrl, deployDomain, requestId, isMultipart);
