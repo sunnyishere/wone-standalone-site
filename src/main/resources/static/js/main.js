@@ -1198,7 +1198,23 @@ $(document).ready(function () {
         };
     };
 
-    $('.submit-btn').on('click', function () {
+    let isLeaveMessageSubmitting = false;
+    let lastLeaveMessageTouchAt = 0;
+
+    const setLeaveMessageSubmittingState = function (submitting) {
+        isLeaveMessageSubmitting = submitting;
+        $('.submit-btn').prop('disabled', submitting).css({
+            pointerEvents: submitting ? 'none' : '',
+            opacity: submitting ? '0.7' : '',
+            backgroundColor: submitting ? '#9ca3af' : 'var(--theme-wone)',
+            cursor: submitting ? 'not-allowed' : ''
+        }).attr('aria-busy', submitting ? 'true' : 'false');
+    };
+
+    const handleLeaveMessageSubmit = function () {
+        if (isLeaveMessageSubmitting) {
+            return;
+        }
         $('.form-error').remove();
         const phonePrefix = $('#phonePrefix').text().trim();
         const phoneNumber = $('#input-phone').val().trim();
@@ -1253,11 +1269,13 @@ $(document).ready(function () {
         }
 
         // 提交数据到后端
+        setLeaveMessageSubmittingState(true);
         const xhr = new XMLHttpRequest();
         xhr.open('POST', "/leaveMessage", true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
 
         xhr.onload = function () {
+            setLeaveMessageSubmittingState(false);
             if (xhr.status >= 200 && xhr.status < 300) {
                 try {
                     const result = JSON.parse(xhr.responseText);
@@ -1282,6 +1300,7 @@ $(document).ready(function () {
         };
 
         xhr.onerror = function () {
+            setLeaveMessageSubmittingState(false);
             showNativeMsg(i18n.ruleNetwork);
         };
 
@@ -1292,6 +1311,20 @@ $(document).ready(function () {
 
         console.log('提交的参数：', formDataParams);
         xhr.send(formDataParams);
+    };
+
+    $('.submit-btn').on('touchend', function (e) {
+        e.preventDefault();
+        lastLeaveMessageTouchAt = Date.now();
+        handleLeaveMessageSubmit();
+    });
+
+    $('.submit-btn').on('click', function (e) {
+        e.preventDefault();
+        if (Date.now() - lastLeaveMessageTouchAt < 700) {
+            return;
+        }
+        handleLeaveMessageSubmit();
     });
 
     // 页面加载时初始化，但不调用setCountryByIP

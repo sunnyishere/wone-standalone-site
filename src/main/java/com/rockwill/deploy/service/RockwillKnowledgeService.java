@@ -144,7 +144,7 @@ public class RockwillKnowledgeService {
     @Value("${cdn.enabled:true}")
     private boolean cdnEnabled;
 
-    @Value("${cdn.prefix:https://oss.iwone.cn}")
+    @Value("${cdn.prefix:https://oss.iee-business.com}")
     private String cdnPrefix;
     @Value("${cdn.version}")
     private String version;
