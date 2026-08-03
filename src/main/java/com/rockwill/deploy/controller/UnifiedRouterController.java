@@ -90,6 +90,11 @@ public class UnifiedRouterController {
                         .build();
         }
         if (ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
+            if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .headers(headers)
+                        .build();
+            }
             return ResponseEntity.status(HttpStatus.FOUND)
                     .location(URI.create("/"))
                     .headers(headers)

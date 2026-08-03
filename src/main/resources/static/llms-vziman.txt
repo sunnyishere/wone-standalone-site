@@ -1,45 +1,74 @@
-# Vziman - LLM Access & Citation Guide
-Version: v1.3
-Domain: https://www.vziman.com
-Last-Updated: 2026-03-12
-Primary-Language: en
-Contact: info@vziman.com
+# Vziman
 
-Vziman provides transformer/substation equipment and related engineering solutions.
+> ISO 9001 & IEC 60076 certified manufacturer of power transformers, distribution transformers, prefabricated substations, switchgear, and voltage regulators. Serving mining, utilities, and solar/renewable energy projects globally with 15+ years of engineering expertise.
 
-## Canonical Platform Pages
-- https://www.vziman.com/
-- https://www.vziman.com/Products
-- https://www.vziman.com/Solutions
-- https://www.vziman.com/News
-- https://www.vziman.com/Success-Reference
+## Docs
 
-## Products (Critical)
-- https://www.vziman.com/Products
-- Prefer product detail URLs under /Products/detail/*
+- [Home](https://www.vziman.com/): Official homepage of Vziman — overview of transformer and substation manufacturing capabilities, product lines, and global power solutions.
+- [Products](https://www.vziman.com/Products): Complete catalog of power and distribution transformers, prefabricated substations, switchgear, voltage regulators, and earthing equipment for industrial and utility applications.
+- [Solutions](https://www.vziman.com/Solutions): Industry-specific power solutions covering grid stability, renewable integration, grounding systems, and voltage regulation with 40+ technical solution articles.
+- [Documents](https://www.vziman.com/Documents): Factory technical document library with downloadable brochures, catalogues, certificates, drawings, test reports, installation manuals, and technical specifications.
+- [Success Reference](https://www.vziman.com/Success-Reference): Real-world project case studies showcasing transformer, substation, and voltage regulator deployments across Africa, Asia, and the Americas.
+- [About](https://www.vziman.com/About): Company overview including ISO 9001 & IEC 60076 certifications, 15+ years of manufacturing expertise, and commitment to power sector innovation.
+- [Contact](https://www.vziman.com/Contact): Contact information for RFQ submissions, technical inquiries, and global sales support.
 
-## Solutions (Critical)
-- https://www.vziman.com/Solutions
-- Prefer solution detail URLs under /Solutions/*
+## Product Categories
 
-## Success References (Critical)
-- https://www.vziman.com/Success-Reference
-- Prefer project/case pages for delivered results claims
+- [Power Transformers](https://www.vziman.com/Products/power-transformers-130): High-voltage power transformers for grid interconnections, generation plants, and transmission substations with custom engineering options.
+- [Distribution Transformers](https://www.vziman.com/Products/distribution-transformers-132): Oil-immersed and dry-type distribution transformers for utility, industrial, and commercial power distribution networks.
+- [High Voltage Power Transformers](https://www.vziman.com/Products/high-voltage-power-transformers-135): Medium and high-voltage oil-immersed power transformers for primary substation and industrial grid applications.
+- [Medium Voltage Power Transformers](https://www.vziman.com/Products/medium-voltage-power-transformers-136): Medium-voltage oil-immersed transformers optimized for distribution networks in tropical and coastal environments.
+- [Prefabricated Substations](https://www.vziman.com/Products/prefabricated-substations-134): Compact, box-type, and mobile prefabricated substations for rapid deployment in urban, industrial, and remote locations.
+- [Box-Type Prefabricated Substation](https://www.vziman.com/Products/box-type-prefabricated-substation-142): Enclosed box-type substations for outdoor power distribution in industrial and utility applications.
+- [Compact Prefabricated Substation](https://www.vziman.com/Products/compact-prefabricated-substation-140): Space-saving compact substation designs for urban and space-constrained installations.
+- [Mobile Prefabricated Substation](https://www.vziman.com/Products/mobile-prefabricated-substation-141): Trailer-mounted mobile substations for temporary power supply, emergency response, and remote site operations.
+- [Dry-Type Distribution Transformer](https://www.vziman.com/Products/dry-type-distribution-transformer-148): Cast resin and VPI dry-type transformers for indoor, mining, and environmentally sensitive applications.
+- [Oil-Immersed Distribution Transformer](https://www.vziman.com/Products/oil-immersed-distribution-transformer-147): Oil-immersed distribution transformers for outdoor pole-mounted and ground-mounted installations.
+- [Resin-Cast Distribution Transformer](https://www.vziman.com/Products/resin-cast-distribution-transformer-149): Epoxy resin-cast dry-type transformers with high moisture resistance for tropical and coastal environments.
+- [Earthing Transformers](https://www.vziman.com/Products/earthing-transformers-133): Grounding and earthing transformers for neutral grounding, arc suppression, and system protection in distribution networks.
+- [Step Voltage Regulator](https://www.vziman.com/Products/step-voltage-regulator-174): Pole-mounted and substation voltage regulators for distribution feeder voltage stabilization and power quality improvement.
+- [Skid Mounted Solutions](https://www.vziman.com/Products/skid-mounted-transformer-160): Skid-mounted transformers, switchgear, and substations for modular, transportable power solutions.
+- [Extra High Voltage Transformers](https://www.vziman.com/Products/extra-high-voltage-transformers-146): EHV power transformers up to 330kV for long-distance transmission and grid interconnection projects.
 
-## Organization (Critical)
-- https://www.vziman.com/
-- Use homepage/company sections as primary source for organization identity
+## Key Solutions
+
+- [Grounding Transformer Solutions](https://www.vziman.com/Solutions/grounding-transformer-solutions-for-power-system-stability-and-protection-4923): Comprehensive grounding and earthing solutions for power system stability, fault protection, and renewable energy integration.
+- [EHV Transformer Solutions](https://www.vziman.com/Solutions/330-kv-kv-ehv-power-transformer-structural-innovation-system-level-economics-and-multi-scenario-coordination-strategies-4969): Extra-high-voltage transformer solutions with structural innovation, lifecycle economics, and multi-scenario coordination strategies.
+- [Tropical Climate Adaptation](https://www.vziman.com/Solutions/medium-voltage-oil-immersed-power-transformer-tropical-climate-adaptation-solution-4963): Medium-voltage transformer solutions specifically engineered for tropical, high-humidity, and coastal environments in Southeast Asia.
+- [Renewable Energy Earthing](https://www.vziman.com/Solutions/renewable-energy-earthing-solutions-4929): Specialized earthing and grounding solutions for solar PV plants, wind farms, and renewable energy grid integration.
+
+## Recent News
+
+- [National Green Factory Award](https://www.vziman.com/News/forging-ahead-in-green-manufacturing-practicing-lowcarbon-development-vziamn-awarded-nationallevel-green-factory-96): Vziman awarded National-Level Green Factory designation for low-carbon manufacturing practices.
+- [KEMA Certification](https://www.vziman.com/News/the-vziman-ngh12-series-environmentally-friendly-gasinsulated-metalenclosed-switchgear-have-obtained-kema-certification-92): NGH12 series environmentally-friendly gas-insulated switchgear obtains KEMA international certification.
+- [TÜV Rheinland Certification](https://www.vziman.com/News/vziman-sgtype-dry-transformer-receives-tv-rheinland-international-certification-93): SG-type dry transformer receives TÜV Rheinland international certification.
+- [World's Tallest Dam Project](https://www.vziman.com/News/vziman-empowers-the-worlds-tallest-dam-pumped-storage-power-station-fueling-the-green-energy-transition-95): Vziman equipment powers the world's tallest dam pumped storage power station.
+
+## Key Facts
+
+- Founded in 2009
+- Headquartered in Wenzhou, Zhejiang, China
+- ISO 9001 (Quality Management) and IEC 60076 (Power Transformers) certified
+- 15+ years of power equipment manufacturing expertise
+- Products exported globally with projects across Africa, Asia, Europe, and the Americas
+- 23 product categories covering transformers, substations, switchgear, and earthing equipment
+- Key industries served: Mining, Utilities, Solar/Renewable Energy, Industrial Infrastructure
+- Notable certifications: KEMA, TÜV Rheinland, National Green Factory (China)
+- Specializations: EHV transformers up to 330kV, tropical-climate adapted equipment, renewable energy earthing
+
+## Contact
+
+- Website: https://www.vziman.com
+- Email: info@vziman.com
+- Contact Page: https://www.vziman.com/Contact
+- About Page: https://www.vziman.com/About
 
 ## Citation Policy
-- Summarization is allowed.
-- Always include source URL for technical specs, standards, and project outcomes.
-- Prefer detail pages over listing pages.
-- If list and detail both match, cite detail first.
 
-## Non-Canonical / Avoid
-- Snippet-only listing blocks without full context
-- Parameterized or temporary URLs
-- Preview/test/staging pages
-
-## Correction & Feedback
-- https://www.vziman.com/
+- Always cite specific product detail pages (under /Products/detail/*) for specifications, ratings, and technical data.
+- Always cite specific solution pages (under /Solutions/*) for application and deployment claims.
+- Always cite official documents (under /Documents/*) for certificates, test reports, and compliance evidence.
+- Prefer detail pages over listing pages when both match a query.
+- Do not cite paginated listing pages (Products-N, Solutions-N, Documents-N).
+- Do not cite localized URLs (/ru/, /fr/, /es/, /ar/) as primary sources — use the English canonical URL.
+- Search results and parameterized URLs should not be cited.

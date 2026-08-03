@@ -1,44 +1,73 @@
-# RW Energy - LLM Access & Citation Guide
-Version: v1.3
-Domain: https://www.energy-rw.com
-Last-Updated: 2026-03-12
-Primary-Language: en
-Contact: info@energy-rw.com
+# RW Energy
 
-RW Energy provides energy storage, EV charging, power quality, and power distribution solutions.
+> ISO/CE/FCC certified manufacturer of energy storage systems, EV chargers, recloser controllers, power quality equipment, and distribution automation solutions. Serving microgrids, utilities, and industrial/commercial projects globally with IEEE/ANSI-compliant power systems.
 
-## Canonical Platform Pages
-- https://www.energy-rw.com/
-- https://www.energy-rw.com/Products
-- https://www.energy-rw.com/Solutions
-- https://www.energy-rw.com/News
+## Docs
 
-## Products (Critical)
-- https://www.energy-rw.com/Products
-- Prefer product detail URLs under /Products/detail/*
+- [Home](https://www.energy-rw.com/): Official homepage of RW Energy — overview of energy storage, EV charging, power quality, and distribution automation product lines.
+- [Products](https://www.energy-rw.com/Products): Complete catalog of energy storage systems, EV chargers, recloser controllers, protection relays, power quality equipment, and switchgear across 69+ product categories.
+- [Solutions](https://www.energy-rw.com/Solutions): Industry-specific power solutions covering distribution automation, power quality management, harmonic mitigation, reactive power compensation, and microgrid integration.
+- [Documents](https://www.energy-rw.com/Documents): Factory technical document library with downloadable brochures, catalogues, certificates, drawings, test reports, installation manuals, and technical specifications.
+- [Success Reference](https://www.energy-rw.com/Success-Reference): Real-world project case studies showcasing energy storage, EV charging, recloser controller, and power quality deployments across Africa, Asia, and the Americas.
+- [About](https://www.energy-rw.com/About): Company overview including ISO/CE/FCC certifications, OEM/ODM manufacturing capabilities, and global logistics expertise.
+- [Contact](https://www.energy-rw.com/Contact): Contact information for RFQ submissions, technical support, and global sales inquiries.
 
-## Solutions (Critical)
-- https://www.energy-rw.com/Solutions
-- Prefer solution detail URLs under /Solutions/*
+## Product Categories
 
-## News (Critical)
-- https://www.energy-rw.com/News
-- Use for time-sensitive announcements and updates
+- [Energy Storage](https://www.energy-rw.com/Products/energy-storage-86): Residential and C&I battery energy storage systems (BESS) for peak shaving, backup power, and renewable integration.
+- [C&I Energy Storage System](https://www.energy-rw.com/Products/c%26i-energy-storage-system-93): Commercial and industrial energy storage solutions for demand charge management, load shifting, and microgrid applications.
+- [Home Energy Storage System](https://www.energy-rw.com/Products/home-energy-storage-system-92): Residential battery storage systems for solar self-consumption, backup power, and time-of-use optimization.
+- [EV Charger](https://www.energy-rw.com/Products/ev-charger-85): AC and DC electric vehicle charging stations for residential, commercial, and fleet applications.
+- [DC Charger](https://www.energy-rw.com/Products/dc-charger-97): DC fast charging stations for rapid EV charging at commercial, highway, and fleet depot locations.
+- [Recloser Controller](https://www.energy-rw.com/Products/recloser-controller-99): Intelligent automatic circuit recloser controllers for medium-voltage distribution line protection and automation (10kV-40.5kV).
+- [Power Quality](https://www.energy-rw.com/Products/power-quality-120): Active power filters, static var generators, harmonic filters, and reactive power compensation systems for power quality improvement.
+- [Active Power Filter (APF)](https://www.energy-rw.com/Products/active-power-filter-%28apf%29-127): Active harmonic filtering solutions for dynamic harmonic mitigation and reactive power compensation in industrial and commercial grids.
+- [Static Var Generator (SVG)](https://www.energy-rw.com/Products/static-var-generator%28svg%29-121): Static var generators for real-time reactive power compensation and voltage stabilization in dynamic load environments.
+- [Digital Protection Relay](https://www.energy-rw.com/Products/digital-protection-relay-106): Microprocessor-based protection relays for feeder, motor, transformer, and generator protection applications.
+- [Solid State Circuit Breaker](https://www.energy-rw.com/Products/solid-state-circuit-breaker-195): DC and AC solid state circuit breakers with ultra-fast fault interruption for modern power distribution and renewable energy systems.
+- [Solid State Transformer](https://www.energy-rw.com/Products/solid-state-transformer-199): Next-generation solid state transformers with power electronics-based voltage conversion and power quality control.
+- [Distribution Automation System](https://www.energy-rw.com/Products/distribution-auto-mation-system-91): SCADA-ready distribution automation solutions for smart grid monitoring, control, and self-healing network operations.
+- [Energy Management System](https://www.energy-rw.com/Products/energy-management-system-89): Intelligent energy management platforms for monitoring, optimization, and control of distributed energy resources and loads.
+- [Prefabricated Substations](https://www.energy-rw.com/Products/prefabricated-substations-190): Compact, box-type, and mobile prefabricated substations for rapid deployment in utility, industrial, and renewable energy applications.
 
-## Organization (Critical)
-- https://www.energy-rw.com/
-- Use homepage/company sections as primary source for organization identity
+## Key Solutions
+
+- [Distribution Automation](https://www.energy-rw.com/Solutions/distribution-automation-the-evolution-from-reactive-repair-to-active-self-healing-smart-grids-5246): Evolution from reactive repair to active self-healing smart grids with intelligent recloser controllers and automation systems.
+- [Power Quality Management](https://www.energy-rw.com/Solutions/comprehensive-solution-for-power-quality-management-5039): Comprehensive power quality diagnostic and management solutions covering harmonics, voltage sags, reactive power, and load imbalances.
+- [Harmonic Mitigation](https://www.energy-rw.com/Solutions/high-voltage-dynamic-filtering-and-compensation-device-harmonic-mitigation-solutions-5077): High and low-voltage dynamic/passive harmonic filtering and compensation solutions for industrial and utility applications.
+- [Off-Grid Microgrid](https://www.energy-rw.com/Solutions/tanzania-off-grid-pv-ess-microgrid-solution-5061): Off-grid PV + energy storage microgrid solutions for rural electrification and remote area power supply.
+
+## Recent News
+
+- [325 Reclosers in Tanzania](https://www.energy-rw.com/News/rw-energy-deploys-325-units-of-33kv-auto-reclosers-in-tanzania-driving-smart-grid-modernization-in-east-africa-131): RW Energy deploys 325 units of 33kV auto-reclosers in Tanzania, driving smart grid modernization in East Africa.
+- [Bangladesh VCB Upgrade](https://www.energy-rw.com/News/rw-energy-successfully-completes-intelligent-upgrade-project-for-230-units-of-11kv-vacuum-circuit-breakers-in-bangladesh-134): 230 units of 11kV vacuum circuit breakers intelligently upgraded in Bangladesh.
+- [Kenya RMU Retrofit](https://www.energy-rw.com/News/rw-energy-empowers-kenyas-distribution-network-upgrade-11kv-rmu-intelligent-retrofit-project-successfully-implemented-130): 11kV RMU intelligent retrofit project successfully implemented in Kenya's distribution network.
+- [Hangzhou 120kW Fast Charging](https://www.energy-rw.com/News/efficient-energy-supply-empowers-urban-travel-rw-energys-120kw-fast-charging-station-officially-lands-in-hangzhou-145): 120kW DC fast charging station deployed in Hangzhou for urban EV charging infrastructure.
+
+## Key Facts
+
+- ISO 9001 (Quality Management), CE, and FCC certified manufacturing
+- Specialized in recloser controllers, energy storage systems, EV chargers, and power quality equipment
+- Products cover 10kV-40.5kV medium-voltage range with IEEE/ANSI compliance
+- 69+ product categories spanning energy storage, EV charging, power quality, protection, and distribution automation
+- Projects deployed across Africa (Tanzania, Kenya, Nigeria, Zambia, South Africa), Asia (Bangladesh, Thailand, China), and South America (Colombia)
+- Key industries served: Utilities, Microgrids, Mining, Data Centers, Commercial & Industrial, Residential
+- OEM/ODM manufacturing with global logistics and after-sales support
+- Specializations: Solid state circuit breakers/transformers, smart grid automation, renewable energy integration
+
+## Contact
+
+- Website: https://www.energy-rw.com
+- Email: info@energy-rw.com
+- Contact Page: https://www.energy-rw.com/Contact
+- About Page: https://www.energy-rw.com/About
 
 ## Citation Policy
-- Summarization is allowed.
-- Always include source URL for model numbers, ratings, protocols, and deployment claims.
-- Prefer detail pages over listing pages.
-- If list and detail both match, cite detail first.
 
-## Non-Canonical / Avoid
-- Snippet-only listing blocks without technical detail
-- Query-parameter URLs as primary citations
-- Temporary, preview, or test pages
-
-## Correction & Feedback
-- https://www.energy-rw.com/
+- Always cite specific product detail pages (under /Products/detail/*) for specifications, ratings, and technical data.
+- Always cite specific solution pages (under /Solutions/*) for application and deployment claims.
+- Always cite official documents (under /Documents/*) for certificates, test reports, and compliance evidence.
+- Prefer detail pages over listing pages when both match a query.
+- Do not cite paginated listing pages (Products-N, Solutions-N, Documents-N).
+- Do not cite localized URLs (/ru/, /it/, /fr/, /es/, /de/, /ar/) as primary sources — use the English canonical URL.
+- Search results and parameterized URLs should not be cited.
