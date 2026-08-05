@@ -265,7 +265,7 @@ public class RockwillKnowledgeService {
                     if (!model.isEmpty()) {
                         String templateName = model.get("templateName").toString();
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
-                        if (StringUtils.isNotEmpty(templateName) && !templateName.equals("404")) {
+                        if (StringUtils.isNotEmpty(templateName)) {
                             String content = templateEnginePageRenderer.renderPage(templateName, model);
                             domainHtmlVo.setHtmlContent(content);
                             domainHtmlVo.setModelMap(model);
@@ -273,11 +273,17 @@ public class RockwillKnowledgeService {
                                 Map<String, Object> pageMap = (Map<String, Object>) model.get("pageData");
                                 domainHtmlVo.setTotalPages(Integer.parseInt(pageMap.get("totalPages").toString()));
                             }
+                            if (templateName.equals("404")){
+                                domainHtmlVo.setHttpErrCode(HttpStatus.NOT_FOUND.value());
+                            }
                         }
                         return domainHtmlVo;
                     }
                 } else {
                     log.error("request resp code:{},msg:{}", result.getCode(), result.getMsg());
+                    DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
+                    domainHtmlVo.setHttpErrCode(result.getCode());
+                    return domainHtmlVo;
                 }
             }
             log.error("request {} error: {}", path, responseEntity.getStatusCode());
@@ -285,7 +291,7 @@ public class RockwillKnowledgeService {
             DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
             log.error("request {} exception", path, e);
             if (e instanceof HttpClientErrorException.NotFound){
-                domainHtmlVo.setHttpErrCode(404);
+                domainHtmlVo.setHttpErrCode(HttpStatus.NOT_FOUND.value());
             }
             return domainHtmlVo;
         }

@@ -54,7 +54,7 @@ basePath =${websitePath +pageName}">
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height"></div>
-
+<h1 class="sr-only" th:text="${pageDescription}"></h1>
 <div class="am-hide-sm-only m-header-banner m-header-1"
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
              + '; height: 300px; display: flex; align-items: center; justify-content: center;'
@@ -116,9 +116,18 @@ basePath =${websitePath +pageName}">
                             <div ><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
                         </div>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" th:text="${index.content}"></span>
-                        <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
-                    <span th:if="${index.created != null}"
-                          th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                        <div class="am-padding-top-xs am-cf am-text-sm">
+                            <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                                <span class="am-icon-user"></span>
+                                <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
+                                   th:href="${brandUrl}" style="border: none">
+                                    <span th:text="${index.author}"></span>
+                                </a>
+                            </div>
+                            <div class="am-fr" style="color:#999999">
+                                        <span th:if="${index.created != null}"
+                                              th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                            </div>
                         </div>
                     </div>
                 </a>

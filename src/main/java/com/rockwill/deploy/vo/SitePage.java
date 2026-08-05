@@ -73,6 +73,7 @@ public class SitePage implements Serializable {
         public static final int NEWS=5;
         public static final int PROFILE=6;
         public static final int SUCCESS_REFERENCE=7;
+        public static final int BLOG=8;
     }
 
 }

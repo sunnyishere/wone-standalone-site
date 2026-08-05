@@ -9,15 +9,18 @@
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <meta property="og:title" th:content="${title}"/>
     <meta property="og:description" th:content="${description}"/>
-    <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},basePath = ${websitePath + pageName}">
-        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
+    <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
+basePath =${websitePath +pageName}">
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}"/>
         <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
-        <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
+        <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default"
+              th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
     </th:block>
     <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
               th:each="transLang : ${langList}"
               th:with="pn=${pageData?.pageNum ?: 1}">
-        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}" />
+        <link rel="alternate" th:hreflang="${transLang.lang}"
+              th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}"/>
     </th:block>
     <meta property="og:type" content="website"/>
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
@@ -33,7 +36,7 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-     <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <link rel="preload"
           th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
@@ -46,10 +49,9 @@
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
 
 
-    <th:block th:replace="pc-en :: section(param1='Success Reference')"></th:block>
+    <th:block th:replace="pc-en :: section(param1='Blogs')"></th:block>
 
     <th:block th:replace="phone-en :: phone-header"></th:block>
-
 
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
@@ -62,7 +64,8 @@
     <section class="am-container wone-text"
              style="text-align: center;">
         <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <p class="dd-clamp-text-3 dd-clamp-text-3-left" style="font-size: 30px;font-weight: bold; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.5; position: relative; top: 60px;"
+            <p class="dd-clamp-text-3 dd-clamp-text-3-left"
+               style="font-size: 30px;font-weight: bold; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.5; position: relative; top: 80px;"
                th:text="${pageDescription}"></p>
         </hgroup>
     </section>
@@ -83,45 +86,55 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}  " th:title="${advanced['home.button']}"  aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
-            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}"
+                   aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span
+                    class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}"
+                   aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
 </nav>
 <div class="" style="">
     <div class="am-container am-padding phone-clear-padding"
-         style="margin: 0px auto 0px !important;padding: 0 30px 0 35px !important;" th:if="${not #strings.isEmpty(pageDetailedText)}">
+         style="margin: 0px auto 0px !important;padding: 0 30px 0 30px !important;"
+         th:if="${not #strings.isEmpty(pageDetailedText)}">
         <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 1px;border-radius: 12px;"
              th:text="${pageDetailedText}">
         </div>
     </div>
-    <!--new -->
+
     <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
-        <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-padding-sm phone-clear-padding phone-clear-margin"
-            style="margin: 0 0 20px 0;">
+        <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails phone-clear-padding phone-clear-margin"
+            style="margin: 0 0 20px 0;padding: 10px">
             <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                 th:if="${not #lists.isEmpty(pageData.rows)}"
                 th:each="index : ${pageData.rows}">
                 <a th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
-                   th:href="
-                   ${currentPathLang} +
-                   (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+                   th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
                    '/' :
-                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
                    ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
-                   ${index.id}"
-                >
+                   ${index.id}">
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">
-                            <img th:alt="${index.title}" th:src="${index.iconUrl}" alt="" class="image-square">
+                            <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" alt="" class="image-square">
                         </div>
                         <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
-                            <div ><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
+                            <div><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
                         </div>
-                        <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm" th:text="${index.content}"></span>
-                        <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
-                    <span th:if="${index.created != null}"
-                          th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem" th:text="${index.content}"></span>
+                        <div class="am-padding-top-xs am-cf am-text-sm">
+                            <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                                <span class="am-icon-user"></span>
+                                <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
+                                   th:href="${brandUrl}" style="border: none">
+                                    <span th:text="${index.author}"></span>
+                                </a>
+                            </div>
+                            <div class="am-fr" style="color:#999999">
+                                        <span th:if="${index.created != null}"
+                                              th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                            </div>
                         </div>
                     </div>
                 </a>
@@ -144,7 +157,7 @@
                 </div>
             </li>
         </ul>
-
+        <!-- 分页组件 -->
         <th:block th:replace="pagination :: pagination(
     totalPages=${pageData.totalPages},
     currentPage=${pageData.pageNum},
@@ -155,16 +168,9 @@
 <!-- 搜索弹窗-->
 <th:block th:replace="search :: search"></th:block>
 
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
-
-<!-- PC端的右侧按钮 -->
-<th:block th:replace="right-menu :: right-menu(param1='Success Reference')"></th:block>
-
-<!-- 底部导航   -->
+<th:block th:replace="right-menu :: right-menu(param1='Blogs')"></th:block>
 <th:block th:replace="footer :: footer"></th:block>
-
-
 </body>
 
 </html>

@@ -7,6 +7,7 @@ public enum StandaloneSyncEntityType {
     PRODUCT(SitePage.SitePageType.PRODUCTS),
     SOLUTION(SitePage.SitePageType.SOLUTIONS),
     NEWS(SitePage.SitePageType.NEWS),
+    BLOG(SitePage.SitePageType.BLOG),
     SUCCESS_CASE(SitePage.SitePageType.SUCCESS_REFERENCE);
 
     final int pageType;

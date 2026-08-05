@@ -89,6 +89,7 @@ public class UnifiedRouterController {
                         .headers(headers)
                         .build();
         }
+        HttpStatus status = HttpStatus.OK;
         if (ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
             if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -100,12 +101,15 @@ public class UnifiedRouterController {
                     .headers(headers)
                     .build();
         }
+        if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
+            status = HttpStatus.NOT_FOUND;
+        }
         //静态化未存储，及时保存html文件
-        if (!realUri.startsWith("/search")) {
+        if (!realUri.startsWith("/search") && status != HttpStatus.NOT_FOUND) {
             String savePrefix = realUri.substring(1);
             staticPageService.saveHtml(host,savePrefix, domainHtmlVo.getHtmlContent());
         }
-        return new ResponseEntity<>(domainHtmlVo.getHtmlContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(domainHtmlVo.getHtmlContent(), headers, status);
     }
 
 }

@@ -622,6 +622,59 @@
             </ul>
         </div>
 
+    <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
+        <div class="home-section-header__center">
+            <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
+                <h2 class="inline-header">
+                    <span class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 8]}"
+                         th:text="${#lists.isEmpty(filtered) ?'' : (filtered[0].i18nName ?: '')}"></span>
+                </h2>
+            </div>
+        </div>
+        <div class="home-section-header__action am-padding-top-xs">
+            <a th:title="${advanced['view.all']}" aria-hidden="false"
+               th:aria-label="${advanced['view.all']}"
+               th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==8])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==8][0].pageName), ' ', '-')) })">
+                        <span style="color: #000000;text-decoration: underline;"
+                              th:text="${advanced['view.all']}"></span>
+                <span class="p-icon-a-067  am-padding-left-sm"></span>
+            </a>
+        </div>
+    </div>
+    <div th:if="${not #lists.isEmpty(blogs)}" class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+        <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+            style="margin: 0 0 20px 0;">
+            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                 th:each="index : ${blogs}">
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="inline-a-link" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+           ${index.id}">
+                        <div class="image-box3">
+                            <img th:data-echo="${index.iconUrl}" th:alt="${index.title}"
+                                 src="https://oss.iee-business.com/landing/img/space.png"
+                                 alt="" class="image-square">
+                        </div>
+                        <span class="am-margin-top-sm dd-clamp-text-1 am-text-bold" th:text="${index.i18nTitle}">
+                            </span>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
+                              th:text="${index.content}"></span>
+                        <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                           <span th:if="${index.created != null}"
+                                 th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                        </div>
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <input type="hidden" id="topNavPageName"
            th:value="${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')}">
 </div>

@@ -357,11 +357,12 @@ public class StaticPageService {
         String cssQuery = "";
         if (sitePage.getPageType() == 3) {
             cssQuery = "a.inline-a-link";
-        } else if (sitePage.getPageType() == 2 || sitePage.getPageType() == 5 || sitePage.getPageType() == 7) {
+        } else if (sitePage.getPageType() == 2 || sitePage.getPageType() == 5 || sitePage.getPageType() == 7
+                || sitePage.getPageType() == 8) {
             cssQuery = "li.dd-hover4 > a";
         }
         if (ObjectUtils.isEmpty(cssQuery)) {
-            log.error("Currently, only products, news, solutions, and Success Reference are supported for static details.");
+            log.error("Currently, only products, news, solutions, Blog, and Success Reference are supported for static details.");
             return new ArrayList<>();
         }
         boolean incrementalEnabled = isIncrementalDetailType(sitePage.getPageType(), updatedIdsByType);

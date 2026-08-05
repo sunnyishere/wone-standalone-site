@@ -1,0 +1,203 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title th:text="${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
+    <meta name="description" th:content="${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+
+    <link rel="canonical" th:href="${websiteUrl}" />
+    <meta property="og:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta property="og:description" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta property="og:url" th:attr="content=${websiteUrl}" />
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}" >
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
+    </th:block>
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" th:content="${currentLang}" />
+    <meta property="og:image" th:attr="content=${blog.iconUrl}" />
+    <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+
+    <meta name="twitter:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:description" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:site" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:image" th:attr="content=${blog.iconUrl}" />
+
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+
+    <th:block th:replace="head :: commonHead"></th:block>
+    <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
+    </script>
+    <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+
+    <th:block th:replace="pc-en :: section(param1='News_'+${blog.id})"></th:block>
+
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+
+</header>
+<div class="header-height"></div>
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li class="am-active">
+                <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${pageName}"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
+<div class="" style="">
+    <div class="am-container am-padding phone-clear-padding"
+         style="margin: 0px auto 20px !important;padding: 0 30px 0 15px !important;" th:if="${not #strings.isEmpty(pageDetailedText)}">
+        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 1px;border-radius: 12px;"
+             th:text="${pageDetailedText}">
+        </div>
+    </div>
+    <div class="am-container phone-container-top am-margin-bottom am-margin-top-sm">
+        <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
+             style="background:#FFFFFF;">
+            <h1 class="am-text-bold " th:text="${blog.title}"></h1>
+            <div class=" am-text-left">
+                <div class="am-padding-top-xs">
+                    <span th:title="${blog.author}" aria-hidden="false" th:aria-label="${blog.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
+                    <a th:title="${blog.author}" th:href="${brandUrl}" aria-hidden="false" th:aria-label="${blog.author}" style="color:#5C779F;" th:text="${blog.author}"></a>
+                    <span th:title="${blog.title}" aria-hidden="false" th:aria-label="${blog.title}" class="am-padding-left" style="color:#999999;"
+                       th:text="${#dates.format(blog.created, 'MM/dd/yyyy')}"></span>
+                </div>
+            </div>
+            <br>
+            <!-- 富文本-->
+            <div class="am-padding-top am-padding-bottom-xl">
+                <div id="editor" th:utext="${blog.content}"></div>
+            </div>
+
+        </div>
+
+        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
+
+            <div class=" am-margin-bottom" style="background:#FFFFFF;">
+                <div class="am-text-xl am-text-bold am-padding"  th:text="${advanced['related']} + ' ' + ${advanced['blogs']}">
+                    Related Blogs
+                </div>
+
+                <div class="am-container" style="padding: 0 !important;">
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom"
+                         th:if="${not #lists.isEmpty(relatedBlogs)}"
+                         th:each="blog : ${relatedBlogs}">
+                            <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                    <div>
+                                        <div class="am-fl am-margin-right">
+                                            <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                                <img th:src="${blog.iconUrl}" th:alt="${blog.i18nTitle}" class="am-img-responsive"
+                                                     style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                            </div>
+                                        </div>
+                                        <div class="" style="height: 100px;">
+                                            <a th:title="${blog.title}" aria-hidden="false" th:aria-label="${blog.title}"
+                                               class="inline-a-link" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(blog.slugTitle), ' ', '-'))} + '-' +
+           ${blog.id}">
+                                            <span class="dd-clamp-text-1 am-text-bold" th:text="${blog.i18nTitle}">Resistance
+                                                and
+                                                Leakage
+                                            </span>
+                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                                 th:text="${blog.content}">
+                                            </div>
+                                            </a>
+                                            <div class="am-padding-top-xs am-cf am-text-sm">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                                    <span class="am-icon-user"></span>
+                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${blog.author}" th:title="${blog.author}"
+                                                       th:href="${brandUrl}" style="border: none">
+                                                       <span th:text="${blog.author}"></span>
+                                                    </a>
+                                                </div>
+                                                <div class="am-fr" style="color:#999999">
+                                                    <span th:text="${#dates.format(blog.created, 'MM/dd/yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                    </div>
+
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom" th:if="${#lists.isEmpty(relatedBlogs)}"
+                         th:each="i : ${#numbers.sequence(1, 5)}">
+                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div style="am-cf">
+                                    <div class="am-fl am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img alt="No Data" src="" class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7;">
+                                        </div>
+                                    </div>
+                                    <div class="" style="height: 100px;">
+                                        <div class="dd-clamp-text-1 am-text-bold"></div>
+                                        <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C">
+                                        </div>
+                                        <div class="am-padding-top-xs am-cf am-text-sm">
+                                            <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                                <span class="am-icon-user"></span>
+                                                <span></span>
+                                            </div>
+                                            <div class="am-fr" style="color:#999999">
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<th:block th:replace="right-menu :: right-menu(param1='Blog_'+${blog.id})"></th:block>
+
+<th:block th:replace="footer :: footer"></th:block>
+</body>
+
+</html>
