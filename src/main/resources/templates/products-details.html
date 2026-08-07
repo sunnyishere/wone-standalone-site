@@ -1,23 +1,30 @@
+
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }"  xmlns:myu="http://www.thymeleaf.org">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${prod.name} + '-' + ${prodBrand.eName}"></title>
+    <th:block th:each="keyword : ${tdkKeywords}">
+        <meta name="keywords" th:content="${keyword}"/>
+    </th:block>
     <meta name="description" th:content="${prod.description} ?: ''"/>
 
     <!-- Canonical URL -->
-    <link rel="canonical" th:href="${websiteUrl}"/>
-    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
-    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
-              th:each="transLang : ${langList}" >
-        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
-    </th:block>
-    <link th:if="${not #lists.isEmpty(imageList)}" rel="preload"
-          th:href="${imageList.get(0)}"
-          as="image"
-          fetchpriority="high">
+    <link rel="canonical"
+          th:if="${websitePath != null and pageName != null and suffix != null}"
+          th:href="${#strings.concat(
+          #strings.endsWith(websitePath, '/') ?
+              #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
+
+          (currentLang != null && currentLang != 'en_US') ? ('/' + currentLang) : '',
+
+          '/' + pageName,
+
+          #strings.startsWith(suffix, '/') ? suffix : '/' + suffix
+      )}"/>
+
     <!-- Robots -->
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
@@ -26,9 +33,18 @@
     <!-- Open Graph -->
     <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta property="og:description" th:content="${prod.description}"/>
-    <meta property="og:url" th:content="${websiteUrl}"/>
+    <meta property="og:url" th:content="${#strings.concat(
+          #strings.endsWith(websitePath, '/') ?
+              #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
+
+          (currentLang != null && currentLang != 'en_US') ? ('/' + currentLang) : '',
+
+          '/' + pageName,
+
+          #strings.startsWith(suffix, '/') ? suffix : '/' + suffix
+      )}"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <!-- Twitter Card -->
@@ -45,72 +61,47 @@
     <meta property="product:modified_time" th:content="${prod.updated}"/>
 
     <!-- Viewport & UX -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
 
     <!-- Common Head Fragment -->
     <th:block th:replace="head :: commonHead"></th:block>
     <style>
-
-        .m-partner .am-slider .am-slides > li > img,
-        .m-partner .am-slider .am-slides > li > video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .product-main-slider .am-slides > li > img,
-        .product-main-slider .am-slides > li > video {
-            object-position: center center;
-            margin: 0 auto;
-        }
-
-        #editor {
-            max-width: 100%;
-            min-height: 120px;
-        }
-
-
-        @media screen and (max-width:768px){
-            .m-partner .am-slider .am-slides > li {
-                aspect-ratio: 1 / 1;
-                height: 180px !important;
-                overflow: hidden;
-            }
-            .product-main-slider{
-                height: 180px !important;
-            }
-        }
         .prod-h2-bg {
             background-color: #DDDDDD;
             padding: 6px 10px !important;
         }
     </style>
+
     <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
     <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
-    <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}"></script>
+    <script type="application/ld+json"
+            th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}"></script>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
 
-
-    <th:block th:replace="pc-en :: section(param1='Products-'+${prod.id})"></th:block>
-
+    <!-- 电脑-->
+    <th:block th:replace="pc-en :: section(param1='prods-'+${prod.id})"></th:block>
+    <!-- 手机-->
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-
+    <!-- 侧边栏内容 -->
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 
 </header>
-<div class="header-height"></div>
+<div class="header-height">占位边距</div>
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}" title="Home" aria-hidden="false" aria-label="Home"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
-            <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" title="Home" aria-hidden="false" aria-label="Home"> <span
+                    class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
+            <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}"
+                   aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
             <li th:if="${category1 != null}">
                 <a th:title="${category1.i18nName}" aria-hidden="false" th:aria-label="${category1.i18nName}" th:href="
                 ${currentPathLang} +
@@ -119,7 +110,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.toLowerCase(#strings.replace(#strings.trim(category1.name), ' ', '-')) +
+                    #strings.replace(#strings.trim(category1.name), ' ', '-') +
                     '-' + category1.id}"
                    th:text="${category1.i18nName}">Sub Category</a>
             </li>
@@ -130,7 +121,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.toLowerCase(#strings.replace(#strings.trim(category2.name), ' ', '-')) +
+                    #strings.replace(#strings.trim(category2.name), ' ', '-') +
                     '-' + category2.id}"
                    th:text="${category2.i18nName}">Sub Category</a>
             </li>
@@ -139,26 +130,25 @@
 </nav>
 
 <div style="background-color: #FFFFFF;">
-
     <div class="am-container phone-clear-padding" style="padding: 0 3%;">
 
         <div class="am-u-sm-12 am-u-md-7 am-u-lg-7 phone-clear-margin" style="padding: 0 15px;">
             <div style="background-color: #FFFFFF;margin-bottom:5px;margin-top: 25px">
                 <div class="dd-clamp-text-2 am-text-bold am-text-lg"
                      style="min-height: 40px;max-height: 40px;">
-                     <h1 class="inline-header" th:text="${prod.name}"></h1>
+                    <h1 class="inline-header" th:text="${prod.name}"></h1>
                 </div>
             </div>
 
             <!-- 视频+图片 -->
             <div class="m-partner">
-                <div data-am-widget="slider" class="am-slider am-slider-default-2 product-main-slider"
-                     data-am-slider='{"directionNav":false,"slideshow": false, "animation":"fade", "animationLoop": false}'>
+                <div data-am-widget="slider" class="am-slider am-slider-default-2"
+                     data-am-slider='{"animation":"slide","controlNav":"thumbnails"}'>
                     <ul class="am-slides">
                         <!-- 条件判断：如果 videoUrl 不为空则显示视频 -->
                         <th:block th:if="${videoUrl != null and videoUrl != ''}">
                             <li class="video-product" data-thumb="/images/play.png"
-                                style="height: 432px;border-radius: 0px;width: 100%;object-fit: contain;">
+                                style="border-radius: 0px;width: 100%;object-fit: contain;">
                                 <video class="video-box new-swiper" id="vid" controls preload loop muted playsinline
                                        autoplay
                                        style="height: 100%;width: 100%;border-radius: 0px;background-color: #000000;">
@@ -167,7 +157,8 @@
                                             type="video/mp4"
                                             style="background-color: #E9E9E9;">
                                 </video>
-                                <img class="new-swiper" id="pauseImage" src="https://oss.iee-business.com/standalone/images/play.png" alt="Stop Image"
+                                <img class="new-swiper" id="pauseImage"
+                                     src="https://oss.iee-business.com/standalone/images/play.png" alt="Stop Image"
                                      style="display: none;object-fit: cover;height: 100%;width: 100%;">
                             </li>
                         </th:block>
@@ -175,7 +166,7 @@
                         <!-- 循环遍历图片列表 -->
                         <th:block th:each="image : ${imageList}">
                             <li th:attr="data-thumb=${image}"
-                                style="border-radius: 0;height: 432px;width: 100%;object-fit: cover;">
+                                style="border-radius: 0;max-height: 432px;width: 100%;object-fit: cover;">
                                 <img class="new-swiper" th:src="${image}" th:alt="${prod.name}"
                                      style="background-color: #FFFFFF;">
                             </li>
@@ -191,11 +182,15 @@
                     <div class="" style="border-bottom: 1px solid #E6E6E6;padding-bottom: 10px;">
                         <div class="am-text-lg am-text-bold border-active">
                             <a class="am-margin-right-lg" data-offset="240" href="#target1"
-                               onclick="scrollToTarget(event)" ><span  th:text="${advanced['attributes']}"></span></a>
+                               onclick="scrollToTarget(event)"><span class="inline-header"
+                                                                     th:text="${advanced['attributes']}"></span></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target2"
-                               onclick="scrollToTarget(event)" ><span th:text="${advanced['description']}"> </span></a>
+                               onclick="scrollToTarget(event)"><span class="inline-header"
+                                                                     th:text="${advanced['description']}"></span></a>
                             <a class="am-margin-right-lg" data-offset="240" href="#target4"
-                               onclick="scrollToTarget(event)" ><span  th:text="${advanced['documentation.library']}"></span></a>
+                               onclick="scrollToTarget(event)"><span class="inline-header"
+                                                                     th:text="${advanced['documentation.library']}"></span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -203,7 +198,7 @@
 
             <!-- 定位1 -->
             <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg"
-                 >
+            >
                 <h2 class="inline-header prod-h2-bg" th:text="${advanced['key.attributes']}"></h2>
             </div>
 
@@ -213,16 +208,17 @@
                     <tr>
                         <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['brand']}">Brand</td>
                         <td style="width: 55%;">
-                            <a  aria-hidden="false"
+                            <a aria-hidden="false"
                                th:aria-label="${brand.name}"
                                th:title="${brand.name}"
-                                th:href="${brandUrl}"
+                               th:href="${brandUrl}"
                                th:text="${brand.name}">Brand Name</a>
                         </td>
                     </tr>
 
                     <tr th:if="${model != null}">
-                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['model.no']}">Model NO.</td>
+                        <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['model.no']}">Model NO.
+                        </td>
                         <td style="width: 55%;" th:text="${model.name}">Model Name</td>
                     </tr>
 
@@ -264,10 +260,9 @@
 
             <!-- 文档资源库 -->
             <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}">
-                <div id="target4" class="am-text-bold"  >
-                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['documentation.library']}"></h2>
+                <div id="target4" class="am-text-bold" >
+                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['documentation.library']}+ '&nbsp;' +${prod.shortKeywords}"></h2>
                 </div>
-
                 <div class="am-margin-bottom-sm"
                      style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div th:each="item : ${faLibraryList}">
@@ -359,7 +354,7 @@
                                                 <div
                                                         data-trigger="modal-1"
                                                         data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                        th:data-biz-id="'site-documents-'+${item.id}"
+                                                        th:data-biz-id="'documents-'+${item.id}"
                                                         style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
                                                     <span th:text="${advanced['consulting']}">Consulting</span>
                                                     <span class="p-icon-a-0041 am-padding-left-sm"></span>
@@ -373,7 +368,8 @@
                             <!-- 手机端按钮 -->
                             <div class="am-hide-lg-only">
                                 <div th:if="${item.isShow == 1 and item.type == 1}">
-                                    <div th:if="${item.fileDatalis != null}" style="width: 100%;display: inline-flex;justify-content: center;">
+                                    <div th:if="${item.fileDatalis != null}"
+                                         style="width: 100%;display: inline-flex;justify-content: center;">
                                         <a aria-hidden="false"
                                            th:aria-label="${item.faAssoc?.name ?: 'Document'}"
                                            th:title="${item.faAssoc?.name ?: 'Document'}"
@@ -409,9 +405,9 @@
                                     <div class="am-text-center"
                                          data-trigger="modal-1"
                                          data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                         th:data-biz-id="'site-documents-'+${item.id}"
+                                         th:data-biz-id="'documents-'+${item.id}"
                                          style="margin-bottom: 10px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
-                                        <span  th:text="${advanced['consulting']}">Consulting</span>
+                                        <span th:text="${advanced['consulting']}">Consulting</span>
                                         <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                     </div>
                                 </div>
@@ -424,9 +420,8 @@
 
             <!-- 证书 -->
             <div th:if="${prCercateList != null and #lists.size(prCercateList) > 0}">
-                <div class="am-text-bold"
-                      >
-                   <h2 class="inline-header prod-h2-bg" th:text="${advanced['certifications']}"></h2>
+                <div class="am-text-bold" >
+                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['certifications']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
                 </div>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0 0 0;">
                     <div data-am-widget="slider" class="am-slider am-slider-default"
@@ -451,7 +446,7 @@
             <!-- FAQ部分 -->
             <th:block th:if="${prodFaqList != null and not prodFaqList.isEmpty()}">
                 <div class="am-text-bold"
-                      >
+                >
                     <h2 class="inline-header prod-h2-bg" th:text="${advanced['faq']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
                 </div>
                 <div style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
@@ -469,8 +464,8 @@
 
             <!-- 问答部分 -->
             <th:block th:if="${questionList != null and not #lists.isEmpty(questionList)}">
-                <div class="am-text-bold" style="display: inline-block;">
-                    <h2 class="am-text-bold inline-header prod-h2-bg" th:text="${advanced['qa']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
+                <div class="am-text-bold" >
+                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['qa']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
                 </div>
 
                 <div style="border-top: 1px solid #E6E6E6; margin-top: 10px; padding: 10px 0; background-color: #FFFFFF;">
@@ -486,12 +481,12 @@
 
                                         <div style="margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
 
-                                            <a th:href="'https://www.iee-business.com' + ${item.articleCommentVo.url}"
+                                            <a th:href="'https://iee-business.com' + ${item.articleCommentVo.url}"
                                                style="display: flex; align-items: center; text-decoration: none; max-width: 60%;">
-                                                <img th:src="${item.articleCommentVo.uhead}"
+                                                <img th:src="${item.articleCommentVo.uHead}"
                                                      style="width: 24px; height: 24px; border-radius: 50%; margin-right: 0; object-fit: cover; flex-shrink: 0;">
                                                 <span style="color: #5C779F; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; margin-left: 6px;"
-                                                      th:text="${item.articleCommentVo.uname}">
+                                                      th:text="${item.articleCommentVo.uName}">
                                                 </span>
                                             </a>
 
@@ -568,14 +563,14 @@
                 </div>
             </th:block>
         </div>
-
         <div class="sticky-bar am-u-sm-12 am-u-md-5 am-u-lg-5 phone-clear-margin" style="padding: 0 15px;">
             <div style="background-color: #FFFFFF;margin-bottom:0;margin-top: 25px;border: 1px solid #E9E9E9;border-radius: 10px;padding: 20px;">
                 <!-- 价格区间展示 -->
                 <div style="border-bottom: 1px solid #E6E6E6;padding-bottom: 15px;">
                     <div>
                         <span class="am-text-xl am-text-bold" style="color: #F75755;"></span>
-                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;" th:text="${(userPrice != null && userPrice != '$Negotiable') ? userPrice : advanced['negotiable']}"></span>
+                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;"
+                              th:text="${(userPrice != null && userPrice != '$Negotiable') ? userPrice : advanced['negotiable']}"></span>
                     </div>
                     <div class="am-padding-top-sm">
                         <!-- 条件判断：显示公式名称或默认文本 -->
@@ -592,41 +587,46 @@
                         </th:block>
                         <th:block th:unless="${formula != null}">
                             <span class="p-icon-a-106" style="color: #07C160;"></span>
-                            <span class="am-text-bold" th:text="${advanced['pricing.calculator']}">Pricing calculator</span>
+                            <span class="am-text-bold"
+                                  th:text="${advanced['pricing.calculator']}">Pricing calculator</span>
                         </th:block>
                     </div>
                 </div>
 
                 <!-- 型号列表 -->
                 <th:block th:if="${modelList != null && modelList.size() > 0}">
-                <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
-                    <div class="am-g">
-                        <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
-                            <span th:text="${advanced['model']}">Model</span>
-                        </div>
-                        <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
-                            <!-- 循环遍历型号列表 -->
-                            <th:block th:each="item, stat : ${modelList}">
-                                <th:block th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
-                                    <div th:style="${isActive
+                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
+                        <div class="am-g">
+                            <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
+                                <span th:text="${advanced['model']}">Model</span>
+                            </div>
+                            <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
+                                <!-- 循环遍历型号列表 -->
+                                <th:block th:each="item, stat : ${modelList}">
+                                    <th:block
+                                            th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
+                                        <div th:style="${isActive
                         ? 'border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
                         : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
-                                        <a aria-hidden="false"
-                                           th:aria-label="${item.modelName}"
-                                           th:title="${item.modelName}"
-                                           th:href="${
-         #strings.replace(websiteUrl, '/detail', '')  + '-series' + item.id}"
-                                           th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
-                                            <div style="padding: 10px 20px;">
-                                                <span th:text="${item.modelName}"></span>
-                                            </div>
-                                        </a>
-                                    </div>
+                                            <a aria-hidden="false"
+                                               th:aria-label="${item.modelName}"
+                                               th:title="${item.modelName}"
+                                               th:href="${currentPathLang +
+         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
+           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
+         #strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-')) +
+         '-' + item.prodId + '-series' + item.id}"
+                                               th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
+                                                <div style="padding: 10px 20px;">
+                                                    <span th:text="${item.modelName}"></span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </th:block>
                                 </th:block>
-                            </th:block>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </th:block>
 
                 <!-- 文档/文件列表 -->
@@ -653,7 +653,9 @@
                                                     <!-- 访问单对象的 type，加默认值避免空显示 -->
                                                     <span>[[${item.fileDatalis.type ?: 'UNKNOWN'}]]</span>
                                                 </div>
-                                                <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>
+                                                <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">
+                                                    [[${item.name}]]
+                                                </div>
                                             </div>
                                         </a>
                                     </th:block>
@@ -666,11 +668,26 @@
                                                 <span class="p-icon-a-085 am-padding-right-xs"></span>
                                                 <span>MP4</span>
                                             </div>
-                                            <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>
+                                            <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">
+                                                [[${item.name}]]
+                                            </div>
                                         </div>
                                     </th:block>
 
-
+                                    <!-- 类型3：受限资源（咨询按钮） -->
+                                    <!--                                    <th:block th:if="${item.isShow == 0}">-->
+                                    <!--                                        <div class="am-text-center"-->
+                                    <!--                                             style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">-->
+                                    <!--                                            <div   data-trigger="modal-1"-->
+                                    <!--                                                   data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"-->
+                                    <!--                                                   th:data-biz-id="'documents-'+${item.id}"-->
+                                    <!--                                                 style="margin: 0 10px; border: 1px solid #FF8D30; background-color: #FFFFFF; border-radius: 100px; padding: 4px 8px; color: #FF8D30; min-width: 140px; text-align: center;">-->
+                                    <!--                                                <span class="p-icon-a-0041 am-padding-right-xs"></span>-->
+                                    <!--                                                <span>Consulting</span>-->
+                                    <!--                                            </div>-->
+                                    <!--                                            <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">[[${item.name}]]</div>-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </th:block>-->
                                 </th:block>
                             </th:block>
                         </th:block>
@@ -686,10 +703,11 @@
                            class="rfq-trigger"
                            data-trigger="modal-1"
                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                           th:data-biz-id="'site-prods-'+${prod.id}"
+                           th:data-biz-id="'prods-'+${prod.id}"
                         >
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;"
+                                    th:text="${advanced['send.inquiry']}">
                                 Send inquiry
                             </button>
                         </a>
@@ -698,7 +716,8 @@
                            title="Chat now"
                            data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }">
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
+                                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;"
+                                    th:text="${advanced['chat.now']}">
                                 Chat now
                             </button>
                         </a>
@@ -713,16 +732,18 @@
                            title="Send inquiry"
                            data-trigger="modal-1"
                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                           th:data-biz-id="'site-prods-'+${prod.id}">
+                           th:data-biz-id="'prods-'+${prod.id}">
                             <button type="button" class="am-btn am-round am-margin-sm"
-                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
+                                    style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;"
+                                    th:text="${advanced['send.inquiry']}">
                                 Send inquiry
                             </button>
                         </a>
                         <button type="button"
                                 class="am-btn am-round am-margin-sm chat-btn-brand"
                                 th:data-details="${prod.brandId}"
-                                style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
+                                style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;"
+                                th:text="${advanced['chat.now']}">
                             Chat now
                         </button>
                     </div>
@@ -738,13 +759,16 @@
                 </div>
                 <div class="am-padding-left-lg am-padding-top-sm" style="color: #1D1D1F;"
                      th:text="${advanced['prod.detail.company.overview.one']}">
-                    Whole-life care management services for equipment procurement, use, maintenance, and after-sales, ensuring safe operation of electrical equipment, continuous control, and worry-free electricity consumption.
+                    Whole-life care management services for equipment procurement, use, maintenance, and after-sales,
+                    ensuring safe operation of electrical equipment, continuous control, and worry-free electricity
+                    consumption.
                 </div>
 
                 <!-- 供应商认证信息 -->
                 <div style="background-color: #F8F8F8;border-radius: 10px;padding: 15px 25px;color: #767676;margin-top: 15px;"
                      th:text="${advanced['prod.detail.company.overview.two']}">
-                    The equipment supplier has passed platform qualification certification and technical evaluation, ensuring compliance, professionalism, and reliability from the source.
+                    The equipment supplier has passed platform qualification certification and technical evaluation,
+                    ensuring compliance, professionalism, and reliability from the source.
                 </div>
             </div>
         </div>
@@ -757,8 +781,9 @@
 
             <!-- Related Products -->
             <div th:if="${prodOther != null and #lists.size(prodOther) > 0}" class="am-g am-margin-top-xl">
-                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;">
-                    <h2 class="inline-header" th:text="${advanced['related.products']}"></h2>
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
+                     th:text="${advanced['related.products']}">
+                    Related Products
                 </div>
                 <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
                     <div th:with="pageName=${topNavPages.?[pageType == 2][0]?.pageName}">
@@ -768,7 +793,8 @@
                         (${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
                  '/' :
                  ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) })">
-                            <span style="color: #5C779F;text-decoration: underline;" th:text="${advanced['more']}">More</span>
+                            <span style="color: #5C779F;text-decoration: underline;"
+                                  th:text="${advanced['more']}">More</span>
                             <span class="p-icon-a-067 am-padding-left-sm" style="color: #5C779F"></span>
                         </a>
                     </div>
@@ -791,7 +817,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#normalizer.normalizeString(prod.name)} +
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
            '-'+${prod.id}"
                                style="border: none">
                                 <div style="padding: 0 15px 0 0; border-radius: 12px;">
@@ -808,7 +834,71 @@
             </div>
 
 
+            <div th:if="${not #lists.isEmpty(knowList)}" class="am-g">
+                <div class="am-u-sm-8 am-text-bold am-text-lg am-margin-bottom-lg" style="padding: 0 4px;"
+                     th:text="${advanced['related.solutions']}">
 
+                </div>
+                <div class="am-u-sm-4 am-margin-bottom-lg am-text-right" style="padding: 0 4px;">
+                    <a th:title="${advanced['more']}" aria-hidden="false" :aria-label="${advanced['more']}"
+                       th:href="
+                    ${currentPathLang} +
+                    (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
+                        <span style="color: #5C779F;text-decoration: underline;"
+                              th:text="${advanced['more']}">More</span>
+                        <span class="p-icon-a-067  am-padding-left-sm" style="color: #5C779F"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                <ul class="am-avg-sm-1 am-avg-md-1 am-avg-lg-3 am-thumbnails phone-clear-padding">
+                    <li class="" style="padding: 0 8px 20px 8px !important;"
+                        th:each="item : ${knowList}">
+                        <a th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
+           ${item.id}">
+                            <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
+                                <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">
+                                    <div style="am-cf">
+                                        <div class="am-fl am-margin-right am-padding-left phone-clear-padding-min">
+                                            <div class="phone-bottom" style="width: 100px; height: 100px;">
+                                                <img th:src="${item.iconUrl}" alt="" class="am-img-responsive"
+                                                     style="object-fit: cover; width: 100px; height: 100px; border-radius: 12px;">
+                                            </div>
+                                        </div>
+                                        <div class="am-padding-right" style="height: 100px;">
+                                            <div class="dd-clamp-text-1 am-text-bold" th:text="${item.i18nTitle}"></div>
+                                            <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                                 th:text="${item.content}"></div>
+                                            <div class="am-padding-top-xs am-cf am-text-sm">
+                                                <div class="am-fl dd-clamp-text-1" style="width: 30%; color: #5C779F;">
+                                                    <span class="am-icon-user"></span>
+                                                    <a class="device-aware-link" aria-hidden="false"
+                                                       th:aria-label="${item.author}" th:title="${item.author}"
+                                                       th:href="${brandUrl}" style="border: none">
+                                                        <span th:text="${item.author}"></span>
+                                                    </a>
+                                                </div>
+                                                <div class="am-fr am-padding-right" style="color: #999999">
+                                    <span th:if="${item.created != null}"
+                                          th:text="${#dates.format(item.created, 'dd/MM-yyyy')}"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -820,36 +910,212 @@
                title="Send inquiry"
                data-trigger="modal-1"
                data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-               th:data-biz-id="'site-prods-'+${prod.id}">
+               th:data-biz-id="'prods-'+${prod.id}">
                 <button type="button" class="am-btn am-round am-margin-sm"
-                        style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;" th:text="${advanced['send.inquiry']}">
+                        style="border: 1px solid var(--theme-wone);background-color: var(--theme-wone);border-radius: 100px;color: #FFFFFF;width: 40%;min-width:120px;height: 45px;"
+                        th:text="${advanced['send.inquiry']}">
                     Send inquiry
                 </button>
             </a>
             <button type="button"
                     class="am-btn am-round am-margin-sm chat-btn-brand"
                     th:data-details="${prod.brandId}"
-                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;" th:text="${advanced['chat.now']}">
+                    style="border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;color: var(--theme-wone);width: 40%;min-width:120px;height: 45px;"
+                    th:text="${advanced['chat.now'+'']}">
                 Chat now
             </button>
         </div>
     </div>
 </div>
-<div class="video-modal" id="videoModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; padding: 40px 20px;">
-    <div class="video-container" style="width: 90%; max-width: 1200px; height: auto; max-height: 90vh; position: relative;">
-        <div class="close-video" id="closeVideo" style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; text-align: center; line-height: 40px;">×</div>
+<!-- 视频播放模态框 -->
+<div class="video-modal" id="videoModal"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; padding: 40px 20px;">
+    <div class="video-container"
+         style="width: 90%; max-width: 1200px; height: auto; max-height: 90vh; position: relative;">
+        <div class="close-video" id="closeVideo"
+             style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; text-align: center; line-height: 40px;">
+            ×
+        </div>
         <div style="position: relative; width: 100%; padding-top: 56.25%;">
-            <div id="videoIframeContainer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+            <div id="videoIframeContainer"
+                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
         </div>
     </div>
 </div>
-    <!-- 搜索弹窗-->
-    <th:block th:replace="search :: search"></th:block>
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
 
-    <th:block th:replace="inquiry :: inquiry"></th:block>
-    <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
-    <th:block th:replace="footer :: footer"></th:block>
-    <script th:src="@{${'/js/product.js?v=' + version}}"></script>
+<!-- 弹窗-->
+<th:block th:replace="inquiry :: inquiry"></th:block>
+
+<!-- PC端的右侧按钮 -->
+<th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
+
+<!-- app端显示的下载按钮 -->
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
+<!-- 底部导航   -->
+<th:block th:replace="footer :: footer"></th:block>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const videoModal = document.getElementById('videoModal');
+        const closeButton = document.getElementById('closeVideo');
+        const iframeContainer = document.getElementById('videoIframeContainer');
+        const playButtonPC = document.getElementById('playVideoBtn');
+        const playButtonMobile = document.getElementById('playVideoBtnMobile');
+
+        function handlePlayVideo(button) {
+            let iframeCode = button.getAttribute('data-video-iframe');
+            if (!iframeCode) {
+                alert('未获取到视频播放代码，请联系管理员');
+                return;
+            }
+
+            iframeCode = iframeCode
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&nbsp;/g, ' ');
+
+            if (!iframeCode.startsWith('<iframe') || !iframeCode.endsWith('</iframe>')) {
+                console.error('data-video-iframe 中的值不是完整的 iframe 代码：', iframeCode);
+                alert('视频播放代码格式错误');
+                return;
+            }
+
+            iframeContainer.innerHTML = iframeCode;
+
+            const iframe = iframeContainer.querySelector('iframe');
+            if (iframe) {
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '8px';
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+                iframe.allowFullScreen = true;
+            }
+
+            videoModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        if (playButtonPC) {
+            playButtonPC.addEventListener('click', function () {
+                handlePlayVideo(this);
+            });
+        }
+
+        if (playButtonMobile) {
+            playButtonMobile.addEventListener('click', function () {
+                handlePlayVideo(this);
+            });
+        }
+
+        function closeVideoModal() {
+            videoModal.style.display = 'none';
+            iframeContainer.innerHTML = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        closeButton.addEventListener('click', closeVideoModal);
+
+        videoModal.addEventListener('click', function (event) {
+            if (event.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && videoModal.style.display === 'flex') {
+                closeVideoModal();
+            }
+        });
+    });
+</script>
+<script>
+    function scrollToTarget(event) {
+        event.preventDefault();
+        var anchor = event.currentTarget;
+        var targetId = anchor.getAttribute('href').substring(1);
+        var offset = parseInt(anchor.dataset.offset, 10);
+        var target = document.getElementById(targetId);
+        window.scrollTo({
+            top: target.offsetTop + offset,
+            behavior: 'smooth'
+        });
+    }
+</script>
+<script src="https://oss.iee-business.com/standalone/js/ckeditor.js"></script>
+<script>
+    // 全局变量存储 CKEditor 实例，避免重复创建
+    let editorInstance = null;
+
+    // 初始化函数（确保只执行一次）
+    async function initCKEditor() {
+        // 如果已有实例，先销毁
+        if (editorInstance) {
+            await editorInstance.destroy();
+        }
+
+        try {
+            editorInstance = await ClassicEditor.create(document.querySelector('#editor'), {
+                readOnly: true,
+                toolbar: [],
+                plugins: [
+                    'HorizontalRule',
+                    'GeneralHtmlSupport'
+                ],
+                htmlSupport: {
+                    allow: [{
+                        name: /.*/,
+                        attributes: true,
+                        classes: true,
+                        styles: true,
+                        allowEmpty: true
+                    }]
+                }
+            });
+            console.log('CKEditor 初始化成功');
+        } catch (error) {
+            // 只忽略「插件未找到」的误报，其他错误正常打印
+            if (error.name === 'CKEditorError') {
+                if (error.message.includes('plugin-not-found')) {
+                    console.log('忽略插件声明警告（功能正常）：', error.plugin);
+                } else if (error.message.includes('duplicated-modules')) {
+                    console.error('CKEditor 模块重复加载，请检查脚本引入是否重复：', error);
+                } else {
+                    console.error('CKEditor 初始化失败：', error);
+                }
+            }
+        }
+    }
+
+    // 确保 DOM 加载完成后再初始化（避免找不到 #editor 元素）
+    document.addEventListener('DOMContentLoaded', initCKEditor);
+</script>
+
+
+<script>
+    const stickyBar = document.querySelector('.sticky-bar');
+    const bottomBlock = document.querySelector('.sticky-bottom');
+
+    function handleScroll() {
+        const bottomBlockTop = bottomBlock.getBoundingClientRect().top;
+
+        const stickyBarHeight = stickyBar.offsetHeight;
+
+        if (bottomBlockTop <= stickyBarHeight) {
+            stickyBar.style.top = `-${stickyBarHeight - bottomBlockTop}px`;
+        } else {
+            stickyBar.style.top = '0';
+        }
+    }
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+</script>
 </body>
 
 </html>

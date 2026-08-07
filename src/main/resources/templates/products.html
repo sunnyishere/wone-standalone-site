@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" xmlns:myu="http://www.thymeleaf.org">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
 
 <head>
     <meta charset="utf-8">
@@ -8,28 +8,20 @@
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <th:block th:with="
-    base = ${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
+    base = ${websitePath + (currentLang !=  null && currentLang != 'en_US' ? currentLang + '/' : '') + pageName},
     slug = ${category != null ?
         #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
         : ''},
-    canonical = ${base + (slug != '' ? '/' + slug : '')},pn=${pageData?.pageNum ?: 1},
-    basePath = ${websitePath +pageName+ (slug != '' ? '/' + slug : '')}">
-        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}"/>
-        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
-        <link th:if="${langList != null and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
-    </th:block>
-    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
-              th:each="transLang : ${langList}"
-              th:with="pn=${pageData?.pageNum ?: 1},slug = ${category != null ?
-        '/' + #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
-        : ''}">
-        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName +slug+ (pn > 1 ? '-' + pn : '')}" />
+    canonical = ${base + (slug != '' ? '/' + slug : '')}
+    ">
+        <link rel="canonical" th:href="${canonical + '-' + (pageData?.pageNum ?: 1)}" />
+        <meta property="og:url" th:content="${canonical + '-' + (pageData?.pageNum ?: 1)}"/>
     </th:block>
     <meta property="og:title" th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${pageContent}"/>
 
     <meta property="og:type" content="website"/>
-    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
+    <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
@@ -41,29 +33,26 @@
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
-    <link rel="preload"
-          th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
-          as="image"
-          fetchpriority="high">
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-
+    <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-
+    <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='Products')"></th:block>
-
+    <!-- 手机-->
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-
+    <!-- 侧边栏内容 -->
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
-<div class="header-height"></div>
-<h1 class="sr-only" th:text="${pageDescription}"></h1>
+<div class="header-height">占位边距</div>
 <div class="am-hide-sm-only m-header-banner m-header-1"
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
              + '; height: 300px; display: flex; align-items: center; justify-content: center;'
@@ -78,7 +67,6 @@
 </div>
 <div class="am-show-sm-only m-header-banner-other m-header-1-other"
      th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + '); ' +
-
                'height: 150px; width: 100%; position: relative;'">
     <div style="position: absolute; top: 20%; left: 0; width: 100%; padding: 0 15px;
                 transform: translateY(-9%); text-align: center;">
@@ -92,7 +80,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:href="${currentPathLang} + '/Home'" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li>
                 <a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
@@ -103,7 +91,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), ' ', '-'), '/', '-'))} + '-' +
+                   ${#strings.toLowerCase(#strings.replace(#strings.trim(item.name), ' ', '-'))} + '-' +
                    ${item.id}"
                    th:text="${item.i18nName}">
                 </a>
@@ -114,7 +102,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(category.name), ' ', '-'), '/', '-'))} + '-' +
+                   ${#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-'))} + '-' +
                    ${category.id}"
                    th:text="${category.i18nName}"></a>
             </li>
@@ -151,7 +139,7 @@
                     </a>
 
                     <ul th:if="${cate.children != null and not cate.children.empty}"
-                        class="am-list admin-sidebar-sub am-collapse"
+                        class="am-list admin-sidebar-sub am-collapse am-in"
                         th:id="|a_${stat.index}|"
                         th:classappend="${hasSelectedChild} ? 'am-in' : ''" >
                         <li th:each="subCategory : ${cate.children}"
@@ -164,7 +152,7 @@
            '/' +
            #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
            '/' +
-           #strings.replace(#strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-'), '/', '-') +
+           #strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-') +
            '-' + subCategory.id}">
                                 <span th:text="${subCategory.i18nName}"></span>
                             </a>
@@ -200,17 +188,17 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#normalizer.normalizeString(index.pName)} +
+           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(index.pName), '/', '-'), ' ', '-'))} +
            '-'+${index.pid}">
                             <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
                                 <div class="image-box">
-                                    <img th:alt="${index.pName}" th:data-echo="${index.url}" src="https://oss.iee-business.com/landing/img/space.png"  class="image-square">
+                                    <img th:alt="${index.pName}" th:src="${index.url}" alt="" class="image-square">
                                 </div>
                                 <div class="dd-clamp-text-2 am-text-lg">
                                     <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 14px;"></span>
                                     <span class="am-text-bold" style="color: #07C160;font-size: 14px"  th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
                                 </div>
-                                <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm" style="height: 5rem;"
                                       th:text="${index.i18nName}"></span>
                             </div>
                         </a>
@@ -223,7 +211,7 @@
     totalPages=${pageData.totalPages},
     currentPage=${pageData.pageNum},
     requestUrl=${category != null
-        ? (#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(category.name), ' ', '-'), '/', '-')) + '-' + category.id)
+        ? (#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id)
         : pageName}
 )"></th:block>
         </div>
@@ -255,6 +243,9 @@
 
 <!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='Products')"></th:block>
+
+<!-- app端显示的下载按钮 -->
+<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
 
 <!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>

@@ -10,26 +10,25 @@
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <link rel="canonical" th:href="${websitePath}+'/search' " />
 
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-    <meta name="robots" content="follow, noindex"/>
-    <meta name="googlebot" content="noindex, follow"/>
-    <meta name="bingbot" content="noindex, follow"/>
-
+    <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-
+    <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='serach')"></th:block>
-
+    <!-- 手机-->
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-
+    <!-- 侧边栏内容 -->
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
-<div class="header-height"></div>
+<div class="header-height">占位边距</div>
 
 <nav class="m-cat-nav">
     <div class="am-container">
@@ -60,10 +59,11 @@
 <div class="" style="">
 
     <div class="am-container phone-clear-padding am-margin-top-sm">
-        <div class="am-u-md-3 am-u-sm-12">
+        <div class="am-u-md-3 am-u-sm-12"
+             th:if="${association != null and #lists.size(association) > 0}">
             <!-- 分类数据存在时显示 -->
             <div class="am-list admin-sidebar-list"
-                    style="background-color: #FFFFFF; border-radius: 8px; min-height: 300px;" th:if="${association != null and #lists.size(association) > 0}">
+                    style="background-color: #FFFFFF; border-radius: 8px; min-height: 300px;">
 
                 <div class="am-padding am-text-lg am-text-bold">Product Category</div>
                 <li class="am-panel am-padding-left"
@@ -91,19 +91,11 @@
                     </ul>
             </div>
 
-            <!-- 分类数据为空时显示的占位区块（背景色#afb4b7） -->
-            <div th:unless="${association != null and not association.isEmpty()}"
-                 style="background-color: #afb4b7; border-radius: 8px; min-height: 380px; display: flex; align-items: center; justify-content: center; padding: 20px;">
-
-                <div class="am-text-center am-text-white">
-                    <i class="am-margin-bottom"></i>
-                    <h3 class="am-margin-bottom-sm"></h3>
-                    <p class="am-text-sm"></p>
-                </div>
-            </div>
         </div>
 
-        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin" style="background:#FFFFFF;">
+        <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
+             th:classappend="${association != null and not association.isEmpty()} ? ' am-u-md-9' : ' am-u-md-12'"
+             style="background:#FFFFFF;">
             <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
                 <!-- 产品列表存在时显示 -->
                 <div th:if="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}">
@@ -115,7 +107,7 @@
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                     'detail/'+
-                    ${#normalizer.normalizeString(index.name)}  +
+                   ${#strings.replace(#strings.replace(#strings.trim(index.name), '/', '-'), ' ', '-')} +
                    '-'+${index.id}">
                                 <div style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">
@@ -133,14 +125,11 @@
                     </ul>
                 </div>
 
-                <!-- 产品列表为空或 pageData 为 null 时显示的占位区块 -->
+                <!-- 产品列表为空或 pageData 为 null 时显示空数据图片 -->
                 <div th:unless="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}"
-                     style="background-color: #afb4b7; border-radius: 12px; min-height: 380px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; padding: 20px;">
-                    <div class="am-text-center am-text-white">
-                        <i class="am-margin-bottom"></i>
-                        <h3 class="am-margin-bottom-sm">No products found</h3>
-                        <p class="am-text-sm">Please try another search.</p>
-                    </div>
+                     style="min-height: 380px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                    <img th:src="@{/img/27.png}" src="/img/27.png" alt="The data is empty."
+                         style="display: block; width: 100%; max-width: 415px; height: auto;">
                 </div>
             </div>
 
