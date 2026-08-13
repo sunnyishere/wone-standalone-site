@@ -6,12 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${prod.name} + '-' + ${prodBrand.eName}"></title>
-    <th:block th:each="keyword : ${tdkKeywords}">
-        <meta name="keywords" th:content="${keyword}"/>
-    </th:block>
+    <meta name="keywords" th:content="${tdkKeywords != null ? #strings.listJoin(tdkKeywords, ',') : ''}"/>
     <meta name="description" th:content="${prod.description} ?: ''"/>
 
-    <!-- Canonical URL -->
     <link rel="canonical"
           th:if="${websitePath != null and pageName != null and suffix != null}"
           th:href="${#strings.concat(
@@ -25,12 +22,10 @@
           #strings.startsWith(suffix, '/') ? suffix : '/' + suffix
       )}"/>
 
-    <!-- Robots -->
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <!-- Open Graph -->
     <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta property="og:description" th:content="${prod.description}"/>
     <meta property="og:url" th:content="${#strings.concat(
@@ -47,26 +42,22 @@
     <meta property="og:locale" th:content="${currentLang}"/>
     <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
-    <!-- Twitter Card -->
     <meta name="twitter:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta name="twitter:description" th:content="${prod.description}"/>
     <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
 
-    <!-- Product Metadata -->
     <meta property="product:price:currency" content="USD"/>
     <meta property="product:availability" content="instock"/>
     <meta property="product:published_time" th:content="${prod.created}"/>
     <meta property="product:modified_time" th:content="${prod.updated}"/>
 
-    <!-- Viewport & UX -->
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
 
-    <!-- Common Head Fragment -->
     <th:block th:replace="head :: commonHead"></th:block>
     <style>
         .prod-h2-bg {
@@ -75,7 +66,6 @@
         }
     </style>
 
-    <!-- Structured Data (Schema.org) -->
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
     <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
     <script type="application/ld+json"
@@ -84,17 +74,12 @@
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-
-    <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='prods-'+${prod.id})"></th:block>
-    <!-- 手机-->
     <th:block th:replace="phone-en :: phone-header"></th:block>
-
-    <!-- 侧边栏内容 -->
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 
 </header>
-<div class="header-height">占位边距</div>
+<div class="header-height"></div>
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
@@ -365,7 +350,6 @@
                                 </div>
                             </div>
 
-                            <!-- 手机端按钮 -->
                             <div class="am-hide-lg-only">
                                 <div th:if="${item.isShow == 1 and item.type == 1}">
                                     <div th:if="${item.fileDatalis != null}"
@@ -389,7 +373,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 手机端：公开 + 视频 -->
                                 <div th:if="${item.isShow == 1 and item.type == 2 and item.url != null}"
                                      style="width: 100%;display: inline-flex;justify-content: center;">
                                     <div class="am-text-center" id="playVideoBtnMobile"
@@ -418,7 +401,6 @@
             </div>
 
 
-            <!-- 证书 -->
             <div th:if="${prCercateList != null and #lists.size(prCercateList) > 0}">
                 <div class="am-text-bold" >
                     <h2 class="inline-header prod-h2-bg" th:text="${advanced['certifications']} + '&nbsp;' + ${prod.shortKeywords}"></h2>
@@ -481,12 +463,12 @@
 
                                         <div style="margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
 
-                                            <a th:href="'https://iee-business.com' + ${item.articleCommentVo.url}"
+                                            <a th:href="'https://www.iee-business.com' + ${item.articleCommentVo.url}"
                                                style="display: flex; align-items: center; text-decoration: none; max-width: 60%;">
-                                                <img th:src="${item.articleCommentVo.uHead}"
+                                                <img th:src="${item.articleCommentVo.uhead}"
                                                      style="width: 24px; height: 24px; border-radius: 50%; margin-right: 0; object-fit: cover; flex-shrink: 0;">
                                                 <span style="color: #5C779F; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; margin-left: 6px;"
-                                                      th:text="${item.articleCommentVo.uName}">
+                                                      th:text="${item.articleCommentVo.uname}">
                                                 </span>
                                             </a>
 
@@ -942,18 +924,9 @@
         </div>
     </div>
 </div>
-<!-- 搜索弹窗-->
 <th:block th:replace="search :: search"></th:block>
-
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
-
-<!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
-
-<!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
-<!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
 
 <script>
@@ -1033,8 +1006,6 @@
             }
         });
     });
-</script>
-<script>
     function scrollToTarget(event) {
         event.preventDefault();
         var anchor = event.currentTarget;
@@ -1046,58 +1017,6 @@
             behavior: 'smooth'
         });
     }
-</script>
-<script src="https://oss.iee-business.com/standalone/js/ckeditor.js"></script>
-<script>
-    // 全局变量存储 CKEditor 实例，避免重复创建
-    let editorInstance = null;
-
-    // 初始化函数（确保只执行一次）
-    async function initCKEditor() {
-        // 如果已有实例，先销毁
-        if (editorInstance) {
-            await editorInstance.destroy();
-        }
-
-        try {
-            editorInstance = await ClassicEditor.create(document.querySelector('#editor'), {
-                readOnly: true,
-                toolbar: [],
-                plugins: [
-                    'HorizontalRule',
-                    'GeneralHtmlSupport'
-                ],
-                htmlSupport: {
-                    allow: [{
-                        name: /.*/,
-                        attributes: true,
-                        classes: true,
-                        styles: true,
-                        allowEmpty: true
-                    }]
-                }
-            });
-            console.log('CKEditor 初始化成功');
-        } catch (error) {
-            // 只忽略「插件未找到」的误报，其他错误正常打印
-            if (error.name === 'CKEditorError') {
-                if (error.message.includes('plugin-not-found')) {
-                    console.log('忽略插件声明警告（功能正常）：', error.plugin);
-                } else if (error.message.includes('duplicated-modules')) {
-                    console.error('CKEditor 模块重复加载，请检查脚本引入是否重复：', error);
-                } else {
-                    console.error('CKEditor 初始化失败：', error);
-                }
-            }
-        }
-    }
-
-    // 确保 DOM 加载完成后再初始化（避免找不到 #editor 元素）
-    document.addEventListener('DOMContentLoaded', initCKEditor);
-</script>
-
-
-<script>
     const stickyBar = document.querySelector('.sticky-bar');
     const bottomBlock = document.querySelector('.sticky-bottom');
 

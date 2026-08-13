@@ -507,6 +507,17 @@ public class RockwillKnowledgeService {
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 requestEntity = new HttpEntity<>(formBody.toString(), headers);
             }
+            if (targetUrl.contains("leaveMessage")) {
+                String email = originalRequest.getParameter("email");
+                String phone = originalRequest.getParameter("phone");
+                if (StringUtils.isBlank(email) || StringUtils.isBlank(phone)) {
+                    requestLog.put("status", "validation_failed");
+                    requestLog.put("error", "email and phone must not be empty");
+                    persistRequestLog(requestLogDir, requestLog);
+                    return ResponseEntity.badRequest().body("email and phone must not be empty");
+                }
+            }
+
             requestLog.put("status", "forwarding");
             if (targetUrl.contains("leaveMessage")) {
                 persistRequestLog(requestLogDir, requestLog);

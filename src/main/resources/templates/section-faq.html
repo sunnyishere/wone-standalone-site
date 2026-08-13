@@ -1,0 +1,24 @@
+<div th:fragment="faqSection(faqList)"
+     th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}"
+     style="background:#FFFFFF;margin-bottom: 15px;border-radius: 12px;">
+
+    <div class="am-text-lg am-text-bold" style="padding: 12px 0;">
+        <h2 class="inline-header" th:text="${advanced['frequently.asked.questions']}">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-list">
+        <div class="faq-item" th:each="item : ${pageFaqList}">
+            <div class="faq-question" onclick="this.parentElement.classList.toggle('faq-open')" >
+                <span style="flex:1;padding-right:24px;" th:text="${item.title}">
+                    Question
+                </span>
+                <span class="faq-arrow tn-icon-down"></span>
+            </div>
+            <div class="faq-answer">
+                <div class="faq-content" th:utext="${item.content}">
+                    Answer
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

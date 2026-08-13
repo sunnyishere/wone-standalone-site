@@ -55,7 +55,7 @@
                     <span class="phone-prefix" id="phonePrefix" style="position: absolute; left: 32px; top: 50%; transform: translateY(-50%); color: #777; font-weight: 500; pointer-events: none;">+86</span>
                     <input type="tel" id="input-phone" name="phone" class="form-control"
                            style="width: 100%; padding: 12px 12px 12px 75px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
-                           th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16);"  required />
+                           th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16);"  required />
                 </div>
             </div>
 

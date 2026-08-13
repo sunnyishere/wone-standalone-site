@@ -92,7 +92,14 @@ public class StaticizeTriggerController {
                 return ResponseEntity.ok("Static page generated accepted");
             }
             Set<String> urlSet = new LinkedHashSet<>();
-            collectHomePage(syncContext, standaloneSyncEvent, urlSet);
+
+            /**
+             *  PAGE即更新菜单时，仅需要更新列表及分类页即可
+             */
+            if (standaloneSyncEvent.getEntityType() != StandaloneSyncEntityType.PAGE
+                    || standaloneSyncEvent.getEntityId() == SitePage.SitePageType.HOME) {
+                collectHomePage(syncContext, standaloneSyncEvent, urlSet);
+            }
             collectPaginationPages(syncContext, standaloneSyncEvent, urlSet);
             collectMainPages(syncContext, standaloneSyncEvent, urlSet);
             cloudflarePurgeService.purgeByUrls(standaloneSyncEvent.getDeployDomain(), new ArrayList<>(urlSet));
@@ -106,7 +113,8 @@ public class StaticizeTriggerController {
     private SyncContext buildSyncContext(StandaloneSyncEvent standaloneSyncEvent) {
         StandaloneSyncEntityType entityType = standaloneSyncEvent.getEntityType();
         for (SitePage sitePage : SiteMenuUtils.getMenuPages()) {
-            if (entityType.getPageType() == sitePage.getPageType().intValue()) {
+            if (entityType.getPageType() == sitePage.getPageType().intValue()
+                    || (entityType.getPageType() == 0 && sitePage.getPageType().equals(standaloneSyncEvent.getEntityId()))) {
                 String pageName = sitePage.getPageName();
                 String domainPrefix = standaloneSyncEvent.getDeployDomain().equals(brandConfig.getDomain())
                         ? ""
@@ -175,6 +183,9 @@ public class StaticizeTriggerController {
             if (!file.isDirectory()) {
                 continue;
             }
+            if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.PAGE) {
+                continue;
+            }
             if (syncContext.isProd) {
                 collectProductPages(file, syncContext, standaloneSyncEvent, urlSet);
             } else if (file.getName().contains("-" + standaloneSyncEvent.getEntityId())) {
@@ -227,7 +238,6 @@ public class StaticizeTriggerController {
     private void deleteAndRecord(File file, String domain, String path, Set<String> urlSet) {
         if (file.exists()) {
             FileUtil.del(file);
-            System.out.println("delete: " + file.getName());
             String normalizedDomain = domain.startsWith("http://") || domain.startsWith("https://")
                     ? domain
                     : "https://" + domain;

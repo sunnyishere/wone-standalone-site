@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- 使用th:content避免属性值冲突 -->
-    <title th:text="${#strings.isEmpty(successCase.seoTitle)?successCase.title:successCase.seoTitle} + '-' + ${prodBrand.eName}"></title>
+    <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
 
     <!-- 链接标签优化 -->
     <link rel="canonical" th:href="${websiteUrl}" />
@@ -47,9 +47,12 @@
 
 
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
     <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
+    </script>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
 </head>
 
@@ -120,14 +123,15 @@
                     </span>
                 </a>
             </div>
+            <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
 
         </div>
 
         <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
 
             <div class=" am-margin-bottom" style="background:#FFFFFF;">
-                <div class="am-text-xl am-text-bold am-padding" th:text="${advanced['recent.success.reference']}">
-                    Recent Success Reference
+                <div class="am-text-bold am-padding" >
+                    <h2 class="inline-header" th:text="${advanced['recent.success.reference']}"></h2>
                 </div>
 
                 <div class="am-container" style="padding: 0 !important;">
@@ -216,16 +220,9 @@
         </div>
     </div>
 </div>
-<!-- 搜索弹窗-->
 <th:block th:replace="search :: search"></th:block>
-
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
-
-<!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='Success Reference_'+${successCase.id})"></th:block>
-
-<!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
 </body>
 
