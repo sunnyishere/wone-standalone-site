@@ -37,46 +37,28 @@
           as="image"
           fetchpriority="high">
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
+    <style>
+        .faq-header{font-size: 2.4rem;}
+        .section-title{font-size: 2.4rem;}
+        @media (max-width:768px){
+            .section-title{font-size: 1.8rem;}
+            .faq-header{font-size: 1.8rem;}
+        }
+    </style>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    </script>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-
     <th:block th:replace="pc-en :: section(param1='about')"></th:block>
-
     <th:block th:replace="phone-en :: phone-header"></th:block>
-
-
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height"></div>
 
-
-<div class="am-hide-sm-only m-header-banner m-header-1"
-     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
-             + '; height: 300px; display: flex; align-items: center; justify-content: center;'
-             + 'background-size: cover; background-position: center; ' ">
-    <section class="am-container wone-text"
-             style="text-align: center;">
-        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <p class="dd-clamp-text-3 dd-clamp-text-3-left" style="font-size: 30px;font-weight: bold; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.5; position: relative; top: 60px;"
-               th:text="${pageDescription}"></p>
-        </hgroup>
-    </section>
-</div>
-<div class="am-show-sm-only m-header-banner-other m-header-1-other"
-     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + '); ' +
-
-               'height: 150px; width: 100%; position: relative;'">
-    <div style="position: absolute; top: 20%; left: 0; width: 100%; padding: 0 15px;
-                transform: translateY(-9%); text-align: center;">
-        <p class="dd-clamp-text-3"
-           style="font-size: 20px; font-weight: bold; color: #FFF;
-                  line-height: 1.4; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);"
-           th:text="${pageDescription}">
-        </p>
-    </div>
-</div>
+<th:block th:replace="banner :: pageBanner"></th:block>
 
 <nav class="m-cat-nav">
     <div class="am-container">
@@ -89,10 +71,7 @@
 
 <div class="am-container phone-container-top am-margin-bottom am-margin-top-sm" style="background-color: #FFFFFF;">
     <div class="am-u-sm-12 am-u-md-7 am-u-lg-5 am-padding-xl am-margin-bottom-xl phone-container-all phone-clear-margin" style="background:#FFFFFF;">
-
-
         <div class="" style="background-color: #FFFFFF;">
-
             <div class="phone-container phone-banner" style="height: 300px;">
                 <div class="am-slider am-slider-default" data-am-flexslider="{playAfterPaused: 8000}" style="border-radius: 10px;overflow: hidden;position: relative;z-index: 0;">
                     <ul class="am-slides">
@@ -106,8 +85,6 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
     <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding">
@@ -116,34 +93,27 @@
             </div>
         </div>
         <p th:text="${brand.profile}">
-
     </div>
 </div>
 
 <div class="am-container phone-container-all phone-clear-padding am-margin-bottom am-padding-top"
      style="background-color: #FFFFFF;">
     <div class="am-container phone-title" style="padding: 20px 30px 20px 30px;">
-
         <div class="am-text-center">
-            <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></span>
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></div>
             </div>
-            <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></span>
-            </div>
-
         </div>
-
     </div>
     <div class="am-padding-top">
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
-            <div class="am-hide-sm-only am-padding type-hover">
+            <div class="am-padding type-hover">
                 <div  th:text="${advanced['organization.name']}"></div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
                 <div  th:text="${advanced['main.categories']}"></div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
                 <div  th:text="${advanced['business.type']}"></div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1"
+                <div class="am-text-bold dd-clamp-text-1"
                      th:with="
                        input=${brand.compNat},
                        step1=${#strings.replace(input, 'Design', advanced['design'])},
@@ -153,25 +123,9 @@
                      th:text="${step3}">
                 </div>
             </div>
-            <div class="am-show-sm-only am-padding type-hover">
-                <div th:text="${advanced['organization.name']}"></div>
-                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
-                <div th:text="${advanced['main.categories']}"></div>
-                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
-                <div  th:text="${advanced['business.type']}"></div>
-                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.compNat}"></div>
-            </div>
         </div>
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
-            <div class="am-hide-sm-only am-padding type-hover">
-                <div th:text="${advanced['employees']}"></div>
-                <div class="am-text-xl am-text-bold"  th:text="${brand.empCount != null ? brand.empCount + '  people' : '100-500  people'}"></div>
-                <div th:text="${advanced['workplace']}"></div>
-                <div class="am-text-xl am-text-bold" th:text="${brand.workplace} "></div>
-                <div th:text="${advanced['registered.capital']}"></div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${factory.entRegFeeType}+${factory.entRegFee}"></div>
-            </div>
-            <div class="am-show-sm-only am-padding type-hover">
+            <div class="am-padding type-hover">
                 <div th:text="${advanced['employees']}"></div>
                 <div class="am-text-bold" th:text="${brand.empCount != null ? brand.empCount + '  people' : '100-500  people'}"></div>
                 <div th:text="${advanced['workplace']}"></div>
@@ -181,15 +135,7 @@
             </div>
         </div>
         <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
-            <div class="am-hide-sm-only am-padding type-hover">
-                <div th:text="${advanced['highest.annual.export.usd']}"></div>
-                <div class="am-text-xl am-text-bold" th:text="${'$'+brand.maxAnnExp}"></div>
-                <div th:text="${advanced['professional.experience']}"></div>
-                <div class="am-text-xl am-text-bold" th:text="${brand.regYears + '  years'} "></div>
-                <div th:text="${advanced['office.address']}"></div>
-                <div class="am-text-xl am-text-bold dd-clamp-text-1" th:text="${factory.eOffAddr}"></div>
-            </div>
-            <div class="am-show-sm-only am-padding type-hover">
+            <div class="am-padding type-hover">
                 <div th:text="${advanced['highest.annual.export.usd']}"></div>
                 <div class="am-text-bold" th:text="${'$'+brand.maxAnnExp}"></div>
                 <div th:text="${advanced['professional.experience']}"></div>
@@ -197,7 +143,6 @@
                 <div th:text="${advanced['office.address']}"></div>
                 <div class="am-text-bold dd-clamp-text-1" th:text="${factory.eOffAddr}"></div>
             </div>
-
         </div>
     </div>
 
@@ -206,17 +151,11 @@
 <div class="am-container phone-container phone-clear-padding am-margin-bottom"
      style="padding: 0 30px 0 30px;background-color: #FFFFFF;">
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
-
         <div class="am-text-center">
-            <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></span>
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></div>
             </div>
-            <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></span>
-            </div>
-
         </div>
-
     </div>
     <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
         <div style="padding-top: 2px;opacity: 0;">占位</div>
@@ -235,29 +174,20 @@
                         th:each="i : ${#numbers.sequence(1, 5)}">
                         <img src="" alt="No Data" style="background: #afb4b7">
                     </li>
-
                 </ul>
             </div>
         </div>
-
     </div>
-
 </div>
 
 
 <div class="am-container phone-container phone-clear-padding" style="padding: 0 30px 0 30px;background-color: #FFFFFF;">
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
-
         <div class="am-text-center">
-            <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></span>
+            <div class="am-u-sm-12">
+                <div class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></div>
             </div>
-            <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></span>
-            </div>
-
         </div>
-
     </div>
     <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding">
         <li class="dd-hover4" th:if="${not #lists.isEmpty(employee)}" th:each="pic : ${employee}">
@@ -311,19 +241,12 @@
 
 <div class="am-container am-margin-top phone-container-title am-margin-bottom phone-clear-padding"
      style="background-color: #FFFFFF;">
-
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
-
         <div class="am-text-center">
-            <div class="am-hide-sm-only am-u-sm-12">
-                <span class="am-text-xl am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></span>
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></div>
             </div>
-            <div class="am-show-sm-only am-u-sm-12">
-                <span class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></span>
-            </div>
-
         </div>
-
     </div>
     <div class="am-container">
         <table class="am-table am-padding-top am-padding-bottom-sm">
@@ -331,17 +254,13 @@
             <tr>
                 <td class="am-text-center am-text-bold am-text-lg">
                     <div class="am-margin-sm" th:text="${advanced['shareholder.names']}">
-
                     </div>
                 </td>
                 <td class="am-text-center am-text-bold am-text-lg">
                     <div class="am-margin-sm" th:text="${advanced['shareholding.percentage']}">
-
                     </div>
                 </td>
             </tr>
-
-            <!-- 修正后的循环 -->
             <tr th:each="pic : ${equity}">
                 <td>
                     <a aria-hidden="false" th:aria-label="${pic.account}"
@@ -377,8 +296,6 @@
                     <div class="am-padding" style="display: inline-flex;">
                         <div class="am-padding-right">
                             <div class="" style="width: 60px;height: 60px;">
-                                <!--                                <img class="am-img-responsive"-->
-                                <!--                                     style="object-fit: cover;width: 60px;height: 60px;border-radius: 100px;background: #afb4b7;">-->
                             </div>
                         </div>
                         <div class="" style="height: 60px;justify-content: center;align-items: center;display: flex;">
@@ -397,26 +314,18 @@
             </tbody>
         </table>
     </div>
-
-
 </div>
 
-<!-- 搜索弹窗-->
+<div class="am-container am-margin-top phone-container-title am-margin-bottom"
+     style="background-color: #FFFFFF;">
+    <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+</div>
+
+
 <th:block th:replace="search :: search"></th:block>
-
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
-
-<!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='about')"></th:block>
-
-<!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
-
-<!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
-
-
 </body>
 
 </html>

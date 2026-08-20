@@ -234,6 +234,9 @@ public class RockwillKnowledgeService {
                         model.put("langEName", "english");
                     }
                     handleDateKey(model);
+                    if (model.containsKey("prodFaqList")) {
+                        model.put("pageFaqList", model.get("prodFaqList"));
+                    }
                     String websiteUrl = "";
                     if (model.containsKey("websitePath")) {
                         String websitePath = model.get("websitePath").toString();

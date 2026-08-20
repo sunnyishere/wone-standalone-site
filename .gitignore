@@ -3,3 +3,8 @@ target/
 build/
 static-output/
 logs
+.codegraph
+request-logs
+.trae
+.agents
+.workbuddy

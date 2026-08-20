@@ -1,0 +1,10 @@
+<div th:fragment="pageBanner"
+     class="page-banner"
+     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'">
+    <div class="page-banner-inner am-container wone-text">
+        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
+            <h1 class="page-banner-title dd-clamp-text-3"
+               th:text="${pageDescription}"></h1>
+        </hgroup>
+    </div>
+</div>
