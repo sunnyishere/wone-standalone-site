@@ -37,9 +37,12 @@
     <meta name="renderer" content="webkit">
 
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
     <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
+    </script>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
 </head>
 
@@ -94,6 +97,7 @@
             <th:block th:if="${not #lists.isEmpty(relatedProducts)}"
                       th:replace="section-related-cards :: relatedCards(${relatedProducts}, ${advanced['related']} + ' ' + ${advanced['products']}, 'Products More', ${productsPagePath})"></th:block>
 
+            <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
         </div>
 
         <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">

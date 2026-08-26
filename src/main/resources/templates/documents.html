@@ -42,6 +42,9 @@
           as="image"
           fetchpriority="high">
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    </script>
 </head>
 
 <body class="body-bg">
@@ -183,111 +186,118 @@
             </ul>
         </div>
 
-        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl" style="background:#FFFFFF;">
-            <div class="am-container phone-container-all phone-clear-padding am-padding-top"
-                 style="background-color: #FFFFFF;">
-                <div style="margin: 0px 10px 0 10px;">
-                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
-                         th:if="${not #lists.isEmpty(pageData.rows)}"
-                         th:each="item : ${pageData.rows}">
-                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
-                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
-                                <div style="am-cf">
-                                    <div class="am-fl am-margin-right">
-                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
-                                            <img th:src="${item.icon}" th:alt="${item.name}" class="am-img-responsive"
-                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl" >
+            <div style="background-color: #FFFFFF;">
+                <div class="am-container phone-container-all phone-clear-padding am-padding-top"
+                     style="background-color: #FFFFFF;">
+                    <div style="margin: 0px 10px 0 10px;">
+                        <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                             th:if="${not #lists.isEmpty(pageData.rows)}"
+                             th:each="item : ${pageData.rows}">
+                            <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                    <div style="am-cf">
+                                        <div class="am-fl am-margin-right">
+                                            <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                                <img th:src="${item.icon}" th:alt="${item.name}" class="am-img-responsive"
+                                                     style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="" style="height: 100px;">
-                                        <div class="am-cf">
-                                            <div class="" style="width: 100%;">
-                                                <div th:if="${item.isShow} == 1" class="dd-clamp-text-1"
-                                                     style="color: #07C160;">
-                                                    <span class="p-icon-a-0012"></span>
-                                                    <span th:text="${advanced['public']} + '.'"></span>
-                                                </div>
-                                                <div th:if="${item.isShow} == 0" class="dd-clamp-text-1"
-                                                     style="color: var(--theme-wone);">
-                                                    <span class="p-icon-a-0022"></span>
-                                                    <span th:text="${advanced['restricted']} + '.'"></span>
-                                                </div>
-                                                <div class="dd-clamp-text-2 am-padding-top-sm am-text-bold"
-                                                     style="min-height: 5rem;" th:text="${item.name}">
-                                                </div>
-                                                <!--                                                <div class="dd-clamp-text-2 am-padding-top-sm"-->
-                                                <!--                                                     style="min-height: 5rem;" th:text="${item.content}">-->
-                                                <!--                                                </div>-->
-                                                <div class=" dd-clamp-text-1 am-text-sm">
+                                        <div class="" style="height: 100px;">
+                                            <div class="am-cf">
+                                                <div class="" style="width: 100%;">
+                                                    <div th:if="${item.isShow} == 1" class="dd-clamp-text-1"
+                                                         style="color: #07C160;">
+                                                        <span class="p-icon-a-0012"></span>
+                                                        <span th:text="${advanced['public']} + '.'"></span>
+                                                    </div>
+                                                    <div th:if="${item.isShow} == 0" class="dd-clamp-text-1"
+                                                         style="color: var(--theme-wone);">
+                                                        <span class="p-icon-a-0022"></span>
+                                                        <span th:text="${advanced['restricted']} + '.'"></span>
+                                                    </div>
+                                                    <div class="dd-clamp-text-2 am-padding-top-sm am-text-bold"
+                                                         style="min-height: 5rem;" th:text="${item.name}">
+                                                    </div>
+                                                    <!--                                                <div class="dd-clamp-text-2 am-padding-top-sm"-->
+                                                    <!--                                                     style="min-height: 5rem;" th:text="${item.content}">-->
+                                                    <!--                                                </div>-->
+                                                    <div class=" dd-clamp-text-1 am-text-sm">
                                                     <span class="am-padding-right"
                                                           style="color: #5C779F; " th:text="${item.eName}"></span>
-                                                    <span th:if="${item.locale} == 1">Chinese</span>
-                                                    <span th:if="${item.locale} == 2">English</span>
-                                                    <span th:if="${item.locale} == 3">French</span>
+                                                        <span th:if="${item.locale} == 1">Chinese</span>
+                                                        <span th:if="${item.locale} == 2">English</span>
+                                                        <span th:if="${item.locale} == 3">French</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <!-- 文件/视频区域 -->
-                                            <div class="am-fr" th:if="${item.isShow} == 1"
-                                                 style="border: 1px solid var(--theme-wone);margin-top: 40px; border-radius: 100px; padding: 4px 8px 4px 20px; color: var(--theme-wone);
+                                                <!-- 文件/视频区域 -->
+                                                <div class="am-fr" th:if="${item.isShow} == 1"
+                                                     style="border: 1px solid var(--theme-wone);margin-top: 40px; border-radius: 100px; padding: 4px 8px 4px 20px; color: var(--theme-wone);
                                                 display: inline-flex; align-items: center; background-color: #FFFFFF">
 
-                                                <!-- 类型1：文件下载 -->
-                                                <div th:if="${item.type == 1 && item.isShow == 1}">
+                                                    <!-- 类型1：文件下载 -->
+                                                    <div th:if="${item.type == 1 && item.isShow == 1}">
                                                     <span th:text="${#strings.toUpperCase(item.fName)}"
                                                           class="am-margin-right-sm"></span>
-                                                    <a th:title="${item.name}" aria-hidden="false" th:aria-label="${item.name}" th:href="${item.url}" download th:attr="download=${item.fName}"
-                                                       style="color: inherit;">
-                                                        <span class="p-icon-a-0031"></span>
-                                                    </a>
+                                                        <a th:title="${item.name}" aria-hidden="false" th:aria-label="${item.name}" th:href="${item.url}" download th:attr="download=${item.fName}"
+                                                           style="color: inherit;">
+                                                            <span class="p-icon-a-0031"></span>
+                                                        </a>
+                                                    </div>
+
+                                                    <!-- 类型2：视频播放 -->
+                                                    <div th:if="${item.type == 2 && item.isShow == 1}"
+                                                         class="play-video-btn"
+                                                         th:attr="data-video-iframe=${#strings.escapeXml(item.url)}"
+                                                         style="cursor: pointer;">
+                                                        <span>MP4</span>
+                                                        <span class="p-icon-a-0051 am-padding-left-sm"></span>
+                                                    </div>
                                                 </div>
 
-                                                <!-- 类型2：视频播放 -->
-                                                <div th:if="${item.type == 2 && item.isShow == 1}"
-                                                     class="play-video-btn"
-                                                     th:attr="data-video-iframe=${#strings.escapeXml(item.url)}"
-                                                     style="cursor: pointer;">
-                                                    <span>MP4</span>
-                                                    <span class="p-icon-a-0051 am-padding-left-sm"></span>
+                                                <div class="am-fr"
+                                                     data-trigger="modal-1"
+                                                     data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                                     th:data-biz-id="'site-documents-'+${item.id}"
+                                                     th:if="${item.isShow} == 0"
+                                                     style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
+                                                    <span th:text="${advanced['consulting']}"></span>
+                                                    <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                                 </div>
-                                            </div>
-
-                                            <div class="am-fr"
-                                                 data-trigger="modal-1"
-                                                 data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                 th:data-biz-id="'site-documents-'+${item.id}"
-                                                 th:if="${item.isShow} == 0"
-                                                 style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
-                                                <span th:text="${advanced['consulting']}"></span>
-                                                <span class="p-icon-a-0041 am-padding-left-sm"></span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="dd-clamp-text-3 am-padding-top-sm am-padding-right"
-                                         style="color: #6C6C6C;min-height: 80px; overflow-wrap: break-word;word-break: break-all;"
-                                         th:text="${item.content}">
+                                        <div class="dd-clamp-text-3 am-padding-top-sm am-padding-right"
+                                             style="color: #6C6C6C;min-height: 80px; overflow-wrap: break-word;word-break: break-all;"
+                                             th:text="${item.content}">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- 数据为空时显示占位区块（背景色#afb4b7） -->
-                    <div th:unless="${not #lists.isEmpty(pageData.rows)}"
-                         style="background-color: #afb4b7; border-radius: 12px; min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                        <!-- 数据为空时显示占位区块（背景色#afb4b7） -->
+                        <div th:unless="${not #lists.isEmpty(pageData.rows)}"
+                             style="background-color: #afb4b7; border-radius: 12px; min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 20px;">
 
-                        <div class="am-text-center am-text-white">
-                            <i class="am-icon-3x am-margin-bottom"></i>
-                            <h3 class="am-margin-bottom-sm"></h3>
-                            <p class="am-text-sm"></p>
+                            <div class="am-text-center am-text-white">
+                                <i class="am-icon-3x am-margin-bottom"></i>
+                                <h3 class="am-margin-bottom-sm"></h3>
+                                <p class="am-text-sm"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="am-container phone-clear-margin" style="margin: 0px 15px 15px 15px;padding-top: 30px;">
-                <!-- 分页组件 -->
-                <th:block th:replace="pagination :: pagination(
+                <div class="am-container phone-clear-margin" style="margin: 0px 15px 15px 15px;padding-top: 30px;">
+                    <!-- 分页组件 -->
+                    <th:block th:replace="pagination :: pagination(
                     totalPages=${pageData.totalPages},
                     currentPage=${pageData.pageNum},
                     requestUrl=${#strings.replace(#strings.trim(selectLabel), ' ', '-')})"></th:block>
+                </div>
+            </div>
+            <div class="am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+                <div style="background:#FFFFFF;padding: 0 1.6rem">
+                    <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+                </div>
             </div>
         </div>
     </div>

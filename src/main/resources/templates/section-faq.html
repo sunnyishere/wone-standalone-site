@@ -9,8 +9,8 @@
     <div class="faq-list">
         <div class="faq-item" th:each="item : ${pageFaqList}">
             <div class="faq-question" onclick="this.parentElement.classList.toggle('faq-open')" >
-                <span style="flex:1;padding-right:24px;" th:text="${item.title}">
-                    Question
+                <span style="flex:1;padding-right:24px;" >
+                    <strong th:text="${item.title}"></strong>
                 </span>
                 <span class="faq-arrow tn-icon-down"></span>
             </div>

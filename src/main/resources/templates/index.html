@@ -93,7 +93,10 @@
     </style>
 
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
+    </script>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
 </head>
 
@@ -673,6 +676,11 @@
                 </div>
             </li>
         </ul>
+    </div>
+    <div class="am-container am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+        <div style="background:#FFFFFF;padding: 0 1.6rem">
+            <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+        </div>
     </div>
 
     <input type="hidden" id="topNavPageName"

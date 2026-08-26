@@ -40,6 +40,9 @@
     <meta name="renderer" content="webkit">
     <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    </script>
 </head>
 
 <body class="body-bg">
@@ -175,15 +178,16 @@
 
 
 
-        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin" style="background:#FFFFFF;"
+        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
              th:if="${not #lists.isEmpty(pageData.rows)}">
-            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
-                <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
-                    style="margin: 0 0;">
-                    <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
-                        th:each="index : ${pageData.rows}">
-                        <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}"
-                           th:href="
+            <div style="background:#FFFFFF;">
+                <div class="am-container phone-container-all phone-clear-padding am-margin-bottom" >
+                    <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                        style="margin: 0 0;">
+                        <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                            th:each="index : ${pageData.rows}">
+                            <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}"
+                               th:href="
                            ${currentPathLang} +
                            (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
@@ -191,30 +195,35 @@
            'detail/'+
            ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(index.pName), '/', '-'), ' ', '-'))} +
            '-'+${index.pid}">
-                            <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
-                                <div class="image-box">
-                                    <img th:alt="${index.pName}" th:src="${index.url}" alt="" class="image-square">
+                                <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img th:alt="${index.pName}" th:src="${index.url}" alt="" class="image-square">
+                                    </div>
+                                    <div class="dd-clamp-text-2 am-text-lg">
+                                        <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 14px;"></span>
+                                        <span class="am-text-bold" style="color: #07C160;font-size: 14px"  th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm" style="height: 5rem;"
+                                          th:text="${index.i18nName}"></span>
                                 </div>
-                                <div class="dd-clamp-text-2 am-text-lg">
-                                    <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 14px;"></span>
-                                    <span class="am-text-bold" style="color: #07C160;font-size: 14px"  th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
-                                </div>
-                                <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm" style="height: 5rem;"
-                                      th:text="${index.i18nName}"></span>
-                            </div>
-                        </a>
+                            </a>
 
-                    </li>
-                </ul>
-            </div>
-
-            <th:block th:replace="pagination :: pagination(
+                        </li>
+                    </ul>
+                </div>
+                <th:block th:replace="pagination :: pagination(
     totalPages=${pageData.totalPages},
     currentPage=${pageData.pageNum},
     requestUrl=${category != null
         ? (#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id)
         : pageName}
 )"></th:block>
+            </div>
+            <div class="am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+                <div style="background:#FFFFFF;padding: 0 1.6rem">
+                    <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+                </div>
+            </div>
         </div>
 
 
