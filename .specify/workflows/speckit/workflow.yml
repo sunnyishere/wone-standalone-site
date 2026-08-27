@@ -1,0 +1,107 @@
+schema_version: "1.0"
+workflow:
+  id: "speckit"
+  name: "Full SDD Cycle with CodeGraph"
+  version: "1.1.0"
+  author: "rockwill"
+  description: "Runs codegraph-explore → specify → plan → tasks → implement with review gates, accelerated by CodeGraph code intelligence"
+
+requires:
+  speckit_version: ">=0.8.5"
+  integrations:
+    any:
+      - "alquimia"
+      - "claude"
+      - "copilot"
+      - "gemini"
+      - "opencode"
+
+inputs:
+  spec:
+    type: string
+    required: true
+    prompt: "Describe what you want to build"
+  integration:
+    type: string
+    default: "auto"
+    prompt: "Integration to use (e.g. claude, copilot, gemini; 'auto' uses the project's initialized integration)"
+  scope:
+    type: string
+    default: "full"
+    enum: ["full", "backend-only", "frontend-only"]
+
+steps:
+  # ============================================
+  # Phase 0: CodeGraph 代码探索（specify 前）
+  # ============================================
+  - id: codegraph-explore
+    command: codegraph.sync-and-explore
+    integration: "{{ inputs.integration }}"
+    optional: true
+    description: "同步 CodeGraph 索引并探索需求相关代码区域"
+
+  # ============================================
+  # Phase 1: 需求规格
+  # ============================================
+  - id: specify
+    command: speckit.specify
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  - id: review-spec
+    type: gate
+    message: "Review the generated spec before planning."
+    options: [approve, reject]
+    on_reject: abort
+
+  # ============================================
+  # Phase 2: CodeGraph 影响分析（plan 前）
+  # ============================================
+  - id: codegraph-impact
+    command: codegraph.impact-analysis
+    integration: "{{ inputs.integration }}"
+    optional: true
+    description: "分析 spec 涉及的代码变更影响范围"
+
+  # ============================================
+  # Phase 3: 实现计划
+  # ============================================
+  - id: plan
+    command: speckit.plan
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  - id: review-plan
+    type: gate
+    message: "Review the plan before generating tasks."
+    options: [approve, reject]
+    on_reject: abort
+
+  # ============================================
+  # Phase 4: 任务拆解
+  # ============================================
+  - id: tasks
+    command: speckit.tasks
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"
+
+  # ============================================
+  # Phase 5: CodeGraph 代码定位（implement 前）
+  # ============================================
+  - id: codegraph-locate
+    command: codegraph.locate-implementation
+    integration: "{{ inputs.integration }}"
+    optional: true
+    description: "精准定位实现所需的代码位置"
+
+  # ============================================
+  # Phase 6: 实现
+  # ============================================
+  - id: implement
+    command: speckit.implement
+    integration: "{{ inputs.integration }}"
+    input:
+      args: "{{ inputs.spec }}"

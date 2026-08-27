@@ -1,0 +1,96 @@
+hooks:
+  # ============================================
+  # CodeGraph 集成 — 加速代码搜索与理解
+  # ============================================
+
+  # ---------- specify 阶段 ----------
+  before_specify:
+    - extension: codegraph
+      command: codegraph.sync-and-explore
+      description: "同步 CodeGraph 索引并探索需求相关代码区域"
+      optional: true
+      enabled: true
+      prompt: |
+        在 speckit-specify 编写 spec 之前，先使用 CodeGraph 探索代码库中与需求相关的代码区域。
+
+        步骤：
+        1. 运行 `codegraph sync` 确保索引最新
+        2. 从用户需求描述中提取关键词
+        3. 运行 `codegraph explore "<关键词>"` 理解相关代码结构
+        4. 将探索结果作为上下文提供给 speckit-specify
+
+  after_specify:
+    - extension: codegraph
+      command: codegraph.verify-spec-entities
+      description: "验证 spec 中提到的实体是否在代码库中存在"
+      optional: true
+      enabled: true
+      prompt: |
+        在 speckit-specify 生成 spec 后，使用 CodeGraph 验证 spec 中提到的关键实体。
+
+        步骤：
+        1. 从 spec.md 中提取关键实体名称（类名、模板名、文件名等）
+        2. 对每个实体运行 `codegraph query "<实体名>"` 确认存在
+        3. 如有不存在的实体，在 spec 中标注
+
+  # ---------- plan 阶段 ----------
+  before_plan:
+    - extension: codegraph
+      command: codegraph.impact-analysis
+      description: "分析 spec 涉及的代码变更影响范围"
+      optional: true
+      enabled: true
+      prompt: |
+        在 speckit-plan 制定实现计划前，使用 CodeGraph 分析变更影响范围。
+
+        步骤：
+        1. 从 spec 中识别需要修改的模板文件、Java 类
+        2. 对每个关键文件/符号运行 `codegraph impact <符号>`
+        3. 运行 `codegraph callers` 和 `codegraph callees` 理解依赖关系
+        4. 将影响范围分析结果提供给 speckit-plan
+
+  after_plan:
+    - extension: codegraph
+      command: codegraph.verify-plan-structure
+      description: "验证 plan 中的模块结构是否与代码库一致"
+      optional: true
+      enabled: true
+      prompt: |
+        验证 plan.md 中提到的文件路径和模块是否在代码库中存在。
+
+        步骤：
+        1. 从 plan.md 提取文件路径和模块名
+        2. 运行 `codegraph files` 确认文件结构
+        3. 运行 `codegraph query "<路径>"` 确认关键文件存在
+
+  # ---------- implement 阶段 ----------
+  before_implement:
+    - extension: codegraph
+      command: codegraph.locate-implementation
+      description: "精准定位实现所需的代码位置"
+      optional: true
+      enabled: true
+      prompt: |
+        在 speckit-implement 开始实现前，使用 CodeGraph 精准定位代码。
+
+        步骤：
+        1. 从 tasks.md 中提取每个任务涉及的文件和符号
+        2. 运行 `codegraph node <文件路径>` 查看文件结构
+        3. 运行 `codegraph query "<关键符号>"` 定位具体代码位置
+        4. 将定位结果提供给 speckit-implement
+
+  # ---------- analyze 阶段 ----------
+  before_analyze:
+    - extension: codegraph
+      command: codegraph.cross-reference
+      description: "交叉验证 spec/plan/tasks 与代码库的一致性"
+      optional: true
+      enabled: true
+      prompt: |
+        在 speckit-analyze 阶段，使用 CodeGraph 交叉验证。
+
+        步骤：
+        1. 从 spec.md、plan.md、tasks.md 提取关键实体
+        2. 对每个实体运行 `codegraph query "<实体>"` 验证存在
+        3. 运行 `codegraph explore "<关键词>"` 确认没有遗漏的代码区域
+        4. 将验证结果提供给 speckit-analyze
