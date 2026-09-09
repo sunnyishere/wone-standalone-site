@@ -1,0 +1,88 @@
+<th:block th:fragment="publisherAbout">
+    <section class="library-publisher-card"
+             th:if="${libraryBrand != null or libraryFactory != null or libraryOwner != null}">
+        <div class="library-publisher-head">
+            <a class="device-aware-link"
+               th:if="${libraryBrandPath != null and libraryBrandPath != ''}"
+               th:href="${landingBaseUrl} + ${libraryBrandPath}"
+               th:title="${libraryBrandName}"
+               th:aria-label="${libraryBrandName}">
+                <img class="library-publisher-logo"
+                     th:src="${libraryBrand != null and libraryBrand.icon != null and libraryBrand.icon != ''
+                         ? libraryBrand.icon
+                         : (libraryOwner != null and libraryOwner.head != null and libraryOwner.head != ''
+                             ? libraryOwner.head : prodBrand.icon)}"
+                     th:alt="${libraryBrandName}">
+                <div class="library-publisher-name" th:text="${libraryBrandName}"></div>
+                <div class="library-publisher-type">Manufacturers</div>
+            </a>
+        </div>
+
+        <div class="library-publisher-body">
+            <div th:if="${libraryProfile != null and libraryProfile != ''
+                        or libraryFactory != null and (libraryFactory.companySize != null and libraryFactory.companySize != ''
+                            or libraryFactory.regDate != null and libraryFactory.regDate != '')
+                        or libraryLocation != null and libraryLocation != ''}">
+                <div class="library-publisher-profile-title"
+                     th:text="${advanced['profile']} ?: 'Profile'">Profile</div>
+                <div class="library-publisher-badges">
+                    <span th:if="${libraryFactory != null and libraryFactory.companySize != null and libraryFactory.companySize != ''}"
+                          th:text="${libraryFactory.companySize}"></span>
+                    <span th:if="${libraryFactory != null and libraryFactory.regDate != null and libraryFactory.regDate != ''}"
+                          th:text="${#strings.length(libraryFactory.regDate) >= 4
+                              ? #strings.substring(libraryFactory.regDate, 0, 4)
+                              : libraryFactory.regDate}"></span>
+                    <span th:if="${libraryLocation != null and libraryLocation != ''}"
+                          th:text="${libraryLocation}"></span>
+                </div>
+                <div class="library-publisher-profile dd-clamp-text-6"
+                     th:if="${libraryProfile != null and libraryProfile != ''}"
+                     th:text="${libraryProfile}"></div>
+            </div>
+
+            <div class="library-publisher-employees"
+                 th:if="${libraryEmployees != null and not libraryEmployees.isEmpty()}">
+                <a class="device-aware-link library-publisher-employee"
+                   th:each="employee, stat : ${libraryEmployees}"
+                   th:if="${stat.index < 3}"
+                   th:href="${employee.profileUrl != null and employee.profileUrl != ''
+                       ? landingBaseUrl + employee.profileUrl : '#'}"
+                   th:title="${employee.account}"
+                   th:aria-label="${employee.account}">
+                    <span class="library-publisher-avatar">
+                        <img th:if="${employee.auHead != null and employee.auHead != ''}"
+                             th:src="${employee.auHead}"
+                             th:alt="${employee.account}">
+                        <span th:unless="${employee.auHead != null and employee.auHead != ''}"
+                              th:text="${#strings.substring(employee.account, 0, 1)}"></span>
+                    </span>
+                    <span class="library-publisher-employee-copy">
+                        <span class="library-publisher-position" th:text="${employee.positions}"></span>
+                        <span class="library-publisher-employee-name" th:text="${employee.account}"></span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="library-publisher-videos"
+                 th:if="${libraryVideoIds != null and not libraryVideoIds.isEmpty()}">
+                <div class="library-publisher-video" th:each="videoId : ${libraryVideoIds}">
+                    <div class="library-publisher-video-frame">
+                        <iframe class="library-publisher-video-iframe"
+                                th:src="'https://www.youtube.com/embed/' + ${videoId} + '?enablejsapi=1'"
+                                th:title="${libraryBrandName} + ' video'"
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <a class="device-aware-link library-publisher-more"
+               th:if="${libraryBrandPath != null and libraryBrandPath != ''}"
+               th:href="${landingBaseUrl} + ${libraryBrandPath}"
+               th:title="${libraryBrandName}"
+               th:aria-label="${libraryBrandName}"
+               th:text="${advanced['learn.more']} ?: 'Learn more'">Learn more</a>
+        </div>
+    </section>
+</th:block>

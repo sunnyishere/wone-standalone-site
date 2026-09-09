@@ -84,7 +84,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang} + '/Home'" title="Home" aria-hidden="false" aria-label="Home"> <span
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " title="Home" aria-hidden="false" aria-label="Home"> <span
                     class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
             <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}"
                    aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
@@ -247,14 +247,32 @@
             </div>
 
             <!-- 文档资源库 -->
-            <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}">
-                <div id="target4" class="am-text-bold" >
-                    <h2 class="inline-header prod-h2-bg" th:text="${advanced['documentation.library']}+ '&nbsp;' +${prod.shortKeywords}"></h2>
+            <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}"
+                 th:with="documentsPageName=${#lists.isEmpty(topNavPages.?[pageType == 4]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')}">
+                <div id="target4" class="am-g">
+                    <div class="am-u-sm-8 am-text-bold prod-h2-bg dd-clamp-text-1 am-text-lg" style="padding: 0 4px;">
+                        <h2 class="inline-header" th:text="${advanced['documentation.library']}+ '&nbsp;' +${prod.shortKeywords}"></h2>
+                    </div>
+                    <div class="am-u-sm-4 am-text-right" style="padding: 0 4px;">
+                        <a th:title="${advanced['more']}"
+                           th:aria-label="${advanced['more']}"
+                           th:href="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName})"
+                           style="border: none;">
+                            <span style="color: #5C779F;text-decoration: underline;"
+                                  th:text="${advanced['more']}">More</span>
+                            <span class="p-icon-a-067 am-padding-left-sm" style="color: #5C779F"></span>
+                        </a>
+                    </div>
                 </div>
                 <div class="am-margin-bottom-sm"
                      style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div th:each="item : ${faLibraryList}">
-                        <div style="background-color: #FFFFFF;height: 100%;margin: 10px 0 15px 0;border-radius: 12px;border: 1px solid #E9E9E9;">
+                        <div class="product-library-card"
+                             th:data-detail-url="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName + '/' + item.slugTitle + '-' + item.id})"
+                             th:title="${item.name}"
+                             role="link"
+                             tabindex="0"
+                             style="background-color: #FFFFFF;height: 100%;margin: 10px 0 15px 0;border-radius: 12px;border: 1px solid #E9E9E9;cursor: pointer;">
                             <div class="am-g dd-hover4 am-padding" style="width: 100%;height: 100%;">
                                 <div style="display: flex;justify-content: left;">
                                     <div class="am-margin-right">
@@ -297,7 +315,7 @@
                                             <span th:if="${item.locale != 1 and item.locale != 2 and item.locale != 3}">Unknown Language</span>
                                         </div>
                                     </div>
-                                    <div class="PC-24">
+                                    <div class="PC-24 product-library-action">
                                         <!-- 公开 + 文档 -->
                                         <div class="am-show-lg-only" th:if="${item.isShow == 1 and item.type == 1}">
                                             <div th:if="${item.fileDatalis != null}">
@@ -353,7 +371,7 @@
                                 </div>
                             </div>
 
-                            <div class="am-hide-lg-only">
+                            <div class="am-hide-lg-only product-library-action">
                                 <div th:if="${item.isShow == 1 and item.type == 1}">
                                     <div th:if="${item.fileDatalis != null}"
                                          style="width: 100%;display: inline-flex;justify-content: center;">
@@ -821,6 +839,34 @@
         const iframeContainer = document.getElementById('videoIframeContainer');
         const playButtonPC = document.getElementById('playVideoBtn');
         const playButtonMobile = document.getElementById('playVideoBtnMobile');
+
+        document.body.addEventListener('click', function (event) {
+            if (event.target.closest && event.target.closest('.product-library-action, a, button, input, select, textarea')) {
+                return;
+            }
+
+            const card = event.target.closest ? event.target.closest('.product-library-card') : null;
+            const detailUrl = card && card.getAttribute('data-detail-url');
+            if (detailUrl) {
+                window.location.href = detailUrl;
+            }
+        });
+
+        document.body.addEventListener('keydown', function (event) {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+            if (event.target.closest && event.target.closest('.product-library-action, a, button, input, select, textarea')) {
+                return;
+            }
+
+            const card = event.target.closest ? event.target.closest('.product-library-card') : null;
+            const detailUrl = card && card.getAttribute('data-detail-url');
+            if (detailUrl) {
+                event.preventDefault();
+                window.location.href = detailUrl;
+            }
+        });
 
         function handlePlayVideo(button) {
             let iframeCode = button.getAttribute('data-video-iframe');

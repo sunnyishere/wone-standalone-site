@@ -148,6 +148,8 @@ public class RockwillKnowledgeService {
     private String cdnPrefix;
     @Value("${cdn.version}")
     private String version;
+    @Value("${landingBaseUrl:https://www.iee-business.com}")
+    private String landingBaseUrl;
 
     /**
      * 查询网页菜单
@@ -221,6 +223,7 @@ public class RockwillKnowledgeService {
                 if (model != null) {
                     model.put("cdnEnabled", cdnEnabled);
                     model.put("cdnPrefix", cdnPrefix);
+                    model.put("landingBaseUrl", landingBaseUrl);
                     model.put("version", version);
                     if (model.containsKey("brandUrl")) {
                         String brandUrl = model.get("brandUrl").toString();
@@ -234,6 +237,7 @@ public class RockwillKnowledgeService {
                         model.put("langEName", "english");
                     }
                     handleDateKey(model);
+                    handleLibraryFileSize(model);
                     if (model.containsKey("prodFaqList")) {
                         model.put("pageFaqList", model.get("prodFaqList"));
                     }
@@ -395,9 +399,17 @@ public class RockwillKnowledgeService {
     List<String> dateList = Arrays.asList("created", "updated");
 
     private void handleDateKey(Map<String, Object> model) {
+        handleDateKey(model, null);
+    }
+
+    private void handleDateKey(Map<String, Object> model, String parentKey) {
         for (Map.Entry<String, Object> entry : model.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
+            // advanced.updated 是页面文案，不是日期字段。
+            if ("advanced".equals(parentKey) && "updated".equals(key)) {
+                continue;
+            }
             // 1. 如果当前值是需要转换的日期键，且是字符串类型，则进行转换
             if (dateList.contains(key) && value instanceof String
                     && !ObjectUtils.isEmpty(value)) {
@@ -416,7 +428,7 @@ public class RockwillKnowledgeService {
             else if (value instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> nestedMap = (Map<String, Object>) value;
-                handleDateKey(nestedMap);
+                handleDateKey(nestedMap, key);
             } else if (value instanceof List) {
                 @SuppressWarnings("unchecked")
                 List<Object> list = (List<Object>) value;
@@ -424,10 +436,60 @@ public class RockwillKnowledgeService {
                     if (item instanceof Map) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> mapInList = (Map<String, Object>) item;
-                        handleDateKey(mapInList);
+                        handleDateKey(mapInList, key);
                     }
                 }
             }
+        }
+    }
+
+    private void handleLibraryFileSize(Map<String, Object> model) {
+        Object libraryValue = model.get("library");
+        if (!(libraryValue instanceof Map)) {
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> library = (Map<String, Object>) libraryValue;
+        if ("2".equals(String.valueOf(library.get("type")))) {
+            model.put("libraryFileSize", "");
+            return;
+        }
+        Object fileValue = model.get("libraryFile");
+        if (!(fileValue instanceof Map)) {
+            model.put("libraryFileSize", "");
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, Object> libraryFile = (Map<String, Object>) fileValue;
+        model.put("libraryFileSize", formatFileSize(libraryFile.get("size")));
+    }
+
+    private String formatFileSize(Object rawSize) {
+        if (rawSize == null || StringUtils.isBlank(rawSize.toString())) {
+            return "";
+        }
+        try {
+            long bytes = Long.parseLong(rawSize.toString().trim());
+            if (bytes < 0) {
+                return "";
+            }
+            if (bytes < 1024) {
+                return bytes + " B";
+            }
+            String[] units = {"KB", "MB", "GB", "TB"};
+            double value = bytes;
+            int unitIndex = -1;
+            do {
+                value /= 1024D;
+                unitIndex++;
+            } while (value >= 1024D && unitIndex < units.length - 1);
+            String formattedValue = String.format(Locale.ROOT, "%.1f", value);
+            if (formattedValue.endsWith(".0")) {
+                formattedValue = formattedValue.substring(0, formattedValue.length() - 2);
+            }
+            return formattedValue + " " + units[unitIndex];
+        } catch (NumberFormatException e) {
+            return "";
         }
     }
 

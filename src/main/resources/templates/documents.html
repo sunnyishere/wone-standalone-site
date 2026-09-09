@@ -194,7 +194,22 @@
                         <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
                              th:if="${not #lists.isEmpty(pageData.rows)}"
                              th:each="item : ${pageData.rows}">
-                            <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                            <div class="library-list-card"
+                                 th:data-detail-url="${currentPathLang} + '/' +
+                                 ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' +
+                                 ${item.slugTitle} + '-' + ${item.id}"
+                                 th:title="${item.name}"
+                                 role="link"
+                                 tabindex="0"
+                                 style="background-color: #F9F9F9;border-radius: 12px;">
+                                <a class="library-detail-link"
+                                   th:href="${currentPathLang} + '/' +
+                                   ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' +
+                                   ${item.slugTitle} + '-' + ${item.id}"
+                                   th:title="${item.name}"
+                                   tabindex="-1"
+                                   aria-hidden="true"
+                                   style="display:none"></a>
                                 <div class="am-g dd-hover4 am-padding" style="width: 100%;">
                                     <div style="am-cf">
                                         <div class="am-fl am-margin-right">
@@ -231,7 +246,7 @@
                                                     </div>
                                                 </div>
                                                 <!-- 文件/视频区域 -->
-                                                <div class="am-fr" th:if="${item.isShow} == 1"
+                                                <div class="am-fr library-list-action" th:if="${item.isShow} == 1"
                                                      style="border: 1px solid var(--theme-wone);margin-top: 40px; border-radius: 100px; padding: 4px 8px 4px 20px; color: var(--theme-wone);
                                                 display: inline-flex; align-items: center; background-color: #FFFFFF">
 
@@ -255,10 +270,10 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="am-fr"
+                                                <div class="am-fr library-list-action"
                                                      data-trigger="modal-1"
                                                      data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                     th:data-biz-id="'site-documents-'+${item.id}"
+                                                     th:data-biz-id="'documents-'+${item.id}"
                                                      th:if="${item.isShow} == 0"
                                                      style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
                                                     <span th:text="${advanced['consulting']}"></span>
@@ -336,6 +351,21 @@
 <th:block th:replace="footer :: footer"></th:block>
 
 <style>
+    .library-list-card {
+        position: relative;
+        cursor: pointer;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .library-list-card:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 10px 24px rgba(20, 42, 66, .12);
+    }
+
+    .library-list-action {
+        cursor: pointer;
+    }
+
     /* 视频模态框样式 */
     .video-modal {
         position: fixed;
@@ -425,6 +455,43 @@
         if (!videoModal || !closeButton || !iframeContainer || !document.body) {
             return;
         }
+
+        // 点击卡片进入详情，下载、视频和咨询区域仍执行原有动作。
+        document.body.addEventListener('click', function (event) {
+            var action = event.target.closest ? event.target.closest('.library-list-action') : null;
+            if (action) {
+                var downloadLink = action.querySelector('a[download]');
+                if (downloadLink && !(event.target.closest && event.target.closest('a[download]'))) {
+                    downloadLink.click();
+                }
+                return;
+            }
+
+            if (event.target.closest && event.target.closest('a, button, input, select, textarea')) {
+                return;
+            }
+
+            var card = event.target.closest ? event.target.closest('.library-list-card') : null;
+            var detailUrl = card && card.getAttribute('data-detail-url');
+            if (detailUrl) {
+                window.location.href = detailUrl;
+            }
+        });
+
+        document.body.addEventListener('keydown', function (event) {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+            if (event.target.closest && event.target.closest('.library-list-action, a, button, input, select, textarea')) {
+                return;
+            }
+            var card = event.target.closest ? event.target.closest('.library-list-card') : null;
+            var detailUrl = card && card.getAttribute('data-detail-url');
+            if (detailUrl) {
+                event.preventDefault();
+                window.location.href = detailUrl;
+            }
+        });
 
         // 处理所有播放按钮（使用事件委托）
         document.body.addEventListener('click', function (event) {

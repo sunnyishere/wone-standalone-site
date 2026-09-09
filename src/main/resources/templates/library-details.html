@@ -1,0 +1,268 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null ? currentLang : 'en'}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
+    <meta name="description" th:content="${library.description ?: library.name}">
+    <meta name="keywords" th:content="${library.label ?: ''}">
+    <link rel="canonical"
+          th:if="${websitePath != null and pageName != null and suffix != null}"
+          th:href="${#strings.concat(
+              #strings.endsWith(websitePath, '/') ? #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
+              (currentLang != null and not #strings.startsWith(currentLang, 'en')) ? ('/' + currentLang) : '',
+              '/' + pageName,
+              #strings.startsWith(suffix, '/') ? suffix : '/' + suffix)}">
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta property="og:title" th:content="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}">
+    <meta property="og:description" th:content="${library.description ?: library.name}">
+    <meta property="og:type" content="article">
+    <meta property="og:image" th:content="${library.icon}">
+    <meta property="og:locale" th:content="${currentLang}">
+    <meta property="og:site_name" th:content="'@' + ${prodBrand.eName ?: 'DefaultBrand'}">
+    <meta name="twitter:title" th:content="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}">
+    <meta name="twitter:description" th:content="${library.description ?: library.name}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" th:content="${library.icon}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="head :: faqStyle"></th:block>
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}"></script>
+    <style>
+        .library-detail-page { padding-bottom: 35px; }
+        .library-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+        .library-detail-panel { margin-bottom: 18px; padding: 25px; border: 1px solid #e9e9e9; border-radius: 12px; background: #fff; }
+        .library-detail-hero { display: flex; gap: 24px; align-items: flex-start; }
+        .library-detail-cover { width: 220px; height: 220px; flex: 0 0 220px; object-fit: cover; border: 1px solid #e9e9e9; border-radius: 12px; background: #f8f8f8; }
+        .library-detail-eyebrow { color: var(--theme-wone); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+        .library-detail-title { margin: 8px 0 10px; color: #1d1d1f; font-size: 30px; line-height: 1.25; }
+        .library-detail-lead { margin: 0; color: #6c6c6c; font-size: 16px; line-height: 1.65; }
+        .library-detail-facts { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 20px; overflow: hidden; border: 1px solid #e6e6e6; border-radius: 10px; }
+        .library-detail-fact { min-width: 0; padding: 13px 15px; border-right: 1px solid #e6e6e6; }
+        .library-detail-fact:last-child { border-right: 0; }
+        .library-detail-fact small { display: block; color: #767676; text-transform: uppercase; }
+        .library-detail-fact strong { display: block; margin-top: 4px; color: #1d1d1f; }
+        .library-detail-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .library-detail-tag { padding: 4px 10px; color: var(--theme-wone); border: 1px solid color-mix(in srgb, var(--theme-wone) 25%, white); border-radius: 100px; background: color-mix(in srgb, var(--theme-wone) 6%, white); }
+        .library-detail-action-wrap { margin-top: 20px; padding: 20px; border: 1px solid color-mix(in srgb, var(--theme-wone) 30%, white); border-radius: 12px; background: color-mix(in srgb, var(--theme-wone) 5%, white); }
+        .library-detail-action { display: flex; width: 100%; min-height: 54px; align-items: center; justify-content: center; color: #fff !important; border: 0; border-radius: 10px; background: var(--theme-wone); font-size: 16px; font-weight: 700; cursor: pointer; }
+        .library-detail-action:hover { color: #fff !important; opacity: .9; }
+        .library-detail-content { color: #333; font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
+        .library-detail-content img { max-width: 100% !important; height: auto !important; }
+        .library-detail-heading { margin: 0 0 18px; color: #1d1d1f; font-size: 22px; }
+        .library-publisher-card { margin-bottom: 18px; padding: 20px; background: #fff; }
+        .library-publisher-head { width: 100%; padding: 10px 10px 18px; border-bottom: 1px solid #e6e6e6; text-align: center; }
+        .library-publisher-head > a { display: block; border: 0; }
+        .library-publisher-logo { width: 80px; height: 80px; object-fit: contain; border: 1px solid #e9e9e9; border-radius: 10px; background: #fff; }
+        .library-publisher-name { display: -webkit-box; margin-top: 18px; overflow: hidden; color: #0a1f44; font-size: 16px; font-weight: 700; overflow-wrap: break-word; word-break: break-word; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .library-publisher-type { margin-top: 4px; overflow: hidden; color: #5c779f; font-size: 14px; white-space: nowrap; text-overflow: ellipsis; }
+        .library-publisher-body { padding: 18px 10px 0; }
+        .library-publisher-profile-title { color: #0a1f44; font-size: 16px; font-weight: 700; }
+        .library-publisher-badges { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 12px; }
+        .library-publisher-badges span { display: inline-flex; min-height: 30px; align-items: center; padding: 5px 10px; color: #2a4c7b; border-radius: 999px; background: #f0f5ff; font-size: 10px; font-weight: 700; }
+        .library-publisher-profile { display: -webkit-box; padding-top: 14px; overflow: hidden; color: #3f4a5a; font-size: 12px; line-height: 1.4; white-space: normal; -webkit-box-orient: vertical; -webkit-line-clamp: 6; }
+        .library-publisher-employees { padding-top: 4px; }
+        .library-publisher-employee { display: flex; align-items: center; margin-top: 12px; padding: 12px 14px; color: inherit !important; border: 1px solid #e8ecf3; border-radius: 16px; background: #fff; }
+        .library-publisher-avatar { display: flex; width: 42px; height: 42px; flex: 0 0 42px; align-items: center; justify-content: center; overflow: hidden; color: #2a4c7b; border-radius: 50%; background: #eef4ff; font-size: 18px; font-weight: 700; }
+        .library-publisher-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .library-publisher-employee-copy { min-width: 0; padding-left: 10px; }
+        .library-publisher-position, .library-publisher-employee-name { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .library-publisher-position { color: #5c779f; font-size: 10px; }
+        .library-publisher-employee-name { color: #0a1f44; font-size: 12px; font-weight: 700; }
+        .library-publisher-videos { margin-top: 14px; padding-top: 2px; border-top: 1px solid #eef1f5; }
+        .library-publisher-video { margin-top: 14px; padding: 14px; border: 1px solid #dce6f2; border-radius: 20px; background: #fff; }
+        .library-publisher-video-frame { position: relative; width: 100%; padding-top: 56.25%; overflow: hidden; border-radius: 16px; background: #000; }
+        .library-publisher-video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .library-publisher-more { display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; margin-top: 24px; color: #fff !important; border-radius: 999px; background: var(--theme-wone); font-size: 16px; font-weight: 700; }
+        .library-related-list { display: grid; gap: 12px; }
+        .library-related-item { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; padding: 10px; color: inherit !important; border: 1px solid #e9e9e9; border-radius: 10px; background: #fff; transition: transform .2s ease, box-shadow .2s ease; }
+        .library-related-item:hover { transform: translateY(-2px); box-shadow: 0 7px 18px rgba(20, 42, 66, .1); }
+        .library-related-image { width: 76px; height: 76px; object-fit: cover; border-radius: 8px; background: #f5f5f5; }
+        .library-related-category { color: var(--theme-wone); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .library-related-title { display: -webkit-box; margin-top: 3px; overflow: hidden; color: #1d1d1f; font-weight: 700; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .library-related-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; color: #767676; font-size: 11px; }
+        .library-video-modal { display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center; padding: 35px 20px; background: rgba(0, 0, 0, .82); }
+        .library-video-dialog { position: relative; width: 90%; max-width: 1000px; }
+        .library-video-close { position: absolute; top: -42px; right: 0; color: #fff; border: 0; background: transparent; font-size: 30px; cursor: pointer; }
+        .library-video-frame { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
+        .library-video-container { position: absolute; inset: 0; }
+        .library-video-container iframe { width: 100% !important; height: 100% !important; border: 0; }
+        @media (max-width: 900px) { .library-detail-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 640px) {
+            .library-detail-panel { padding: 18px; border-radius: 0; }
+            .library-detail-hero { display: block; }
+            .library-detail-cover { width: 150px; height: 150px; margin-bottom: 15px; }
+            .library-detail-title { font-size: 24px; }
+            .library-detail-facts { grid-template-columns: 1fr; }
+            .library-detail-fact { border-right: 0; border-bottom: 1px solid #e6e6e6; }
+            .library-detail-fact:last-child { border-bottom: 0; }
+        }
+    </style>
+</head>
+<body class="body-bg">
+<header class="m-hd" style="background-color:var(--theme-header-bg);">
+    <th:block th:replace="pc-en :: section(param1='documents-'+${library.id})"></th:block>
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height">占位边距</div>
+
+<nav class="m-cat-nav">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:text="${advanced['home.button']}" th:title="${advanced['home.button']}"></a></li>
+            <li><a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName ?: 'Documents'}" th:title="${i18nName ?: 'Documents'}"></a></li>
+            <li class="am-active" th:if="${library.eName != null and library.eName != ''}">
+                <a th:href="${currentPathLang} + '/' + ${pageName} + '/' + ${#strings.toLowerCase(#strings.replace(#strings.trim(library.faAssoc.name), ' ', '-'))} + '-' + ${library.fid}"
+                   th:text="${library.eName}" th:title="${library.eName}"></a>
+            </li>
+        </ol>
+    </div>
+</nav>
+
+<main class="am-container phone-clear-padding library-detail-page">
+    <div class="library-detail-grid">
+        <div>
+            <article class="library-detail-panel">
+                <div class="library-detail-hero">
+                    <img class="library-detail-cover" th:src="${library.icon != null and library.icon != '' ? library.icon : '/images/case-bg.jpg'}" th:alt="${library.name}">
+                    <div>
+                        <div class="library-detail-eyebrow">
+                            <span th:text="${library.eName ?: libraryFileType}"></span>
+                            <span th:if="${libraryBrandName != null and libraryBrandName != ''}" th:text="' · ' + ${libraryBrandName}"></span>
+                        </div>
+                        <h1 class="library-detail-title" th:text="${library.name}"></h1>
+                        <p class="library-detail-lead" th:if="${library.description != null and library.description != ''}" th:text="${library.description}"></p>
+                    </div>
+                </div>
+
+                <div class="library-detail-facts">
+                    <div class="library-detail-fact">
+                        <small th:text="${advanced['updated']} ?: 'Updated'">Updated</small>
+                        <strong th:text="${#dates.format(library.updated != null ? library.updated : library.created, 'yyyy.MM')}"></strong>
+                    </div>
+                    <div class="library-detail-fact">
+                        <small th:text="${advanced['language']} ?: 'Language'">Language</small>
+                        <strong th:text="${libraryLanguage}"></strong>
+                    </div>
+                    <div class="library-detail-fact">
+                        <small th:text="${advanced['file']} ?: 'File'">File</small>
+                        <strong>
+                            <span th:text="${libraryFileType}"></span>
+                            <span th:if="${library.type != 2 and libraryFileSize != null and libraryFileSize != ''}" th:text="' · ' + ${libraryFileSize}"></span>
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="library-detail-tags" th:if="${libraryTags != null and not libraryTags.isEmpty()}">
+                    <span class="library-detail-tag" th:each="tag : ${libraryTags}" th:text="${tag}"></span>
+                </div>
+
+                <div class="library-detail-action-wrap">
+                    <a class="library-detail-action"
+                       th:if="${library.isShow == 1 and library.type == 1 and libraryFile != null and libraryFile['url'] != null}"
+                       th:href="${libraryFile['url']}" th:download="${libraryFile['name']}">
+                        <span class="p-icon-a-0031 am-padding-right-sm"></span>
+                        <span th:text="${advanced['download']} ?: 'Download'">Download</span>
+                    </a>
+                    <button type="button" class="library-detail-action library-video-button"
+                            th:if="${library.isShow == 1 and library.type == 2 and library.url != null and library.url != ''}"
+                            th:data-video-iframe="${library.url}">
+                        <span class="p-icon-a-0051 am-padding-right-sm"></span>
+                        <span th:text="${advanced['watch.video']} ?: 'Watch Video'">Watch Video</span>
+                    </button>
+                    <button type="button" class="library-detail-action rfq-trigger"
+                            th:if="${library.isShow == 0}" data-trigger="modal-1"
+                            data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0}"
+                            th:data-biz-id="'documents-' + ${library.id}"><span th:text="${advanced['consulting'] ?: 'Consulting'}">Consulting</span></button>
+                </div>
+            </article>
+
+            <section class="library-detail-panel" th:if="${library.content != null and library.content != ''}">
+                <h2 class="library-detail-heading" th:text="${advanced['document.description'] ?: 'Document description'}">Document description</h2>
+                <div class="library-detail-content" th:utext="${library.content}"></div>
+            </section>
+
+            <section class="library-detail-panel" th:if="${relatedProducts != null and not relatedProducts.isEmpty()}">
+                <th:block th:replace="section-related-cards :: relatedCards(${relatedProducts}, ${advanced['related.products'] ?: 'Related products'}, ${advanced['more'] ?: 'More'}, ${productsPagePath})"></th:block>
+            </section>
+
+            <section class="library-detail-panel"
+                     th:if="${libraryFaqList != null and not libraryFaqList.isEmpty()}">
+                <th:block th:replace="section-faq :: faqSection(${libraryFaqList})"></th:block>
+            </section>
+        </div>
+
+        <aside>
+            <th:block th:replace="section-publisher-about :: publisherAbout"></th:block>
+            <section class="library-detail-panel" th:if="${relatedLibraries != null and not relatedLibraries.isEmpty()}">
+                <h2 class="library-detail-heading" th:text="${(advanced['related'] ?: 'Related') + ' ' + (advanced['documents'] ?: 'Documents')}">Related Documents</h2>
+                <div class="library-related-list">
+                    <a class="library-related-item" th:each="item : ${relatedLibraries}"
+                       th:href="${currentPathLang} + '/' + ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' + ${item.slugTitle} + '-' + ${item.id}"
+                       th:title="${item.name}">
+                        <img class="library-related-image" th:src="${item.icon != null and item.icon != '' ? item.icon : '/images/case-bg.jpg'}" th:alt="${item.name}">
+                        <span>
+                            <span class="library-related-category" th:text="${item.eName ?: 'Library'}"></span>
+                            <span class="library-related-title" th:text="${item.name}"></span>
+                            <span class="library-related-meta"><span th:text="${item.remark}"></span><span th:text="${#dates.format(item.created, 'yyyy.MM')}"></span></span>
+                        </span>
+                    </a>
+                </div>
+            </section>
+        </aside>
+    </div>
+</main>
+
+<div class="library-video-modal" id="libraryVideoModal">
+    <div class="library-video-dialog">
+        <button type="button" class="library-video-close" id="libraryVideoClose" aria-label="Close">&times;</button>
+        <div class="library-video-frame"><div class="library-video-container" id="libraryVideoContainer"></div></div>
+    </div>
+</div>
+
+<th:block th:replace="search :: search"></th:block>
+<th:block th:replace="inquiry :: inquiry"></th:block>
+<th:block th:replace="right-menu :: right-menu(param1='documents-'+${library.id})"></th:block>
+<th:block th:replace="footer :: footer"></th:block>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = document.getElementById('libraryVideoModal');
+        var closeButton = document.getElementById('libraryVideoClose');
+        var container = document.getElementById('libraryVideoContainer');
+        if (!modal || !closeButton || !container) return;
+
+        function closeVideo() {
+            modal.style.display = 'none';
+            container.innerHTML = '';
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('click', function (event) {
+            var button = event.target.closest ? event.target.closest('.library-video-button') : null;
+            if (button) {
+                var iframeCode = button.getAttribute('data-video-iframe') || '';
+                if (/^\s*<iframe\b[\s\S]*<\/iframe>\s*$/i.test(iframeCode)) {
+                    container.innerHTML = iframeCode;
+                    var iframe = container.querySelector('iframe');
+                    if (iframe) {
+                        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                        iframe.allowFullscreen = true;
+                    }
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            if (event.target === modal) closeVideo();
+        });
+        closeButton.addEventListener('click', closeVideo);
+        document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeVideo(); });
+    });
+</script>
+</body>
+</html>

@@ -1,8 +1,6 @@
 package com.rockwill.deploy.service;
 
 import cn.hutool.core.io.FileUtil;
-import com.redfin.sitemapgenerator.ChangeFreq;
-import com.redfin.sitemapgenerator.WebSitemapUrl;
 import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
 import com.rockwill.deploy.utils.*;
@@ -36,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -80,7 +77,7 @@ public class StaticPageService {
     @Qualifier("rockwillTaskExecutor")
     private ThreadPoolTaskExecutor taskExecutor;
 
-    Map<String, List<WebSitemapUrl>> webSitemapUrls = new ConcurrentHashMap<>();
+    Map<String, Map<Integer, ConcurrentHashMap<String, SitemapGroup>>> webSitemapGroups = new ConcurrentHashMap<>();
 
 
     Map<String, List<String>> detailUrlNap = new ConcurrentHashMap<>();
@@ -88,7 +85,7 @@ public class StaticPageService {
     @Async("rockwillTaskExecutor")
     public void triggerGenPages(String domain, Map<Integer, Set<Long>> todayUpdatedIds) {
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
-        webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
+        webSitemapGroups.put(domain, new ConcurrentHashMap<>());
         int state = 0;
         String reason = "";
         try {
@@ -101,6 +98,13 @@ public class StaticPageService {
                 new File(domainPath).mkdirs();
             }
             generateMenuAndDetailPage("", domain, todayUpdatedIds);
+            for (String lang : SiteMenuUtils.getLangList()) {
+                generateMenuAndDetailPage(lang, domain, todayUpdatedIds);
+            }
+
+            siteSitemapUtils.generateStaticSitemap(domain, webSitemapGroups.get(domain));
+            webSitemapGroups.remove(domain);
+            RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
             state = 2;
         } catch (Exception e) {
             log.error("triggerGenPages exception: {}", domain, e);
@@ -126,7 +130,7 @@ public class StaticPageService {
             return;
         }
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
-        webSitemapUrls.put(domain, new CopyOnWriteArrayList<>());
+        webSitemapGroups.put(domain, new ConcurrentHashMap<>());
         try {
             copyStaticResources(domain);
             generateIndexPage(domain);
@@ -141,7 +145,8 @@ public class StaticPageService {
                 generateMenuAndDetailPage(lang, domain, null);
             }
 
-            siteSitemapUtils.generateStaticSitemap(domain, webSitemapUrls.get(domain));
+            siteSitemapUtils.generateStaticSitemap(domain, webSitemapGroups.get(domain));
+            webSitemapGroups.remove(domain);
             RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
         } catch (Exception e) {
             log.error("Failed to generating {} html files", domain, e);
@@ -160,7 +165,7 @@ public class StaticPageService {
                 return;
             }
             saveHtml(domain, "index", domainHtmlVo.getHtmlContent());
-            addWebSitemap(domainHtmlVo.getHtmlContent(), "", 1.0, domain);
+            addWebSitemap(domainHtmlVo.getHtmlContent(), "", 1.0, domain, "", SitePage.SitePageType.HOME);
             log.info("End of generating index html files,site: {}", domain);
             String content404=templateEnginePageRenderer.renderPage("404",domainHtmlVo.getModelMap());
             saveHtml(domain, "404", content404);
@@ -205,11 +210,11 @@ public class StaticPageService {
             if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 saveHtml(domain, pageName, domainHtmlVo.getHtmlContent());
                 addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + pageName,
-                        sitePage.getPageType() == SitePage.SitePageType.HOME ? 0.8 : 0.64, domain);
+                        getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
                 if (sitePage.getPageType() == SitePage.SitePageType.HOME) {
                     //其他语种首页
                     saveHtml(domain, lang, domainHtmlVo.getHtmlContent());
-                    addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 0.8, domain);
+                    addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 1.0, domain, lang, SitePage.SitePageType.HOME);
                     continue;
                 }
                 List<CompletableFuture<Void>> pageTaskList = processPagination(sitePage, null, domainHtmlVo, false, lang, domain, updatedIdsByType);
@@ -223,8 +228,7 @@ public class StaticPageService {
                     }, taskExecutor);
                     futures.add(menuTask);
                 }
-                if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
-                        && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
+                if (sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
                     List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, domainHtmlVo, lang, domain, updatedIdsByType);
                     if (!detailTasks.isEmpty()) {
                         futures.addAll(detailTasks);
@@ -260,13 +264,12 @@ public class StaticPageService {
                 if (menuPageVo!=null && !ObjectUtils.isEmpty(menuPageVo.getHtmlContent())){
                     saveHtml(domain, menuName, menuPageVo.getHtmlContent());
                     if (p != 1) {
-                        addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, 0.64, domain);
+                        addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
                     }
 
                     //仅对菜单根列表页面进行处理详情采集
                     if (p >= 2 && !isSubMenu) {
-                        if (sitePage.getPageType() != SitePage.SitePageType.DOCUMENTS
-                                && sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
+                        if (sitePage.getPageType() != SitePage.SitePageType.PROFILE) {
                             List<CompletableFuture<Void>> detailTasks = processDetailPages(sitePage, menuPageVo, lang, domain, updatedIdsByType);
                             if (!detailTasks.isEmpty()) {
                                 futures.addAll(detailTasks);
@@ -319,7 +322,7 @@ public class StaticPageService {
                 }
                 DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
                 saveHtml(domain, docName, subVo.getHtmlContent());
-                addWebSitemap(subVo.getHtmlContent(), "/" + docName, 0.64, domain);
+                addWebSitemap(subVo.getHtmlContent(), "/" + docName, 1.0, domain, lang, SitePage.SitePageType.DOCUMENTS);
                 SitePage sub = new SitePage();
                 sub.setPageName(sort.substring(0, sort.lastIndexOf("-")));
                 sub.setId(Long.parseLong(sort.substring(sort.lastIndexOf("-") + 1)));
@@ -346,7 +349,7 @@ public class StaticPageService {
             return new ArrayList<>();
         }
         saveHtml(domain, docName, categoryVo.getHtmlContent());
-        addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, 0.64, domain);
+        addWebSitemap(categoryVo.getHtmlContent(), "/" + docName, getPriorityByPageType(menu.getPageType().intValue()), domain, lang, menu.getPageType().intValue());
         List<CompletableFuture<Void>> futures = processPagination(menu, sitePage, categoryVo, true, lang, domain, null);
         return futures;
     }
@@ -354,7 +357,7 @@ public class StaticPageService {
     public List<CompletableFuture<Void>> processDetailPages(SitePage sitePage, DomainHtmlVo domainHtmlVo, String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {
         log.info("Start generating details html files,detail:{}", sitePage.getPageName());
         List<CompletableFuture<Void>> futureList = new ArrayList<>();
-        String cssQuery = "";
+        String cssQuery = getDetailCssQuery(sitePage.getPageType());
         if (sitePage.getPageType() == 3) {
             cssQuery = "a.inline-a-link";
         } else if (sitePage.getPageType() == 2 || sitePage.getPageType() == 5 || sitePage.getPageType() == 7
@@ -362,7 +365,7 @@ public class StaticPageService {
             cssQuery = "li.dd-hover4 > a";
         }
         if (ObjectUtils.isEmpty(cssQuery)) {
-            log.error("Currently, only products, news, solutions, Blog, and Success Reference are supported for static details.");
+            log.error("Currently, only products, documents, news, solutions, Blog, and Success Reference are supported for static details.");
             return new ArrayList<>();
         }
         boolean incrementalEnabled = isIncrementalDetailType(sitePage.getPageType(), updatedIdsByType);
@@ -385,7 +388,7 @@ public class StaticPageService {
             CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
                 DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
                 saveHtml(domain, detailUrl, subVo.getHtmlContent());
-                addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, sitePage.getPageType() == 2 ? 0.9 : 0.8, domain);
+                addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
                 if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
                     if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
                         List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
@@ -404,6 +407,21 @@ public class StaticPageService {
         }
         log.info("End of generating details html files,detail: {}", sitePage.getPageName());
         return futureList;
+    }
+
+    String getDetailCssQuery(Long pageType) {
+        if (pageType == null) {
+            return "";
+        }
+        String cssQuery = "";
+        if (pageType == SitePage.SitePageType.DOCUMENTS) {
+            cssQuery = "a.library-detail-link";
+        } else if (pageType == 3) {
+            cssQuery = "a.inline-a-link";
+        } else if (pageType == 2 || pageType == 5 || pageType == 7 || pageType == 8) {
+            cssQuery = "li.dd-hover4 > a";
+        }
+        return cssQuery;
     }
 
     private boolean isIncrementalDetailType(Long pageType, Map<Integer, Set<Long>> updatedIdsByType) {
@@ -425,7 +443,7 @@ public class StaticPageService {
         return ids == null ? Collections.emptySet() : ids;
     }
 
-    private List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {
+    List<String> getDetailLinkFromPage(String htmlContent, String cssQuery) {
         try {
             Document document = Jsoup.parse(htmlContent);
             Elements directChildLinks = document.select(cssQuery);
@@ -567,6 +585,21 @@ public class StaticPageService {
         return fileName.replaceAll("\\s", "-").replaceAll("[\\\\:*?\"<>|]", "");
     }
 
+    /**
+     * 根据页面类型返回 sitemap 优先级
+     */
+    private double getPriorityByPageType(int pageType) {
+        if (pageType == SitePage.SitePageType.HOME
+                || pageType == SitePage.SitePageType.SOLUTIONS
+                || pageType == SitePage.SitePageType.BLOG
+                || pageType == SitePage.SitePageType.SUCCESS_REFERENCE) {
+            return 1.0;
+        } else if (pageType == SitePage.SitePageType.PRODUCTS) {
+            return 0.9;
+        }
+        return 0.6;
+    }
+
 
     private boolean isHttpsSupported(String domain) {
         try {
@@ -584,24 +617,45 @@ public class StaticPageService {
         }
     }
 
-    private void addWebSitemap(String html, String uri, double priority, String domain) {
+    private void addWebSitemap(String html, String uri, double priority, String domain, String lang, int pageType) {
         if (ObjectUtils.isEmpty(html)) {
             return;
         }
-        String baseUrl = "https://" + domain;
-        String url = baseUrl + uri;
-        try {
-            WebSitemapUrl index = new WebSitemapUrl.Options(url)
-                    .lastMod(new Date())
-                    .priority(priority)
-                    .changeFreq(ChangeFreq.DAILY)
-                    .build();
-            if (webSitemapUrls.containsKey(domain)) {
-                webSitemapUrls.get(domain).add(index);
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+        uri = sanitizeFileName(uri);
+        String uriBase = extractUriBase(uri, lang);
+        boolean isDefault = ObjectUtils.isEmpty(lang);
+
+        Map<Integer, ConcurrentHashMap<String, SitemapGroup>> typeGroups =
+                webSitemapGroups.computeIfAbsent(domain, k -> new ConcurrentHashMap<>());
+        ConcurrentHashMap<String, SitemapGroup> groups =
+                typeGroups.computeIfAbsent(pageType, k -> new ConcurrentHashMap<>());
+
+        SitemapGroup group = groups.computeIfAbsent(uriBase, k -> {
+            SitemapGroup g = new SitemapGroup(uriBase, pageType);
+            g.setLastMod(new Date());
+            return g;
+        });
+
+        SitemapGroup.LangEntry entry = new SitemapGroup.LangEntry(uri, lang, priority, isDefault);
+        group.getLangEntries().put(lang, entry);
+        group.setLastMod(new Date());
+    }
+
+    /**
+     * 从完整 URI 中提取不含语言前缀的 base URI
+     */
+    private String extractUriBase(String uri, String lang) {
+        if (ObjectUtils.isEmpty(lang) || ObjectUtils.isEmpty(uri)) {
+            return uri;
         }
+        String langPrefix = "/" + lang;
+        if (uri.equals(langPrefix)) {
+            return "";
+        }
+        if (uri.startsWith(langPrefix + "/")) {
+            return uri.substring(langPrefix.length());
+        }
+        return uri;
     }
 
 }

@@ -10,6 +10,11 @@ server:
       min-spare: 100
     connection-timeout: 20000
 
+spring:
+  servlet:
+      multipart:
+        max-file-size: 100MB
+        max-request-size: 100MB
 
 logging:
   level:
@@ -17,15 +22,9 @@ logging:
     org.springframework: warn
 
 
-spring:
-  profiles:
-    active: dev
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    cache: false
+landingBaseUrl: https://www.iee-business.com
 
-wcm-api: http://192.168.35.11/wcm-api/site/static/
+wcm-api: http://192.168.35.16/wcm-api/site/static/
 brand:
   languages: en,fr,pl,et,bn,id,uk,cs,kn,gl,pa,sv,pt,no,ar,ku,hr,fi,eu,vi,tr,sw,ja,is,lv,nl,de,fa,hi,it,hy,es,te,eo,ka,ru,uz,sl,ca,bg,hu,el,he,sr,ps,ne,kk,az,af,ms,la,ko,mk,mt,tl,ur,ta,si,ha,da,ga,ceb,fil,th
   mapLang: en_US,fr_FR,pl_PL,et_EE,bn_BD,id_ID,uk_UA,cs_CZ,kn_IN,gl_ES,pa_IN,sv_SE,pt_PT,ar_SA,no_NO,ku_TR,hr_HR,fi_FI,eu_ES,vi_VN,tr_TR,sw_KE,ja_JP,is_IS,lv_LV,nl_NL,de_DE,fa_AF,hi_IN,it_IT,hy_AM,es_ES,te_IN,ka_GE,ru_RU,fa_IR,uz_UZ,sl_SI,ca_ES,bg_BG,hu_HU,el_GR,he_IL,sr_RS,ps_AF,ne_NP,kk_KZ,az_AZ,af_ZA,ms_MY,ko_KR,mk_MK,mt_MT,tl_PH,ur_PK,ta_IN,si_LK,ha_NG,da_DK,ga_IE,th_TH
