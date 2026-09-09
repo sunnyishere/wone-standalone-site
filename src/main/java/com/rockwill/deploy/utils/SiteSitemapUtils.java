@@ -300,6 +300,6 @@ public class SiteSitemapUtils {
     }
 
     String getWebsiteUrl(String domain) {
-        return "http://" + domain;
+        return "https://" + domain;
     }
 }
