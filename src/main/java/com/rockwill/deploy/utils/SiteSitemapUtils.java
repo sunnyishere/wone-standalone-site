@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -164,6 +165,7 @@ public class SiteSitemapUtils {
             String xslUrl = getWebsiteUrl(domain) + "/sitemap_nb.xsl";
             for (File sitemapFile : generatedFiles) {
                 addXslStylesheet(sitemapFile.getAbsolutePath(), xslUrl);
+                addSchemaLocation(sitemapFile);
                 entries.add(new SitemapIndexEntry(sitemapFile.getName(), new Date()));
             }
         }
@@ -281,6 +283,7 @@ public class SiteSitemapUtils {
 
         String xslUrl = getWebsiteUrl(domain) + "/sitemap_nb.xsl";
         addXslStylesheet(indexFile.getAbsolutePath(), xslUrl);
+        addSchemaLocation(indexFile);
     }
 
     /**
@@ -297,6 +300,31 @@ public class SiteSitemapUtils {
             }
         }
         Files.write(filePath, lines);
+    }
+
+    /**
+     * 为 Sitemap 根元素注入 xsi 命名空间与 schemaLocation 声明，
+     * 便于 XML 校验工具 / IDE 正确识别结构。
+     * urlset 使用 sitemap.xsd，sitemapindex 使用 siteindex.xsd。
+     */
+    private void addSchemaLocation(File sitemapFile) throws IOException {
+        String content = new String(Files.readAllBytes(sitemapFile.toPath()), StandardCharsets.UTF_8);
+
+        final String urlsetTag = "<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"https://www.w3.org/1999/xhtml\" >";
+        final String urlsetWithSchema = "<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"https://www.w3.org/1999/xhtml\" "
+                + "xmlns:xsi=\"https://www.w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"https://www.sitemaps.org/schemas/sitemap/0.9 https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" >";
+        final String indexTag = "<sitemapindex xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\">";
+        final String indexWithSchema = "<sitemapindex xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" "
+                + "xmlns:xsi=\"https://www.w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"https://www.sitemaps.org/schemas/sitemap/0.9 https://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd\">";
+
+        if (content.contains(urlsetTag)) {
+            content = content.replace(urlsetTag, urlsetWithSchema);
+        } else if (content.contains(indexTag)) {
+            content = content.replace(indexTag, indexWithSchema);
+        }
+        Files.write(sitemapFile.toPath(), content.getBytes(StandardCharsets.UTF_8));
     }
 
     String getWebsiteUrl(String domain) {
