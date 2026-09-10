@@ -310,14 +310,14 @@ public class SiteSitemapUtils {
     private void addSchemaLocation(File sitemapFile) throws IOException {
         String content = new String(Files.readAllBytes(sitemapFile.toPath()), StandardCharsets.UTF_8);
 
-        final String urlsetTag = "<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"https://www.w3.org/1999/xhtml\" >";
-        final String urlsetWithSchema = "<urlset xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"https://www.w3.org/1999/xhtml\" "
-                + "xmlns:xsi=\"https://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"https://www.sitemaps.org/schemas/sitemap/0.9 https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" >";
-        final String indexTag = "<sitemapindex xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\">";
-        final String indexWithSchema = "<sitemapindex xmlns=\"https://www.sitemaps.org/schemas/sitemap/0.9\" "
-                + "xmlns:xsi=\"https://www.w3.org/2001/XMLSchema-instance\" "
-                + "xsi:schemaLocation=\"https://www.sitemaps.org/schemas/sitemap/0.9 https://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd\">";
+        final String urlsetTag = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" >";
+        final String urlsetWithSchema = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\" "
+                + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd\" >";
+        final String indexTag = "<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">";
+        final String indexWithSchema = "<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" "
+                + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+                + "xsi:schemaLocation=\"http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd\">";
 
         if (content.contains(urlsetTag)) {
             content = content.replace(urlsetTag, urlsetWithSchema);

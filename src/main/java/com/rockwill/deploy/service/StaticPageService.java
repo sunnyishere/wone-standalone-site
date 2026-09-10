@@ -198,10 +198,7 @@ public class StaticPageService {
                         sitePage.getPageType(), domain, lang);
                 continue;
             }
-            String pageName = sitePage.getPageName();
-            if (!ObjectUtils.isEmpty(pageName)) {
-                pageName = lang + "/" + pageName;
-            }
+            String pageName = prefixWithLang(lang, sitePage.getPageName());
             String menuPath = getApiPath(pageName);
             DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath, domain);
             if (domainHtmlVo != null &&  domainHtmlVo.getHttpErrCode()==404){
@@ -615,6 +612,13 @@ public class StaticPageService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    static String prefixWithLang(String lang, String path) {
+        if (ObjectUtils.isEmpty(path) || ObjectUtils.isEmpty(lang)) {
+            return path;
+        }
+        return lang + "/" + path;
     }
 
     private void addWebSitemap(String html, String uri, double priority, String domain, String lang, int pageType) {
