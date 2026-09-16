@@ -7,15 +7,15 @@
     <title th:text="${pageTitle}"></title>
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
-    <th:block th:with="
+    <th:block th:with="pn=${pageData?.pageNum ?: 1},
     base = ${websitePath + (currentLang !=  null && currentLang != 'en_US' ? currentLang + '/' : '') + pageName},
     slug = ${category != null ?
         #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
         : ''},
     canonical = ${base + (slug != '' ? '/' + slug : '')}
     ">
-        <link rel="canonical" th:href="${canonical + '-' + (pageData?.pageNum ?: 1)}" />
-        <meta property="og:url" th:content="${canonical + '-' + (pageData?.pageNum ?: 1)}"/>
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
+        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
     </th:block>
     <meta property="og:title" th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${pageContent}"/>
