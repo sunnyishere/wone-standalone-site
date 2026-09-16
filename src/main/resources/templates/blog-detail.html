@@ -141,10 +141,7 @@
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
-                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${blog.author}" th:title="${blog.author}"
-                                                       th:href="${brandUrl}" style="border: none">
-                                                       <span th:text="${blog.author}"></span>
-                                                    </a>
+                                                    <span th:text="${blog.author}"></span>
                                                 </div>
                                                 <div class="am-fr" style="color:#999999">
                                                     <span th:text="${#dates.format(blog.created, 'MM/dd/yyyy')}"></span>

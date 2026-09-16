@@ -111,7 +111,7 @@
                    (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+                   ${#normalizer.normalizeString(index.slugTitle)} + '-' +
                    ${index.id}"
                 >
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">

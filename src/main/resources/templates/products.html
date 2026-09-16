@@ -194,7 +194,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(index.pName), '/', '-'), ' ', '-'))} +
+           ${#normalizer.normalizeString(index.pName)} +
            '-'+${index.pid}">
                                 <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
                                     <div class="image-box">

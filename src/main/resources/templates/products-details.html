@@ -96,7 +96,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.replace(#strings.trim(category1.name), ' ', '-') +
+                    #normalizer.normalizeString(category1.name) +
                     '-' + category1.id}"
                    th:text="${category1.i18nName}">Sub Category</a>
             </li>
@@ -107,7 +107,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.replace(#strings.trim(category2.name), ' ', '-') +
+                    #normalizer.normalizeString(category2.name) +
                     '-' + category2.id}"
                    th:text="${category2.i18nName}">Sub Category</a>
             </li>
@@ -499,7 +499,7 @@
                                                th:href="${currentPathLang +
          (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
            '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
-         #strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(item.name), '/', '-'), ' ', '-')) +
+         #normalizer.normalizeString(item.name) +
          '-' + item.prodId + '-series' + item.id}"
                                                th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
                                                 <div style="padding: 10px 20px;">
@@ -702,7 +702,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#strings.toLowerCase(#strings.replace(#strings.replace(#strings.trim(prod.name), '/', '-'), ' ', '-'))} +
+           ${#normalizer.normalizeString(prod.name)} +
            '-'+${prod.id}"
                                style="border: none">
                                 <div style="padding: 0 15px 0 0; border-radius: 12px;">

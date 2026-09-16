@@ -47,11 +47,7 @@
                                     <div class="am-fl dd-clamp-text-1" style="color:#5C779F;">
                                         <th:block th:if="${item.cardMetaName != null and !#strings.isEmpty(#strings.trim(item.cardMetaName))}">
                                             <span class="am-icon-user"></span>
-                                            <a class="device-aware-link"
-                                               th:href="${item.cardMetaUrl != null ? item.cardMetaUrl : 'javascript:void(0);'}"
-                                               style="border:none">
-                                                <span th:text="${item.cardMetaName}">Meta Name</span>
-                                            </a>
+                                            <span th:text="${item.cardMetaName}">Meta Name</span>
                                         </th:block>
                                     </div>
                                 </div>

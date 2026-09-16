@@ -155,7 +155,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(scate.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.normalizeString(scate.slugTitle)} + '-' +
            ${scate.id}">
                                             <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.i18nTitle}">
                                                 Resistance and
@@ -168,10 +168,7 @@
                                             <div class="am-padding-top-xs am-cf am-text-sm">
                                                 <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
                                                     <span class="am-icon-user"></span>
-                                                    <a class="device-aware-link" aria-hidden="false" th:aria-label="${scate.author}" th:title="${scate.author}"
-                                                       th:href="${brandUrl}" style="border: none">
                                                         <span th:text="${scate.author}"></span>
-                                                    </a>
                                                 </div>
                                                 <div class="am-fr" style="color:#999999">
                                                     <span th:text="${#dates.format(scate.created, 'MM/dd/yyyy')}"></span>

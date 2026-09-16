@@ -106,7 +106,7 @@ basePath =${websitePath +pageName}">
                    th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+                   ${#normalizer.normalizeString(index.slugTitle)} + '-' +
                    ${index.id}">
                     <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">

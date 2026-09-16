@@ -123,11 +123,7 @@ basePath = ${websitePath + pageName}">
     (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
         '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
     ) +
-    #uris.escapePath(
-        #strings.toLowerCase(
-            #strings.replace(#strings.trim(index.slugTitle), ' ', '-')
-        )
-    ) + '-' + index.id
+    #normalizer.normalizeString(index.slugTitle) + '-' + index.id
 }">
                                     <div class="dd-clamp-text-1 am-text-bold">
                                         <h2 class="inline-header" th:text="${index.i18nTitle}"></h2>
