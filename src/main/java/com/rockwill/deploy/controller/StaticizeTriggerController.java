@@ -186,6 +186,11 @@ public class StaticizeTriggerController {
             if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.PAGE) {
                 continue;
             }
+            if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.DOCUMENTS
+                    && "detail".equals(file.getName())) {
+                collectDetailPages(file, syncContext, standaloneSyncEvent, urlSet);
+                continue;
+            }
             if (syncContext.isProd) {
                 collectProductPages(file, syncContext, standaloneSyncEvent, urlSet);
             } else if (file.getName().contains("-" + standaloneSyncEvent.getEntityId())) {
@@ -211,19 +216,30 @@ public class StaticizeTriggerController {
             return;
         }
         if ("detail".equals(fileName)) {
-            File[] detailFiles = file.listFiles(pathname -> pathname.getName().contains("-" + entityId));
-            if (detailFiles == null) {
-                return;
-            }
-            for (File detailFile : detailFiles) {
-                deleteAndRecord(detailFile, standaloneSyncEvent.getDeployDomain(),
-                        "/" + syncContext.pageName + "/detail/" + detailFile.getName(), urlSet);
-            }
+            collectDetailPages(file, syncContext, standaloneSyncEvent, urlSet);
             return;
         }
         if (!fileName.contains("series")) {
             deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
                     "/" + syncContext.pageName + "/" + fileName, urlSet);
+        }
+    }
+
+    /**
+     * 删除 detail 子目录中与同步实体 ID 对应的静态详情页。
+     */
+    private void collectDetailPages(File detailDirectory,
+                                    SyncContext syncContext,
+                                    StandaloneSyncEvent standaloneSyncEvent,
+                                    Set<String> urlSet) {
+        File[] detailFiles = detailDirectory.listFiles(
+                pathname -> pathname.getName().contains("-" + standaloneSyncEvent.getEntityId()));
+        if (detailFiles == null) {
+            return;
+        }
+        for (File detailFile : detailFiles) {
+            deleteAndRecord(detailFile, standaloneSyncEvent.getDeployDomain(),
+                    "/" + syncContext.pageName + "/detail/" + detailFile.getName(), urlSet);
         }
     }
 

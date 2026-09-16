@@ -268,7 +268,7 @@
                      style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div th:each="item : ${faLibraryList}">
                         <div class="product-library-card"
-                             th:data-detail-url="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName + '/' + item.slugTitle + '-' + item.id})"
+                             th:data-detail-url="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName + '/detail/' + item.slugTitle + '-' + item.id})"
                              th:title="${item.name}"
                              role="link"
                              tabindex="0"
@@ -354,16 +354,16 @@
                                             </div>
                                         </div>
 
-                                        <!-- 受限 -->
+                                        <!-- 受限：沿用咨询弹窗，展示为文件类型和下载图标 -->
                                         <div class="am-show-lg-only" th:if="${item.isShow == 0}">
                                             <div class="am-text-center" style="display: flex;justify-content: right;">
                                                 <div
-                                                        data-trigger="modal-1"
-                                                        data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                        th:data-biz-id="'documents-'+${item.id}"
-                                                        style="margin-top: 30px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
-                                                    <span th:text="${advanced['consulting']}">Consulting</span>
-                                                    <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                                         data-trigger="modal-1"
+                                                         data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                                         th:data-biz-id="'documents-'+${item.id}"
+                                                         style="margin-top: 30px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);width: 100px;cursor: pointer;">
+                                                    <span th:text="${item.type == 2 ? 'MP4' : (item.fileDatalis != null ? item.fileDatalis.type : 'UNKNOWN')}">PDF</span>
+                                                    <span class="p-icon-a-0031 am-padding-left-sm"></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -410,9 +410,9 @@
                                          data-trigger="modal-1"
                                          data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
                                          th:data-biz-id="'documents-'+${item.id}"
-                                         style="margin-bottom: 10px;border: 1px solid #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: #FF8D30;width: 140px;">
-                                        <span th:text="${advanced['consulting']}">Consulting</span>
-                                        <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                         style="margin-bottom: 10px;border: 1px solid var(--theme-wone);background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px;color: var(--theme-wone);cursor: pointer;">
+                                        <span th:text="${item.type == 2 ? 'MP4' : (item.fileDatalis != null ? item.fileDatalis.type : 'UNKNOWN')}">PDF</span>
+                                        <span class="p-icon-a-0031 am-padding-left-sm"></span>
                                     </div>
                                 </div>
                             </div>

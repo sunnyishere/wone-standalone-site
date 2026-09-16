@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum StandaloneSyncEntityType {
     PRODUCT(SitePage.SitePageType.PRODUCTS),
     SOLUTION(SitePage.SitePageType.SOLUTIONS),
+    DOCUMENTS(SitePage.SitePageType.DOCUMENTS),
     NEWS(SitePage.SitePageType.NEWS),
     BLOG(SitePage.SitePageType.BLOG),
     PAGE(0), //菜单sitePage更新

@@ -196,7 +196,7 @@
                              th:each="item : ${pageData.rows}">
                             <div class="library-list-card"
                                  th:data-detail-url="${currentPathLang} + '/' +
-                                 ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' +
+                                 ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' +
                                  ${item.slugTitle} + '-' + ${item.id}"
                                  th:title="${item.name}"
                                  role="link"
@@ -204,7 +204,7 @@
                                  style="background-color: #F9F9F9;border-radius: 12px;">
                                 <a class="library-detail-link"
                                    th:href="${currentPathLang} + '/' +
-                                   ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' +
+                                   ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' +
                                    ${item.slugTitle} + '-' + ${item.id}"
                                    th:title="${item.name}"
                                    tabindex="-1"
@@ -273,11 +273,16 @@
                                                 <div class="am-fr library-list-action"
                                                      data-trigger="modal-1"
                                                      data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
-                                                     th:data-biz-id="'documents-'+${item.id}"
-                                                     th:if="${item.isShow} == 0"
-                                                     style="margin-top: 40px;border: 1px solid #FF8D30;background-color: #FF8D30;background-color: #FFFFFF;border-radius: 100px;padding: 4px 8px 4px 20px;color: #FF8D30;">
-                                                    <span th:text="${advanced['consulting']}"></span>
-                                                    <span class="p-icon-a-0041 am-padding-left-sm"></span>
+                                                      th:data-biz-id="'documents-'+${item.id}"
+                                                      th:if="${item.isShow} == 0"
+                                                      style="margin-top: 40px;border: 1px solid var(--theme-wone);border-radius: 100px;padding: 4px 8px 4px 20px;color: var(--theme-wone);display: inline-flex;align-items: center;background-color: #FFFFFF;">
+                                                    <div>
+                                                        <span th:text="${item.type == 2 ? 'MP4' : (item.fName != null ? #strings.toUpperCase(item.fName) : 'UNKNOWN')}"
+                                                              class="am-margin-right-sm">PDF</span>
+                                                        <span style="color: inherit;">
+                                                            <span class="p-icon-a-0031"></span>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

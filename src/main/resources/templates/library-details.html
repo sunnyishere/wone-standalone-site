@@ -178,7 +178,10 @@
                     <button type="button" class="library-detail-action rfq-trigger"
                             th:if="${library.isShow == 0}" data-trigger="modal-1"
                             data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0}"
-                            th:data-biz-id="'documents-' + ${library.id}"><span th:text="${advanced['consulting'] ?: 'Consulting'}">Consulting</span></button>
+                            th:data-biz-id="'documents-' + ${library.id}">
+                        <span class="p-icon-a-0031 am-padding-right-sm"></span>
+                        <span th:text="${advanced['download']} ?: 'Download'">Download</span>
+                    </button>
                 </div>
             </article>
 
@@ -192,8 +195,8 @@
             </section>
 
             <section class="library-detail-panel"
-                     th:if="${libraryFaqList != null and not libraryFaqList.isEmpty()}">
-                <th:block th:replace="section-faq :: faqSection(${libraryFaqList})"></th:block>
+                     th:if="${pageFaqList != null and not pageFaqList.isEmpty()}">
+                <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
             </section>
         </div>
 
@@ -203,7 +206,7 @@
                 <h2 class="library-detail-heading" th:text="${(advanced['related'] ?: 'Related') + ' ' + (advanced['documents'] ?: 'Documents')}">Related Documents</h2>
                 <div class="library-related-list">
                     <a class="library-related-item" th:each="item : ${relatedLibraries}"
-                       th:href="${currentPathLang} + '/' + ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/' + ${item.slugTitle} + '-' + ${item.id}"
+                       th:href="${currentPathLang} + '/' + ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' + ${item.slugTitle} + '-' + ${item.id}"
                        th:title="${item.name}">
                         <img class="library-related-image" th:src="${item.icon != null and item.icon != '' ? item.icon : '/images/case-bg.jpg'}" th:alt="${item.name}">
                         <span>
