@@ -80,7 +80,9 @@
             <div class=" am-text-left">
                 <div class="am-padding-top-xs">
                     <span th:title="${news.author}" aria-hidden="false" th:aria-label="${news.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
-                    <a th:title="${news.author}" th:href="${brandUrl}" aria-hidden="false" th:aria-label="${news.author}" style="color:#5C779F;" th:text="${news.author}"></a>
+                    <a th:title="${news.author}" th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+                                   '/' :
+                                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" aria-hidden="false" th:aria-label="${news.author}" style="color:#5C779F;" th:text="${news.author}"></a>
                     <span th:title="${news.title}" aria-hidden="false" th:aria-label="${news.title}" class="am-padding-left" style="color:#999999;"
                        th:text="${#dates.format(news.created, 'MM/dd/yyyy')}"></span>
                 </div>

@@ -93,10 +93,12 @@
             <h1 class="am-text-bold " th:text="${successCase.title}"></h1>
             <div class=" am-text-left">
                 <div class="am-padding-top-xs">
-                    <a th:title="${successCase.author}" aria-hidden="false" th:aria-label="${successCase.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></a>
-                    <a th:title="${successCase.author}" th:href="${brandUrl}" aria-hidden="false" th:aria-label="${successCase.author}" style="color:#5C779F;" th:text="${successCase.author}"></a>
-                    <a th:title="${successCase.title}" aria-hidden="false" th:aria-label="${successCase.title}" class="am-padding-left" style="color:#999999;"
-                       th:text="${#dates.format(successCase.created, 'MM/dd/yyyy')}"></a>
+                    <span th:title="${successCase.author}" aria-hidden="false" th:aria-label="${successCase.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
+                    <a th:title="${successCase.author}" th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+                                   '/' :
+                                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" aria-hidden="false" th:aria-label="${successCase.author}" style="color:#5C779F;" th:text="${successCase.author}"></a>
+                    <span th:title="${successCase.title}" aria-hidden="false" th:aria-label="${successCase.title}" class="am-padding-left" style="color:#999999;"
+                       th:text="${#dates.format(successCase.created, 'MM/dd/yyyy')}"></span>
 
 
                 </div>

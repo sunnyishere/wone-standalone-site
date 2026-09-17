@@ -2,11 +2,6 @@
     <section class="library-publisher-card"
              th:if="${libraryBrand != null or libraryFactory != null or libraryOwner != null}">
         <div class="library-publisher-head">
-            <a class="device-aware-link"
-               th:if="${libraryBrandPath != null and libraryBrandPath != ''}"
-               th:href="${landingBaseUrl} + ${libraryBrandPath}"
-               th:title="${libraryBrandName}"
-               th:aria-label="${libraryBrandName}">
                 <img class="library-publisher-logo"
                      th:src="${libraryBrand != null and libraryBrand.icon != null and libraryBrand.icon != ''
                          ? libraryBrand.icon
@@ -15,7 +10,6 @@
                      th:alt="${libraryBrandName}">
                 <div class="library-publisher-name" th:text="${libraryBrandName}"></div>
                 <div class="library-publisher-type">Manufacturers</div>
-            </a>
         </div>
 
         <div class="library-publisher-body">
@@ -42,7 +36,7 @@
 
             <div class="library-publisher-employees"
                  th:if="${libraryEmployees != null and not libraryEmployees.isEmpty()}">
-                <a class="device-aware-link library-publisher-employee"
+                <div class="device-aware-link library-publisher-employee"
                    th:each="employee, stat : ${libraryEmployees}"
                    th:if="${stat.index < 3}"
                    th:href="${employee.profileUrl != null and employee.profileUrl != ''
@@ -60,7 +54,7 @@
                         <span class="library-publisher-position" th:text="${employee.positions}"></span>
                         <span class="library-publisher-employee-name" th:text="${employee.account}"></span>
                     </span>
-                </a>
+                </div>
             </div>
 
             <div class="library-publisher-videos"

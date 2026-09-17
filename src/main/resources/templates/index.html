@@ -499,7 +499,9 @@
                                             <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
                                                 <span class="am-icon-user"></span>
                                                 <a class="device-aware-link"
-                                                   th:href="${brandUrl}" style="border: none">
+                                                   th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==6])) ?
+                                                 '/' :
+                                                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==6][0].pageName), ' ', '-')) })" style="border: none">
                                                     <span th:text="${article.author}"></span>
                                                 </a>
                                             </div>

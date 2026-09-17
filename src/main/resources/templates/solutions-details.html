@@ -96,10 +96,12 @@
             <h1 class="am-text-bold " th:text="${article.title}"></h1>
             <div class=" am-text-left">
                 <div class="am-padding-top-xs">
-                    <a th:title="${article.author}" aria-hidden="false" th:aria-label="${article.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></a>
-                    <a th:title="${article.author}" th:href="${brandUrl}" aria-hidden="false" th:aria-label="${article.author}" style="color:#5C779F;" th:text="${article.author}"></a>
-                    <a th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}"  class="am-padding-left" style="color:#999999;"
-                       th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></a>
+                    <span th:title="${article.author}" aria-hidden="false" th:aria-label="${article.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
+                    <a th:title="${article.author}" th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+                                   '/' :
+                                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" aria-hidden="false" th:aria-label="${article.author}" style="color:#5C779F;" th:text="${article.author}"></a>
+                    <span th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}"  class="am-padding-left" style="color:#999999;"
+                       th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></span>
                 </div>
             </div>
             <br>

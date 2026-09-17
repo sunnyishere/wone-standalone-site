@@ -45,6 +45,15 @@
             .section-title{font-size: 1.8rem;}
             .faq-header{font-size: 1.8rem;}
         }
+        .hero-row{ display:flex; flex-wrap:wrap; align-items:stretch; }
+        .hero-row::before,
+        .hero-row::after{ display:none; }
+        .hero-row > [class*="am-u-"]{ float:none; }
+        .about-cta-col{ display:flex; flex-direction:column; }
+        .about-cta-col .device-aware-link{ margin-top:auto; }
+        @media (max-width:768px){
+            .about-cta-col .device-aware-link{ margin-top:36px; }
+        }
     </style>
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
@@ -69,7 +78,7 @@
     </div>
 </nav>
 
-<div class="am-container phone-container-top am-margin-bottom am-margin-top-sm" style="background-color: #FFFFFF;">
+<div class="am-container phone-container-top am-margin-bottom am-margin-top-sm hero-row" style="background-color: #FFFFFF;">
     <div class="am-u-sm-12 am-u-md-7 am-u-lg-5 am-padding-xl am-margin-bottom-xl phone-container-all phone-clear-margin" style="background:#FFFFFF;">
         <div class="" style="background-color: #FFFFFF;">
             <div class="phone-container phone-banner" style="height: 300px;">
@@ -87,12 +96,18 @@
         </div>
     </div>
 
-    <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding">
+    <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding about-cta-col">
         <div class="">
             <div class="am-text-lg am-text-bold am-margin-top-sm" > <h2 class="inline-header"  th:text="${advanced['about.us']}"></h2>
             </div>
         </div>
-        <p th:text="${brand.profile}">
+        <p th:text="${brand.profile}"/>
+        <a class="device-aware-link"
+           style="display: flex; width: 200px; height: 44px; align-items: center; justify-content: center; color: #fff !important; border-radius: 999px; background: var(--theme-wone); font-size: 16px; font-weight: 700;"
+           th:href="${brandUrl}"
+           th:title="${brandName}"
+           th:aria-label="${brandName}"
+           th:text="${advanced['learn.more']} ?: 'Learn more'">Learn more</a>
     </div>
 </div>
 
