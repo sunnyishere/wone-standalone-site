@@ -24,6 +24,12 @@ public class SitePage implements Serializable {
     /** 页面名称（可自定义修改） */
     private String pageName;
 
+    /** 页面名称多语种译文（getMenu 接口按当前语种返回，导航/面包屑显示用） */
+    private String i18nName;
+
+    /** 页面标题多语种译文（列表/卡片标题显示用） */
+    private String i18nTitle;
+
     /** 简短描述文字（用于卡片/摘要显示） */
     private String description;
 

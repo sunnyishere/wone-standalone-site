@@ -87,7 +87,7 @@ public class PathMatchUtils {
         return new ArrayList<>(appConfig.getLanguages());
     }
 
-    public static MatchResult matchResult(String path) {
+    public static MatchResult matchResult(String path, String domain) {
         MatchResult matchResult = new MatchResult();
         String normalizedPath = path;
         String lang = "";
@@ -139,7 +139,7 @@ public class PathMatchUtils {
                     }
                 }
                 if (params.get("menuName") != null) {
-                    boolean isLegal =  SiteMenuUtils.getMenuPages().stream()
+                    boolean isLegal =  SiteMenuUtils.getMenuPages(domain).stream()
                             .filter(sitePage -> sitePage.getPageName() != null)
                             .anyMatch(sitePage -> sitePage.getPageName()
                                     .equalsIgnoreCase(params.get("menuName").trim()));

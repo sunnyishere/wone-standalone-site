@@ -117,7 +117,7 @@ public class SiteSitemapUtils {
         List<SitemapIndexEntry> entries = new ArrayList<>();
         int groupCount = groups.size();
         int numFiles = (int) Math.ceil((double) groupCount / MAX_URLS_PER_SITEMAP);
-        boolean isMultiLang = SiteMenuUtils.getLangList().size() > 1;
+        boolean isMultiLang = SiteMenuUtils.getLangList(domain).size() > 1;
 
         for (int i = 0; i < numFiles; i++) {
             int fromIndex = i * MAX_URLS_PER_SITEMAP;

@@ -6,8 +6,10 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.conf.GoogleTagProperties;
+import com.rockwill.deploy.conf.SiteContentProperties;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
-import com.rockwill.deploy.utils.PathMatchUtils;
+import com.rockwill.deploy.utils.RichTextUtils;
+import com.rockwill.deploy.utils.SignUtils;
 import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.utils.ThymeleafUtils;
 import com.rockwill.deploy.vo.AjaxResult;
@@ -30,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -44,7 +45,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -67,6 +67,12 @@ public class RockwillKnowledgeService {
 
     @Resource
     BrandConfig brandConfig;
+
+    @Resource
+    SiteContentProperties siteContentProperties;
+
+    @Resource
+    SiteCommonContextCache siteCommonContextCache;
 
     @Resource
     TemplateEnginePageRenderer templateEnginePageRenderer;
@@ -107,7 +113,7 @@ public class RockwillKnowledgeService {
         put("eo", "esperanto");
         put("ka", "georgian");
         put("ru", "russian");
-        put("fa", "persian");  // 注意：与fa_AF冲突，需要特殊处理
+        put("fa", "persian");
         put("uz", "uzbek");
         put("sl", "slovenian");
         put("ca", "catalan");
@@ -178,8 +184,7 @@ public class RockwillKnowledgeService {
                             .toString(), SitePage.class);
                     List<String> langList = JSON.parseArray(ajaxResult.getData().getJSONArray("langList")
                             .toString(), String.class);
-                    SiteMenuUtils.setMenuPages(sitePageList);
-                    SiteMenuUtils.setLangList(langList);
+                    SiteMenuUtils.setMenuData(domain, sitePageList, langList);
                     log.info("lang list:{}", String.join(",", langList));
                     return sitePageList;
                 }
@@ -221,23 +226,10 @@ public class RockwillKnowledgeService {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
                 if (model != null) {
-                    model.put("cdnEnabled", cdnEnabled);
-                    model.put("cdnPrefix", cdnPrefix);
-                    model.put("landingBaseUrl", landingBaseUrl);
-                    model.put("version", version);
-                    if (model.containsKey("brandUrl")) {
-                        String brandUrl = model.get("brandUrl").toString();
-                        model.put("brandUrl", brandUrl.toLowerCase());
-                    }
-                    if (model.containsKey("currentLang")
-                            && model.get("currentLang") != null && !model.get("currentLang")
-                            .equals("en")) {
-                        model.put("langEName", languageMap.get(model.get("currentLang").toString()).toLowerCase());
-                    } else {
-                        model.put("langEName", "english");
-                    }
+                    fillCommonModel(model, host);
                     handleDateKey(model);
                     handleLibraryFileSize(model);
+                    stripEmbeddedSkeleton(model);
                     if (model.containsKey("prodFaqList")) {
                         model.put("pageFaqList", model.get("prodFaqList"));
                     }
@@ -260,13 +252,6 @@ public class RockwillKnowledgeService {
                         websiteUrl = website.toString();
                         model.put("websiteUrl", website);
                     }
-                    model.put("currentHost",host);
-                    String tagId = googleTagProperties.getId();
-                    if (googleTagProperties.getDomains().containsKey(host)) {
-                        tagId = googleTagProperties.getDomains().get(host);
-                    }
-                    model.put("year", Calendar.getInstance().get(Calendar.YEAR));
-                    model.put("gaTrackingId", tagId);
                     handlePlatformSuccessCaseLink(model);
                     handleSchemaJson(model, websiteUrl, host);
                     if (!model.isEmpty()) {
@@ -283,6 +268,8 @@ public class RockwillKnowledgeService {
                             if (templateName.equals("404")){
                                 domainHtmlVo.setHttpErrCode(HttpStatus.NOT_FOUND.value());
                             }
+                            // 渲染成功后收割通用上下文（渲染完成态快照，供搜索页合并）
+                            harvestCommonContext(model, host);
                         }
                         return domainHtmlVo;
                     }
@@ -303,6 +290,307 @@ public class RockwillKnowledgeService {
             return domainHtmlVo;
         }
         return new DomainHtmlVo();
+    }
+
+    /**
+     * 递归剥离 model 富文本字符串中被整体粘贴的 HTML 文档骨架（{@code <!DOCTYPE>/<html>/<head>/<body>}）。
+     * <p>
+     * CMS 编辑器粘贴网页源码时会把整份文档存进正文（如 prod.detail、news.content），
+     * 经 {@code th:utext} 原样输出会让页面出现第二套 head/body；剥离规则见
+     * {@link RichTextUtils#stripDocumentSkeleton(String)}。
+     *
+     * @param model 页面渲染 model
+     */
+    private void stripEmbeddedSkeleton(Map<String, Object> model) {
+        for (Map.Entry<String, Object> entry : model.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof String) {
+                entry.setValue(RichTextUtils.stripDocumentSkeleton((String) value));
+            } else if (value instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> nestedMap = (Map<String, Object>) value;
+                stripEmbeddedSkeleton(nestedMap);
+            } else if (value instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Object> list = (List<Object>) value;
+                for (Object item : list) {
+                    if (item instanceof Map) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> mapInList = (Map<String, Object>) item;
+                        stripEmbeddedSkeleton(mapInList);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 渲染成功后收割通用上下文（渲染完成态快照，供搜索页合并）；
+     * 白名单与浅拷贝规则见 SiteCommonContextCache。
+     */
+    private void harvestCommonContext(Map<String, Object> model, String host) {
+        try {
+            Object currentLang = model.get("currentLang");
+            String lang = currentLang == null ? "en" : currentLang.toString();
+            siteCommonContextCache.put(host, lang, model);
+        } catch (Exception e) {
+            // 收割失败不影响页面渲染
+            log.warn("harvest common context failed, host:{}", host);
+        }
+    }
+
+    /**
+     * 站点内容列表接口签名：sign = sha256Hex("reqTime={reqTime}&accessKey={accessKey}&secretKey={secretKey}")
+     */
+    static String buildSiteContentSign(long reqTime, String accessKey, String secretKey) {
+        String plain = "reqTime=" + reqTime + "&accessKey=" + accessKey + "&secretKey=" + secretKey;
+        return SignUtils.sha256(plain);
+    }
+
+    /**
+     * 组装站点内容搜索接口完整查询串（业务参数 + 鉴权参数）。
+     * 接口口径（实测 192.168.35.16 联调环境，GET /api/siteContent/search）：
+     * keyword 必传（缺失时接口 state=fail "keyword is required"），服务端按关键词过滤；
+     * lang 为 mapLang 全码（en_US/fr_FR…）；分页 pageNum/pageSize（响应回显）；
+     * 无 type 参数；响应结构 data.pageData.{rows,totalPages} + data.association。
+     *
+     * @return 查询串；accessKey/secretKey 未配置时返回 null，由调用方走空结果兜底
+     */
+    String buildSiteContentQuery(String lang, String keyword, String channelCid, int pageNum) {
+        if (StringUtils.isBlank(siteContentProperties.getAccessKey())
+                || StringUtils.isBlank(siteContentProperties.getSecretKey())) {
+            log.warn("site-content accessKey/secretKey is not configured, skip request");
+            return null;
+        }
+        long reqTime = System.currentTimeMillis() / 1000L;
+        String sign = buildSiteContentSign(reqTime, siteContentProperties.getAccessKey(), siteContentProperties.getSecretKey());
+        StringBuilder query = new StringBuilder();
+        query.append("keyword=").append(urlEncode(StringUtils.defaultString(keyword)));
+        String apiLang = resolveApiLang(lang);
+        if (StringUtils.isNotBlank(apiLang)) {
+            query.append("&lang=").append(urlEncode(apiLang));
+        }
+        if (StringUtils.isNotBlank(channelCid)) {
+            query.append("&channelCid=").append(urlEncode(channelCid));
+        }
+        query.append("&pageNum=").append(Math.max(1, pageNum));
+        if (siteContentProperties.getPageSize() != null) {
+            query.append("&pageSize=").append(siteContentProperties.getPageSize());
+        }
+        query.append("&accessKey=").append(urlEncode(siteContentProperties.getAccessKey()));
+        query.append("&reqTime=").append(reqTime);
+        query.append("&sign=").append(sign);
+        return query.toString();
+    }
+
+    private String urlEncode(String value) {
+        try {
+            return URLEncoder.encode(StringUtils.defaultString(value), "UTF-8");
+        } catch (Exception e) {
+            return StringUtils.defaultString(value);
+        }
+    }
+
+    /**
+     * 将站点语言短码（en/fr/…）解析为接口语种代码（brand.mapLang 中的 en_US/fr_FR/…）。
+     * 英语返回 en_US；无法匹配时返回原值（联调兜底）。
+     */
+    String resolveApiLang(String lang) {
+        if (StringUtils.isBlank(lang)) {
+            return "en_US";
+        }
+        List<String> mapLang = brandConfig == null ? null : brandConfig.getMapLang();
+        if (mapLang != null) {
+            for (String code : mapLang) {
+                if (code.toLowerCase().startsWith(lang.toLowerCase() + "_")) {
+                    return code;
+                }
+            }
+        }
+        return lang;
+    }
+
+    /**
+     * 站内搜索
+     */
+    public DomainHtmlVo searchSiteContent(String keyword, String channelCid, String pageNum, String lang, String host) {
+        Map<String, Object> model = new HashMap<>();
+        fillCommonModel(model, host);
+        int page = parsePageNum(pageNum);
+        model.put("pageData", emptyPageData(page));
+        siteCommonContextCache.mergeInto(host, lang, model);
+        fillSearchPageModel(model, lang, host);
+        List<SitePage> topNavPages = new ArrayList<>(SiteMenuUtils.getMenuPages(host));
+        for (SitePage navItem : topNavPages) {
+            if (navItem.getI18nName() == null) {
+                navItem.setI18nName(navItem.getPageName());
+            }
+        }
+        model.put("topNavPages", topNavPages);
+        if (StringUtils.isNotBlank(keyword)) {
+            if (StringUtils.isNotBlank(channelCid)) {
+                model.put("selectLabel", ThymeleafUtils.normalizeString(keyword) + "-" + channelCid);
+            } else {
+                model.put("selectLabel", ThymeleafUtils.normalizeString(keyword));
+            }
+        }
+        Map<String, Object> pageData = new HashMap<>();
+        try {
+            String query = buildSiteContentQuery(lang, keyword, channelCid, page);
+            if (query == null) {
+                return renderSearchPage(model, host);
+            }
+            String url = siteContentProperties.getBaseUrl() + "/api/siteContent/search?" + query;
+            log.info("request siteContent list, host:{}, pageNum:{}, lang:{}", host, page, lang);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("siteContent list request failed, status:{}", response.getStatusCodeValue());
+                return renderSearchPage(model, host);
+            }
+            JSONObject body = JSON.parseObject(response.getBody());
+            if (body == null || "fail".equalsIgnoreCase(body.getString("state"))) {
+                log.error("siteContent list request rejected, msg:{}", body == null ? "empty body" : body.getString("msg"));
+                return renderSearchPage(model, host);
+            }
+            mapToPageData(body, pageData, page);
+            model.put("pageData", pageData);
+
+            model.put("selectValue",keyword);
+            mapIfPresent(dataObject(body), "association", model);
+            mapIfPresent(dataObject(body), "category1", model);
+            mapIfPresent(dataObject(body), "category2", model);
+        } catch (Exception e) {
+            log.error("siteContent list request exception, pageNum:{}, lang:{}", page, lang, e);
+        }
+        return renderSearchPage(model, host);
+    }
+
+    private JSONObject dataObject(JSONObject body) {
+        Object data = body.get("data");
+        return data instanceof JSONObject ? (JSONObject) data : null;
+    }
+
+    private void mapIfPresent(JSONObject dataObj, String key, Map<String, Object> model) {
+        if (dataObj != null) {
+            Object value = dataObj.get(key);
+            if (value != null) {
+                model.put(key, value);
+            }
+        }
+    }
+
+    /**
+     * 补齐搜索页模板依赖的页面级公共变量
+     */
+    private void fillSearchPageModel(Map<String, Object> model, String lang, String host) {
+        String currentLang = StringUtils.defaultIfBlank(lang, "en");
+        model.putIfAbsent("currentLang", currentLang);
+        model.putIfAbsent("currentPathLang", "en".equals(currentLang) ? "" : "/" + currentLang);
+        model.putIfAbsent("langName", "en".equals(currentLang) ? "English" : currentLang);
+        model.putIfAbsent("langEName", "en".equals(currentLang) ? "english" : currentLang);
+        model.putIfAbsent("pageName", "search");
+        model.putIfAbsent("suffix", "");
+        model.putIfAbsent("websitePath", "https://" + host + "/");
+        model.putIfAbsent("fontColor", "#FF5656");
+        model.putIfAbsent("headColor", "#FFFFFF");
+        model.putIfAbsent("headFontColor", "#000000");
+        model.putIfAbsent("otherHeadFontColor", "#000000");
+        Object langList = model.get("langList");
+        if (langList == null || ((List<?>) langList).isEmpty()) {
+            List<Map<String, String>> fallback = new ArrayList<>();
+            for (String code : SiteMenuUtils.getLangList(host)) {
+                Map<String, String> item = new HashMap<>();
+                item.put("lang", code);
+                item.put("langName", code);
+                fallback.add(item);
+            }
+            model.put("langList", fallback);
+        }
+    }
+
+    /**
+     * 响应到 pageData 的单点映射。
+     * 实测 /api/siteContent/search 结构：data.pageData.rows（行数据）、
+     * data.pageData.totalPages（总页数）、data.association（分类侧边栏，可空数组）。
+     * 行字段实测：{id, name, url}——与 search-details 模板的 index.name/index.url/index.id 直接对齐。
+     * 联调字段名变化时在此校准。
+     */
+    private void mapToPageData(JSONObject body, Map<String, Object> pageData, int page) {
+        JSONObject dataObj = dataObject(body);
+        Object pageDataObj = dataObj == null ? null : dataObj.get("pageData");
+        if (!(pageDataObj instanceof JSONObject)) {
+            pageData.put("rows", new ArrayList<>());
+            pageData.put("pageNum", page);
+            pageData.put("totalPages", 0);
+            return;
+        }
+        JSONObject pd = (JSONObject) pageDataObj;
+        Object rows = pd.get("rows");
+        pageData.put("rows", rows == null ? new ArrayList<>() : rows);
+        Object pageNum = pd.get("pageNum");
+        try {
+            pageData.put("pageNum", pageNum == null ? page : Integer.parseInt(pageNum.toString()));
+        } catch (NumberFormatException e) {
+            pageData.put("pageNum", page);
+        }
+        Object totalPages = pd.get("totalPages");
+        try {
+            pageData.put("totalPages", totalPages == null ? 0 : Integer.parseInt(totalPages.toString()));
+        } catch (NumberFormatException e) {
+            pageData.put("totalPages", 0);
+        }
+    }
+
+    private Map<String, Object> emptyPageData(int page) {
+        Map<String, Object> pageData = new HashMap<>();
+        pageData.put("rows", new ArrayList<>());
+        pageData.put("pageNum", page);
+        pageData.put("totalPages", 0);
+        return pageData;
+    }
+
+    private DomainHtmlVo renderSearchPage(Map<String, Object> model, String host) {
+        DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
+        String content = templateEnginePageRenderer.renderPage("search-details", model);
+        domainHtmlVo.setHtmlContent(content);
+        domainHtmlVo.setModelMap(model);
+        return domainHtmlVo;
+    }
+
+    private int parsePageNum(String pageNum) {
+        try {
+            return Integer.parseInt(pageNum);
+        } catch (Exception e) {
+            return 1;
+        }
+    }
+
+    /**
+     * 填充各页面渲染共用的公共 model 变量（CDN、语言、统计、宿主信息等）
+     */
+    private void fillCommonModel(Map<String, Object> model, String host) {
+        model.put("cdnEnabled", cdnEnabled);
+        model.put("cdnPrefix", cdnPrefix);
+        model.put("landingBaseUrl", landingBaseUrl);
+        model.put("version", version);
+        if (model.containsKey("brandUrl")) {
+            String brandUrl = model.get("brandUrl").toString();
+            model.put("brandUrl", brandUrl.toLowerCase());
+        }
+        if (model.containsKey("currentLang")
+                && model.get("currentLang") != null && !model.get("currentLang")
+                .equals("en")) {
+            model.put("langEName", languageMap.get(model.get("currentLang").toString()).toLowerCase());
+        } else {
+            model.put("langEName", "english");
+        }
+        model.put("currentHost", host);
+        String tagId = googleTagProperties.getId();
+        if (googleTagProperties.getDomains().containsKey(host)) {
+            tagId = googleTagProperties.getDomains().get(host);
+        }
+        model.put("year", Calendar.getInstance().get(Calendar.YEAR));
+        model.put("gaTrackingId", tagId);
     }
 
     private void handlePlatformSuccessCaseLink(Map<String, Object> model) {

@@ -52,7 +52,9 @@ public class UnifiedRouterController {
             realUri = request.getHeader("X-Original-URI");
         }
         realUri = realUri.substring(5);
-        String host = request.getHeader("Host");
+        //优先取拦截器归一后的配置域名，保证与菜单缓存、静态文件目录、CMS Deploy-Domain 口径一致
+        Object resolvedHost = request.getAttribute("resolvedHost");
+        String host = resolvedHost != null ? resolvedHost.toString() : request.getHeader("Host");
         log.info("request url : {}", realUri);
         Object patternType = request.getAttribute("patternType");
         Object forwardTarget = request.getAttribute("forwardTarget");
@@ -73,12 +75,30 @@ public class UnifiedRouterController {
                     domainHtmlVo = rockwillKnowledgeService.getHome(realTimeRestTemplate, host);
                     break;
                 }
+//                if (isSearchPrefixRequest(forwardTarget.toString())) {
+//                    // /search-xxx 形态：关键词本地搜索
+//                    String keyword = extractParam(forwardTarget.toString(), "name");
+//                    keyword = keyword != null && keyword.startsWith("search-")
+//                            ? keyword.substring("search-".length()) : "";
+//                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(keyword, null, "1", null, host);
+//                    break;
+//                }
             case DETAIL:
             case CATEGORY_PAGINATION:
             case MULTI_LEVEL:
             case CATEGORY_WITH_ID:
             case MENU_WITH_PAGE:
             case SEARCH:
+//                if (pathPatternType == PathPatternType.SEARCH) {
+//                    // /search/xxx-xxx-id-page 形态：分类+关键词本地搜索
+//                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(
+//                            extractParam(forwardTarget.toString(), "searchKey"),
+//                            extractParam(forwardTarget.toString(), "categoryId"),
+//                            extractParam(forwardTarget.toString(), "pageNum"),
+//                            extractParam(forwardTarget.toString(), "lang"),
+//                            host);
+//                    break;
+//                }
                 domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString(),host);
                 break;
             case DEFAULT:
@@ -110,6 +130,34 @@ public class UnifiedRouterController {
             staticPageService.saveHtml(host,savePrefix, domainHtmlVo.getHtmlContent());
         }
         return new ResponseEntity<>(domainHtmlVo.getHtmlContent(), headers, status);
+    }
+
+    /**
+     * 判断 MENU_WITHOUT_PAGE 转发目标是否为 /search-xxx 搜索请求（PathMatchUtils 特判产出）
+     */
+    private boolean isSearchPrefixRequest(String forwardTarget) {
+        String name = extractParam(forwardTarget, "name");
+        return name != null && name.startsWith("search-");
+    }
+
+    /**
+     * 从转发目标查询串中提取指定参数值（查询串形如 /xxx?a=1&b=2）
+     */
+    private String extractParam(String forwardTarget, String param) {
+        if (forwardTarget == null) {
+            return null;
+        }
+        int queryIndex = forwardTarget.indexOf('?');
+        if (queryIndex < 0) {
+            return null;
+        }
+        for (String pair : forwardTarget.substring(queryIndex + 1).split("&")) {
+            int eq = pair.indexOf('=');
+            if (eq > 0 && pair.substring(0, eq).equals(param)) {
+                return pair.substring(eq + 1);
+            }
+        }
+        return null;
     }
 
 }

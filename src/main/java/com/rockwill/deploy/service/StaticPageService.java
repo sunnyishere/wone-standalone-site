@@ -42,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -82,10 +83,36 @@ public class StaticPageService {
 
     Map<String, List<String>> detailUrlNap = new ConcurrentHashMap<>();
 
+    /**
+     * 每轮生成的统计上下文：保存成功数、失败页面路径（页面路径 → 失败原因）
+     */
+    static class GenStats {
+        final AtomicInteger savedCount = new AtomicInteger();
+        final Map<String, String> failedPages = new ConcurrentHashMap<>();
+    }
+
+    Map<String, GenStats> genStatsMap = new ConcurrentHashMap<>();
+
+    /**
+     * 记录一次页面保存结果：成功计数或登记失败原因（用于全量结束统计遗漏）
+     */
+    private void recordSave(String domain, String name, boolean saved, String failReason) {
+        GenStats stats = genStatsMap.get(domain);
+        if (stats == null) {
+            return;
+        }
+        if (saved) {
+            stats.savedCount.incrementAndGet();
+        } else {
+            stats.failedPages.put(name, failReason);
+        }
+    }
+
     @Async("rockwillTaskExecutor")
     public void triggerGenPages(String domain, Map<Integer, Set<Long>> todayUpdatedIds) {
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapGroups.put(domain, new ConcurrentHashMap<>());
+        genStatsMap.put(domain, new GenStats());
         int state = 0;
         String reason = "";
         try {
@@ -98,7 +125,7 @@ public class StaticPageService {
                 new File(domainPath).mkdirs();
             }
             generateMenuAndDetailPage("", domain, todayUpdatedIds);
-            for (String lang : SiteMenuUtils.getLangList()) {
+            for (String lang : SiteMenuUtils.getLangList(domain)) {
                 generateMenuAndDetailPage(lang, domain, todayUpdatedIds);
             }
 
@@ -111,6 +138,7 @@ public class StaticPageService {
             reason =e.getMessage();
             state = 3;
         }
+        logGenStats(domain);
         Map<String, String> map = new HashMap<>();
         map.put("state", state + "");
         map.put("reason", reason);
@@ -131,6 +159,7 @@ public class StaticPageService {
         }
         detailUrlNap.put(domain, new CopyOnWriteArrayList<>());
         webSitemapGroups.put(domain, new ConcurrentHashMap<>());
+        genStatsMap.put(domain, new GenStats());
         try {
             copyStaticResources(domain);
             generateIndexPage(domain);
@@ -141,7 +170,7 @@ public class StaticPageService {
                 new File(domainPath).mkdirs();
             }
             generateMenuAndDetailPage("", domain, null);
-            for (String lang : SiteMenuUtils.getLangList()) {
+            for (String lang : SiteMenuUtils.getLangList(domain)) {
                 generateMenuAndDetailPage(lang, domain, null);
             }
 
@@ -150,6 +179,23 @@ public class StaticPageService {
             RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
         } catch (Exception e) {
             log.error("Failed to generating {} html files", domain, e);
+        }
+        logGenStats(domain);
+    }
+
+    /**
+     * 输出一轮生成的统计：保存成功页数、失败页面明细（含原因），用于核对静态化遗漏
+     */
+    private void logGenStats(String domain) {
+        GenStats stats = genStatsMap.remove(domain);
+        if (stats == null) {
+            return;
+        }
+        log.info("Static generation stats, site:{}, saved pages:{}, failed pages:{}",
+                domain, stats.savedCount.get(), stats.failedPages.size());
+        for (Map.Entry<String, String> entry : stats.failedPages.entrySet()) {
+            log.warn("Static generation missed page, site:{}, page:{}, reason:{}",
+                    domain, entry.getKey(), entry.getValue());
         }
     }
 
@@ -181,12 +227,12 @@ public class StaticPageService {
     public void generateMenuAndDetailPage(String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {
         log.info("Start generating menu  html files,site:{},lang:{}", domain, lang);
         long start=System.currentTimeMillis();
-        if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages())) {
+        if (ObjectUtils.isEmpty(SiteMenuUtils.getMenuPages(domain))) {
             log.error("Failed to request menu data: {}", domain);
             return;
         }
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        for (SitePage sitePage : SiteMenuUtils.getMenuPages()) {
+        for (SitePage sitePage : SiteMenuUtils.getMenuPages(domain)) {
             if (sitePage.getPageType() == SitePage.SitePageType.HOME
                     && ObjectUtils.isEmpty(lang)) {
                 continue;
@@ -199,10 +245,14 @@ public class StaticPageService {
                 continue;
             }
             String pageName = prefixWithLang(lang, sitePage.getPageName());
-            String menuPath = getApiPath(pageName);
+            String menuPath = getApiPath(domain, pageName);
             DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, menuPath, domain);
             if (domainHtmlVo != null &&  domainHtmlVo.getHttpErrCode()==404){
                 deleteSavedHtml(domain, pageName);
+            }
+            if (domainHtmlVo == null || ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
+                recordSave(domain, pageName, false, domainHtmlVo == null
+                        ? "menu api returned null" : "menu api returned empty content");
             }
             if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 saveHtml(domain, pageName, domainHtmlVo.getHtmlContent());
@@ -254,9 +304,13 @@ public class StaticPageService {
                 if (!ObjectUtils.isEmpty(lang)) {
                     menuName = lang + "/" + menuName;
                 }
-                DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(menuName), domain);
+                DomainHtmlVo menuPageVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, menuName), domain);
                 if (menuPageVo!=null && menuPageVo.getHttpErrCode()==404){
                     deleteSavedHtml(domain, menuName);
+                }
+                if (menuPageVo == null || ObjectUtils.isEmpty(menuPageVo.getHtmlContent())) {
+                    recordSave(domain, menuName, false, menuPageVo == null
+                            ? "pagination api returned null" : "pagination api returned empty content");
                 }
                 if (menuPageVo!=null && !ObjectUtils.isEmpty(menuPageVo.getHtmlContent())){
                     saveHtml(domain, menuName, menuPageVo.getHtmlContent());
@@ -317,7 +371,7 @@ public class StaticPageService {
                 if (!ObjectUtils.isEmpty(lang)) {
                     docName = lang + "/" + docName;
                 }
-                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
+                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, docName), domain);
                 saveHtml(domain, docName, subVo.getHtmlContent());
                 addWebSitemap(subVo.getHtmlContent(), "/" + docName, 1.0, domain, lang, SitePage.SitePageType.DOCUMENTS);
                 SitePage sub = new SitePage();
@@ -334,8 +388,9 @@ public class StaticPageService {
         if (!ObjectUtils.isEmpty(lang)) {
             docName = lang + "/" + docName;
         }
-        DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(docName), domain);
+        DomainHtmlVo categoryVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, docName), domain);
         if (categoryVo==null){
+            recordSave(domain, docName, false, "category api returned null");
             return new ArrayList<>();
         }
         if (categoryVo.getHttpErrCode() == 404){
@@ -343,6 +398,7 @@ public class StaticPageService {
             return new ArrayList<>();
         }
         if (ObjectUtils.isEmpty(categoryVo.getHtmlContent())){
+            recordSave(domain, docName, false, "category api returned empty content");
             return new ArrayList<>();
         }
         saveHtml(domain, docName, categoryVo.getHtmlContent());
@@ -383,19 +439,25 @@ public class StaticPageService {
             }
             detailUrlNap.get(domain).add(detailUrl);
             CompletableFuture<Void> detailTask = CompletableFuture.runAsync(() -> {
-                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(detailUrl), domain);
-                saveHtml(domain, detailUrl, subVo.getHtmlContent());
-                addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
-                if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
-                    if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
-                        List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
-                        for (LinkedHashMap<String, Object> model : modelList) {
-                            String modelName = sitePage.getPageName() + subVo.getModelMap().get("suffix").toString().replace("/detail", "") + "-series" + model.get("id");
-                            if (!ObjectUtils.isEmpty(lang)) {
-                                modelName = lang + "/" + modelName;
+                DomainHtmlVo subVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, detailUrl), domain);
+                if (subVo == null || ObjectUtils.isEmpty(subVo.getHtmlContent())) {
+                    recordSave(domain, detailUrl, false, subVo == null
+                            ? "detail api returned null" : "detail api returned empty content");
+                }
+                saveHtml(domain, detailUrl, subVo == null ? "" : subVo.getHtmlContent());
+                if (subVo != null) {
+                    addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
+                    if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
+                        if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
+                            List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
+                            for (LinkedHashMap<String, Object> model : modelList) {
+                                String modelName = sitePage.getPageName() + subVo.getModelMap().get("suffix").toString().replace("/detail", "") + "-series" + model.get("id");
+                                if (!ObjectUtils.isEmpty(lang)) {
+                                    modelName = lang + "/" + modelName;
+                                }
+                                DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, modelName), domain);
+                                saveHtml(domain, modelName, modelVo.getHtmlContent());
                             }
-                            DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(modelName), domain);
-                            saveHtml(domain, modelName, modelVo.getHtmlContent());
                         }
                     }
                 }
@@ -461,13 +523,16 @@ public class StaticPageService {
     public void saveHtml(String domain, String namePrefix, String html) {
         if (ObjectUtils.isEmpty(html)) {
             log.info("Empty html content,uri:{}", namePrefix);
+            recordSave(domain, namePrefix, false, "empty html content");
             return;
         }
         String menuPagePath = getStaticPageFileName(domain, namePrefix);
         try {
             templateEnginePageRenderer.saveToFile(html, menuPagePath);
+            recordSave(domain, namePrefix, true, null);
         } catch (IOException e) {
             log.error("save {} html file exception", namePrefix, e);
+            recordSave(domain, namePrefix, false, "save file exception: " + e.getMessage());
         }
     }
 
@@ -491,11 +556,11 @@ public class StaticPageService {
     }
 
 
-    private String getApiPath(String name) {
+    private String getApiPath(String domain, String name) {
         if (!name.startsWith("/")) {
             name = "/" + name;
         }
-        return PathMatchUtils.matchResult(name).getForwardTarget();
+        return PathMatchUtils.matchResult(name, domain).getForwardTarget();
     }
 
     /**

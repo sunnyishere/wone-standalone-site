@@ -14,8 +14,9 @@ public class ThymeleafUtils {
             return input;
         }
         // 初始处理：转小写，替换斜杠和空格
-        String processed = input.toLowerCase().trim();
-        
+        String processed = input.toLowerCase().trim()
+                .replaceAll("[\\u2010-\\u2015\\u2212\\uFE58\\uFF0D]", "-");
+
         // 处理特殊字符：括号、点、波浪线等
         processed = processed
                 .replaceAll("[\\s_]+", "-")  // 替换空格和下划线为连字符

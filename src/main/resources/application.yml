@@ -24,6 +24,15 @@ logging:
 
 landingBaseUrl: https://www.iee-business.com
 
+# 站点内容列表接口（搜索页数据源）
+# 生产环境: https://www.iee-business.com ；本地测试环境: http://192.168.35.16
+# access-key/secret-key 由接口提供方分配，部署环境注入，禁止入库入日志
+site-content:
+  base-url: http://192.168.35.16
+  access-key: a59adea3b9e74c18abafe71013c591f1
+  secret-key: 3c5cff8656234619ac5c733463d750c8
+  page-size: 12
+
 wcm-api: http://192.168.35.16/wcm-api/site/static/
 brand:
   languages: en,fr,pl,et,bn,id,uk,cs,kn,gl,pa,sv,pt,no,ar,ku,hr,fi,eu,vi,tr,sw,ja,is,lv,nl,de,fa,hi,it,hy,es,te,eo,ka,ru,uz,sl,ca,bg,hu,el,he,sr,ps,ne,kk,az,af,ms,la,ko,mk,mt,tl,ur,ta,si,ha,da,ga,ceb,fil,th
@@ -42,7 +51,7 @@ brand:
 cdn:
   enabled: true
   prefix: "https://oss.iee-business.com"
-  version: 1.1.5
+  version: 1.1.8
 
 google-tag:
   id: G-0HKGZJNMN6

@@ -112,7 +112,7 @@ public class StaticizeTriggerController {
      */
     private SyncContext buildSyncContext(StandaloneSyncEvent standaloneSyncEvent) {
         StandaloneSyncEntityType entityType = standaloneSyncEvent.getEntityType();
-        for (SitePage sitePage : SiteMenuUtils.getMenuPages()) {
+        for (SitePage sitePage : SiteMenuUtils.getMenuPages(standaloneSyncEvent.getDeployDomain())) {
             if (entityType.getPageType() == sitePage.getPageType().intValue()
                     || (entityType.getPageType() == 0 && sitePage.getPageType().equals(standaloneSyncEvent.getEntityId()))) {
                 String pageName = sitePage.getPageName();

@@ -36,9 +36,11 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
             log.warn("copy static error:{}",e.getMessage());
         }
         knowledgeService.getSiteMenu(brandConfig.getDomain());
+        staticPageService.generateIndexPage(brandConfig.getDomain());
         if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
             for (String domain : brandConfig.getDomainList()) {
                 knowledgeService.getSiteMenu(domain);
+                staticPageService.generateIndexPage(domain);
             }
         }
         if (brandConfig.getExecuteOnStart()) {

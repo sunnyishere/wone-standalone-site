@@ -18,22 +18,9 @@ public class RobotsUtils {
     private static final List<String> AI_BOT_RULES = Arrays.asList(
             "User-agent: *",
             "Allow: /",
-            "User-agent: OAI-SearchBot",
-            "Allow: /",
-            "User-agent: GPTBot",
-            "Allow: /",
-            "User-agent: ChatGPT-User",
-            "Allow: /",
-            "User-agent: Google-Extended",
-            "Allow: /",
-            "User-agent: ClaudeBot",
-            "Allow: /",
-            "User-agent: PerplexityBot",
-            "Allow: /",
-            "",
-            "# Bing/Copilot discovery",
-            "User-agent: Bingbot",
-            "Allow: /",
+            "Disallow: /cdn-cgi/",
+            "Disallow: /search/",
+            "Disallow: /search-",
             ""
     );
 
