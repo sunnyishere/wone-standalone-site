@@ -256,14 +256,14 @@ public class StaticPageService {
             }
             if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
                 saveHtml(domain, pageName, domainHtmlVo.getHtmlContent());
-                addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + pageName,
-                        getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
                 if (sitePage.getPageType() == SitePage.SitePageType.HOME) {
-                    //其他语种首页
+                    //其他语种首页：sitemap 只登记语言根路径，避免出现 "/Home" 条目
                     saveHtml(domain, lang, domainHtmlVo.getHtmlContent());
                     addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + lang, 1.0, domain, lang, SitePage.SitePageType.HOME);
                     continue;
                 }
+                addWebSitemap(domainHtmlVo.getHtmlContent(), "/" + pageName,
+                        getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
                 List<CompletableFuture<Void>> pageTaskList = processPagination(sitePage, null, domainHtmlVo, false, lang, domain, updatedIdsByType);
                 if (!pageTaskList.isEmpty()) {
                     futures.addAll(pageTaskList);
@@ -314,9 +314,6 @@ public class StaticPageService {
                 }
                 if (menuPageVo!=null && !ObjectUtils.isEmpty(menuPageVo.getHtmlContent())){
                     saveHtml(domain, menuName, menuPageVo.getHtmlContent());
-                    if (p != 1) {
-                        addWebSitemap(menuPageVo.getHtmlContent(), "/" + menuName, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
-                    }
 
                     //仅对菜单根列表页面进行处理详情采集
                     if (p >= 2 && !isSubMenu) {

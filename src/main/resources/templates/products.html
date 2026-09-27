@@ -103,7 +103,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(item.name), ' ', '-'))} + '-' +
+                   ${#normalizer.normalizeString(item.name)} + '-' +
                    ${item.id}"
                    th:text="${item.i18nName}">
                 </a>
@@ -114,7 +114,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-'))} + '-' +
+                   ${#normalizer.normalizeString(category.name)} + '-' +
                    ${category.id}"
                    th:text="${category.i18nName}"></a>
             </li>
@@ -165,7 +165,7 @@
            '/' +
            #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
            '/' +
-           #strings.replace(#strings.trim(#strings.toLowerCase(subCategory.name)), ' ', '-') +
+           #normalizer.normalizeString(subCategory.name) +
            '-' + subCategory.id}">
                                 <span th:text="${subCategory.i18nName}"></span>
                             </a>

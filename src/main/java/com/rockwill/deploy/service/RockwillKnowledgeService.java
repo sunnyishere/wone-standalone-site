@@ -229,7 +229,8 @@ public class RockwillKnowledgeService {
                     fillCommonModel(model, host);
                     handleDateKey(model);
                     handleLibraryFileSize(model);
-                    stripEmbeddedSkeleton(model);
+                    sanitizeRichText(model);
+                    upgradeOssAssetsToHttps(model);
                     if (model.containsKey("prodFaqList")) {
                         model.put("pageFaqList", model.get("prodFaqList"));
                     }
@@ -293,31 +294,79 @@ public class RockwillKnowledgeService {
     }
 
     /**
-     * 递归剥离 model 富文本字符串中被整体粘贴的 HTML 文档骨架（{@code <!DOCTYPE>/<html>/<head>/<body>}）。
+     * 富文本字段定点清单：model 中的实体 key → [内容字段名, img alt 兜底字段名]。
+     * prod 的内容字段为 detail、alt 取 name；news/article/successCase/blog 的内容字段
+     * 均为 content、alt 取 title。
+     */
+    private static final Map<String, String[]> RICH_TEXT_FIELDS = new LinkedHashMap<String, String[]>() {{
+        put("prod", new String[]{"detail", "name"});
+        put("news", new String[]{"content", "title"});
+        put("article", new String[]{"content", "title"});
+        put("successCase", new String[]{"content", "title"});
+        put("blog", new String[]{"content", "title"});
+    }};
+
+    /**
+     * 定点清理富文本字段：剥离被粘贴的 HTML 文档骨架（{@code <!DOCTYPE>/<html>/<head>/<body>}），
+     * 并为缺失 alt 的 img 补齐兜底 alt（prod 取实体 name，其余取实体 title）。
      * <p>
-     * CMS 编辑器粘贴网页源码时会把整份文档存进正文（如 prod.detail、news.content），
-     * 经 {@code th:utext} 原样输出会让页面出现第二套 head/body；剥离规则见
-     * {@link RichTextUtils#stripDocumentSkeleton(String)}。
+     * CMS 编辑器粘贴网页源码时会把整份文档存进正文，经 {@code th:utext} 原样输出会让页面
+     * 出现第二套 head/body；富文本内 UEditor 图片普遍缺 alt。剥离与补齐规则分别见
+     * {@link RichTextUtils#stripDocumentSkeleton(String)} 与
+     * {@link RichTextUtils#fillMissingAlt(String, String)}。
      *
      * @param model 页面渲染 model
      */
-    private void stripEmbeddedSkeleton(Map<String, Object> model) {
+    private void sanitizeRichText(Map<String, Object> model) {
+        for (Map.Entry<String, String[]> field : RICH_TEXT_FIELDS.entrySet()) {
+            String[] fieldNames = field.getValue();
+            Object entityObj = model.get(field.getKey());
+            if (!(entityObj instanceof Map)) {
+                continue;
+            }
+            @SuppressWarnings("unchecked")
+            Map<String, Object> entity = (Map<String, Object>) entityObj;
+            Object content = entity.get(fieldNames[0]);
+            if (!(content instanceof String) || StringUtils.isBlank((String) content)) {
+                continue;
+            }
+            Object alt = entity.get(fieldNames[1]);
+            String altText = alt instanceof String && StringUtils.isNotBlank((String) alt) ? (String) alt : null;
+            String cleaned = RichTextUtils.stripDocumentSkeleton((String) content);
+            cleaned = RichTextUtils.fillMissingAlt(cleaned, altText);
+            entity.put(fieldNames[0], cleaned);
+        }
+    }
+
+    /**
+     * 递归升级 model 各层字符串中白名单 OSS host 的 http 资源地址为 https，
+     * 消除富文本图片、library.icon、列表 item.icon 等下发内容造成的混合内容。
+     * 替换规则见 {@link RichTextUtils#upgradeOssToHttps(String)}，仅命中
+     * {@code http://oss.iwone.cn} 与 {@code http://oss.iee-business.com} 两个前缀，
+     * 其他 host（含内网地址）不做任何改写。
+     *
+     * @param model 页面渲染 model
+     */
+    private void upgradeOssAssetsToHttps(Map<String, Object> model) {
         for (Map.Entry<String, Object> entry : model.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof String) {
-                entry.setValue(RichTextUtils.stripDocumentSkeleton((String) value));
+                entry.setValue(RichTextUtils.upgradeOssToHttps((String) value));
             } else if (value instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> nestedMap = (Map<String, Object>) value;
-                stripEmbeddedSkeleton(nestedMap);
+                upgradeOssAssetsToHttps(nestedMap);
             } else if (value instanceof List) {
                 @SuppressWarnings("unchecked")
                 List<Object> list = (List<Object>) value;
-                for (Object item : list) {
-                    if (item instanceof Map) {
+                for (int i = 0; i < list.size(); i++) {
+                    Object item = list.get(i);
+                    if (item instanceof String) {
+                        list.set(i, RichTextUtils.upgradeOssToHttps((String) item));
+                    } else if (item instanceof Map) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> mapInList = (Map<String, Object>) item;
-                        stripEmbeddedSkeleton(mapInList);
+                        upgradeOssAssetsToHttps(mapInList);
                     }
                 }
             }

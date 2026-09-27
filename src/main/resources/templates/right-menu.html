@@ -7,7 +7,7 @@
 
         <!-- WhatsApp (type=0) -->
         <div th:if="${widget.type == 0}">
-            <a th:href="'https://wa.me/' + ${widget.details}" target="_blank" title="WhatsApp">
+            <a th:href="'https://wa.me/' + ${widget.details}" target="_blank" rel="noopener noreferrer" title="WhatsApp">
                 <img th:src="${widget.iconUrl}" alt="WhatsApp" style="width: 32px; height: 32px; object-fit: contain;border-radius: 50%;" />
                 <br>
                 <div style="font-size: 12px">WhatsApp</div>

@@ -18,7 +18,7 @@
           th:content="${successCase.description} + '-' + ${prodBrand.eName}"/>
     <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="${currentLang}" />
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
     <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
     <meta property="og:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
