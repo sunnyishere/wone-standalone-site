@@ -39,8 +39,6 @@
                 <div class="device-aware-link library-publisher-employee"
                    th:each="employee, stat : ${libraryEmployees}"
                    th:if="${stat.index < 3}"
-                   th:href="${employee.profileUrl != null and employee.profileUrl != ''
-                       ? landingBaseUrl + employee.profileUrl : '#'}"
                    th:title="${employee.account}"
                    th:aria-label="${employee.account}">
                     <span class="library-publisher-avatar">

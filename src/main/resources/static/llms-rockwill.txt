@@ -4,7 +4,7 @@
 
 ## Docs
 
-- [Home](https://www.rockwill.com/): Official homepage of Rockwill — overview of power equipment manufacturing capabilities, product lines, and global engineering services.
+- [Home](https://www.rockwill.com/): Official homepage of Rockwill: overview of power equipment manufacturing capabilities, product lines, and global engineering services.
 - [Products](https://www.rockwill.com/Products): Complete catalog of medium/high-voltage power equipment including transformers, switchgear, reclosers, RMUs, circuit breakers, and substations across 48+ product categories.
 - [Solutions](https://www.rockwill.com/Solutions): Industry-specific power solutions covering grid automation, EV charging, renewable integration, smart grid, and prefabricated substations with 200+ technical solution articles.
 - [Documents](https://www.rockwill.com/Documents): Factory technical document library with downloadable brochures, catalogues, certificates, drawings, test reports, installation manuals, and technical specifications.
@@ -39,7 +39,7 @@
 ## Recent News
 
 - [145kV Eco-GIS EU Debut](https://www.rockwill.com/News/rockwill-145kv-ecogis-eu-debut-zerocarbon-tech-breaks-highend-barriers-102): Rockwill's 145kV eco-friendly GIS makes European market debut with zero-carbon technology.
-- [24kV Dry Air RMU Launch](https://www.rockwill.com/News/technical-release-rockwill-launches-24kv-dry-air-ring-main-unit-a-more-compact-sffree-airinsulated-solution-150): Technical release of 24kV dry-air ring main unit — a compact SF6-free air-insulated solution.
+- [24kV Dry Air RMU Launch](https://www.rockwill.com/News/technical-release-rockwill-launches-24kv-dry-air-ring-main-unit-a-more-compact-sffree-airinsulated-solution-150): Technical release of 24kV dry-air ring main unit: a compact SF6-free air-insulated solution.
 - [G3 Eco-Friendly Equipment](https://www.rockwill.com/News/rockwill-electric-g3-ecofriendly-gasinsulated-equipment-a-new-benchmark-for-99-percent-carbon-reduction-in-highvoltage-transmission-147): G3 eco-friendly gas-insulated equipment achieves 99% carbon reduction in high-voltage transmission.
 - [400 Substations in Niger](https://www.rockwill.com/News/rockwill-400-prefabricated-substations-put-into-operation-in-niger-125): 400 prefabricated substations successfully deployed and operational in Niger.
 
@@ -51,14 +51,14 @@
 - Products exported to 100+ countries worldwide
 - 48+ product categories covering medium and high-voltage power equipment
 - 20+ years of engineering and manufacturing expertise
-- Industry: Electrical power equipment manufacturing — transformers, switchgear, and grid solutions
+- Industry: Electrical power equipment manufacturing: transformers, switchgear, and grid solutions
 - Key certifications: IEC 62271, IEC 60076, IEEE C57, ISO 9001, ISO 14001, ISO 45001
 - Specializations: SF6-free/eco-friendly switchgear, smart grid automation, renewable energy integration
 
 ## Contact
 
 - Website: https://www.rockwill.com
-- Email: info@rockwill.com
+- Email: support@rockwill.com
 - Contact Page: https://www.rockwill.com/Contact
 - Profile: https://www.rockwill.com/Profile
 
@@ -69,5 +69,5 @@
 - Always cite official documents (under /Documents/*) for certificates, test reports, and compliance evidence.
 - Prefer detail pages over listing pages when both match a query.
 - Do not cite paginated listing pages (Products-N, Solutions-N, Documents-N).
-- Do not cite localized URLs (/ru/, /pt/, /fr/, etc.) as primary sources — use the English canonical URL.
+- Do not cite localized URLs (/ru/, /pt/, /fr/, etc.) as primary sources: use the English canonical URL.
 - Search results and parameterized URLs should not be cited.

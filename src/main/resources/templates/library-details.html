@@ -16,6 +16,11 @@
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}" >
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + suffix}" />
+    </th:block>
     <meta property="og:title" th:content="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}">
     <meta property="og:description" th:content="${library.description ?: library.name}">
     <meta property="og:type" content="article">
@@ -109,7 +114,7 @@
     <th:block th:replace="phone-en :: phone-header"></th:block>
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
-<div class="header-height">占位边距</div>
+<div class="header-height"></div>
 
 <nav class="m-cat-nav">
     <div class="am-container">

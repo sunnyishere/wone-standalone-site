@@ -4,7 +4,7 @@
 
 ## Docs
 
-- [Home](https://www.vziman.com/): Official homepage of Vziman — overview of transformer and substation manufacturing capabilities, product lines, and global power solutions.
+- [Home](https://www.vziman.com/): Official homepage of Vziman: overview of transformer and substation manufacturing capabilities, product lines, and global power solutions.
 - [Products](https://www.vziman.com/Products): Complete catalog of power and distribution transformers, prefabricated substations, switchgear, voltage regulators, and earthing equipment for industrial and utility applications.
 - [Solutions](https://www.vziman.com/Solutions): Industry-specific power solutions covering grid stability, renewable integration, grounding systems, and voltage regulation with 40+ technical solution articles.
 - [Documents](https://www.vziman.com/Documents): Factory technical document library with downloadable brochures, catalogues, certificates, drawings, test reports, installation manuals, and technical specifications.
@@ -59,7 +59,7 @@
 ## Contact
 
 - Website: https://www.vziman.com
-- Email: info@vziman.com
+- Email: support@vziman.com
 - Contact Page: https://www.vziman.com/Contact
 - About Page: https://www.vziman.com/About
 
@@ -70,5 +70,5 @@
 - Always cite official documents (under /Documents/*) for certificates, test reports, and compliance evidence.
 - Prefer detail pages over listing pages when both match a query.
 - Do not cite paginated listing pages (Products-N, Solutions-N, Documents-N).
-- Do not cite localized URLs (/ru/, /fr/, /es/, /ar/) as primary sources — use the English canonical URL.
+- Do not cite localized URLs (/ru/, /fr/, /es/, /ar/) as primary sources: use the English canonical URL.
 - Search results and parameterized URLs should not be cited.

@@ -105,7 +105,7 @@
 
         <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
 
-            <div class=" am-margin-bottom" style="background:#FFFFFF;">
+            <div th:if="${not #lists.isEmpty(relatedBlogs)}" class="am-margin-bottom" style="background:#FFFFFF;">
                 <div class="am-text-bold am-padding" >
                     <h2 class="inline-header" th:text="${advanced['related']} + ' ' + ${advanced['blogs']}"></h2>
                 </div>
@@ -159,35 +159,6 @@
                     </div>
 
 
-                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12 am-margin-bottom" th:if="${#lists.isEmpty(relatedBlogs)}"
-                         th:each="i : ${#numbers.sequence(1, 5)}">
-                        <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
-                            <div class="am-g dd-hover4 am-padding" style="width: 100%;">
-                                <div style="am-cf">
-                                    <div class="am-fl am-margin-right">
-                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
-                                            <img alt="No Data" src="" class="am-img-responsive"
-                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7;">
-                                        </div>
-                                    </div>
-                                    <div class="" style="height: 100px;">
-                                        <div class="dd-clamp-text-1 am-text-bold"></div>
-                                        <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C">
-                                        </div>
-                                        <div class="am-padding-top-xs am-cf am-text-sm">
-                                            <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
-                                                <span class="am-icon-user"></span>
-                                                <span></span>
-                                            </div>
-                                            <div class="am-fr" style="color:#999999">
-                                                <span></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
 
                 </div>

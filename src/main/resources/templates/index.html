@@ -694,8 +694,8 @@
 <th:block th:replace="inquiry :: inquiry"></th:block>
 <th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
 <th:block th:replace="footer :: footer"></th:block>
-<script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
-<script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js"></script>
+<script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js" defer></script>
+<script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js" defer></script>
 <script>
     (function () {
         function initHeroEmbla() {
@@ -731,7 +731,7 @@
         initHeroEmbla();
     })();
 </script>
-<script th:src="@{${'/js/home.js?v=' + version}}"></script>
+<script th:src="@{${'/js/home.js?v=' + version}}" defer></script>
 
 </body>
 

@@ -4,7 +4,7 @@
 
 ## Docs
 
-- [Home](https://www.energy-rw.com/): Official homepage of RW Energy — overview of energy storage, EV charging, power quality, and distribution automation product lines.
+- [Home](https://www.energy-rw.com/): Official homepage of RW Energy: overview of energy storage, EV charging, power quality, and distribution automation product lines.
 - [Products](https://www.energy-rw.com/Products): Complete catalog of energy storage systems, EV chargers, recloser controllers, protection relays, power quality equipment, and switchgear across 69+ product categories.
 - [Solutions](https://www.energy-rw.com/Solutions): Industry-specific power solutions covering distribution automation, power quality management, harmonic mitigation, reactive power compensation, and microgrid integration.
 - [Documents](https://www.energy-rw.com/Documents): Factory technical document library with downloadable brochures, catalogues, certificates, drawings, test reports, installation manuals, and technical specifications.
@@ -58,7 +58,7 @@
 ## Contact
 
 - Website: https://www.energy-rw.com
-- Email: info@energy-rw.com
+- Email: Support@rw-relay.com
 - Contact Page: https://www.energy-rw.com/Contact
 - About Page: https://www.energy-rw.com/About
 
@@ -69,5 +69,5 @@
 - Always cite official documents (under /Documents/*) for certificates, test reports, and compliance evidence.
 - Prefer detail pages over listing pages when both match a query.
 - Do not cite paginated listing pages (Products-N, Solutions-N, Documents-N).
-- Do not cite localized URLs (/ru/, /it/, /fr/, /es/, /de/, /ar/) as primary sources — use the English canonical URL.
+- Do not cite localized URLs (/ru/, /it/, /fr/, /es/, /de/, /ar/) as primary sources: use the English canonical URL.
 - Search results and parameterized URLs should not be cited.
