@@ -10,6 +10,7 @@ public enum StandaloneSyncEntityType {
     NEWS(SitePage.SitePageType.NEWS),
     BLOG(SitePage.SitePageType.BLOG),
     PAGE(0), //菜单sitePage更新
+    SITE(-1), //全站公共配置更新
     SUCCESS_CASE(SitePage.SitePageType.SUCCESS_REFERENCE);
 
     final int pageType;

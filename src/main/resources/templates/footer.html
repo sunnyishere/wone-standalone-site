@@ -1,37 +1,89 @@
-<footer class="" th:fragment="footer">
-
-    <div class="" style="background-color: #777A82;">
-        <section class="am-container am-g m-footer-container am-padding-top-lg">
-            <section th:if="${not #lists.isEmpty(bottomNavItems)}"
-                     th:each="section : ${bottomNavItems}"
-                     class="am-u-sm-6 am-u-md-3 am-u-lg-3 am-padding-bottom-lg am-padding-top-lg">
-
-                <!-- 渲染顶级导航标题 -->
-                <span class="am-text-sm" th:text="${section.title}"></span>
-
-                <!-- 循环渲染子导航项 -->
-                <div style="display: flex;flex-direction: column;gap:10px;">
-                    <a th:title="${item.text}" aria-hidden="false" th:aria-label="${item.text}" class="am-text-xs" th:each="item : ${section.items}"
-                       th:href="@{${item.href}}"
-                       th:text="${item.text}"
-                       th:utext="${item.text}"></a>
+<footer class="m-footer" th:fragment="footer">
+    <div class="site-footer-main">
+        <div class="am-container footer-grid">
+            <section class="footer-brand-column">
+                <h2 class="footer-brand-name"
+                    th:text="${footerConfig != null and footerConfig.title != null and footerConfig.title != '' ? footerConfig.title : (prodBrand != null and prodBrand.eName != null and prodBrand.eName != '' ? prodBrand.eName : brandName)}"></h2>
+                <p class="footer-brand-description"
+                   th:if="${footerConfig != null and footerConfig.description != null and footerConfig.description != ''}"
+                   th:text="${footerConfig.description}"></p>
+                <div class="footer-socials"
+                     th:if="${footerConfig != null and
+                        ((footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != '') or
+                         (footerConfig.youtubeUrl != null and footerConfig.youtubeUrl != '') or
+                         (footerConfig.whatsappUrl != null and footerConfig.whatsappUrl != ''))}">
+                    <a th:if="${footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != ''}"
+                       th:href="${footerConfig.linkedinUrl}" target="_blank" rel="noopener noreferrer"
+                       title="LinkedIn" aria-label="LinkedIn"><i class="am-icon-linkedin" aria-hidden="true"></i></a>
+                    <a th:if="${footerConfig.youtubeUrl != null and footerConfig.youtubeUrl != ''}"
+                       th:href="${footerConfig.youtubeUrl}" target="_blank" rel="noopener noreferrer"
+                       title="YouTube" aria-label="YouTube"><i class="am-icon-youtube-play" aria-hidden="true"></i></a>
+                    <a th:if="${footerConfig.whatsappUrl != null and footerConfig.whatsappUrl != ''}"
+                       th:href="${footerConfig.whatsappUrl}" target="_blank" rel="noopener noreferrer"
+                       title="WhatsApp" aria-label="WhatsApp"><i class="am-icon-whatsapp" aria-hidden="true"></i></a>
                 </div>
             </section>
-        </section>
+
+            <section class="footer-nav-column"
+                     th:if="${bottomNavItems != null and not #lists.isEmpty(bottomNavItems)}"
+                     th:each="section : ${bottomNavItems}">
+                <h2 class="footer-column-title" th:text="${section.title}"></h2>
+                <ul class="footer-link-list">
+                    <li th:each="item : ${section.items}">
+                        <a th:if="${item.containsKey('href')}"
+                           th:title="${item.text}" th:aria-label="${item.text}"
+                           th:href="${item.get('href')}" th:text="${item.text}"></a>
+                        <span th:unless="${item.containsKey('href')}" th:text="${item.text}"></span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="footer-contact-column"
+                     th:if="${footerContact != null and
+                        ((footerContact.headquartersFactory != null and footerContact.headquartersFactory != '') or
+                         (footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != '') or
+                         (footerContact.email != null and footerContact.email != ''))}">
+                <h2 class="footer-column-title" th:text="${advanced['contact']}"></h2>
+                <ul class="footer-contact-list">
+                    <li th:if="${footerContact.headquartersFactory != null and footerContact.headquartersFactory != ''}">
+                        <i class="am-icon-map-marker" aria-hidden="true"></i>
+                        <span th:text="${footerContact.headquartersFactory}"></span>
+                    </li>
+                    <li th:if="${footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != ''}">
+                        <i class="am-icon-phone" aria-hidden="true"></i>
+                        <span th:text="${footerContact.phoneWhatsapp}"></span>
+                    </li>
+                    <li th:if="${footerContact.email != null and footerContact.email != ''}">
+                        <i class="am-icon-envelope-o" aria-hidden="true"></i>
+                        <span th:text="${footerContact.email}"></span>
+                    </li>
+                </ul>
+            </section>
+        </div>
     </div>
 
-    <div class="m-footer-bottom"  style="background-color: #000000;">
+    <div class="m-footer-bottom">
         <div class="am-container">
-            <div class="am-g am-text-center am-padding-top-lg">
-                 <span class="m-u-sm-12">
-                        Copyright &copy; <span th:text="${year}"></span>
-                 </span>
-                 <span th:text="${brandName}"></span>.
-                <a title="All Rights Reserved.POWERED BY IEE-Business" aria-hidden="false" aria-label="All Rights Reserved.POWERED BY IEE-Business" href="https://www.iee-business.com/">
-                    <span>
-                         All Rights Reserved.POWERED BY IEE-Business
-                    </span>
-                </a>
+            <div class="footer-copyright">
+                <span>&copy; <span th:text="${year}"></span>
+                    <span th:text="${brandName}"></span>. All rights reserved.</span>
+                <span class="footer-legal">
+                    <a th:if="${footerConfig != null and footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != ''}"
+                       th:href="${footerConfig.privacyPolicyUrl}" target="_blank" rel="noopener noreferrer"
+                       th:text="${advanced['account.privacy.policy']}"></a>
+                    <span th:if="${footerConfig != null and
+                        footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != '' and
+                        footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''}"
+                          aria-hidden="true">&middot;</span>
+                    <a th:if="${footerConfig != null and footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''}"
+                       th:href="${footerConfig.termsOfUseUrl}" target="_blank" rel="noopener noreferrer"
+                       th:text="${advanced['terms.of.use']}"></a>
+                    <span th:if="${footerConfig != null and
+                        ((footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != '') or
+                         (footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''))}"
+                          aria-hidden="true">&middot;</span>
+                    <span th:text="${currentHost}"></span>
+                </span>
             </div>
         </div>
     </div>
@@ -50,10 +102,6 @@
     echo.init({
         offset: 500,
         throttle: 250,
-        unload: false,
-        callback: function (element, op) {
-            console.log(element, 'has been', op + 'ed')
-        }
+        unload: false
     });
-    // 图片赖加载
 </script>

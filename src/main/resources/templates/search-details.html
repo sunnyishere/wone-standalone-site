@@ -99,17 +99,17 @@
             <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
                 <!-- 产品列表存在时显示 -->
                 <div th:if="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}">
-                    <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                    <ul class="equal-height-card-list am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                         style="margin: 0 0;">
-                        <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                        <li class="equal-height-card-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                             th:each="index : ${pageData.rows}">
-                            <a th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+                            <a class="equal-height-card-link" th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                     'detail/'+
                    ${#normalizer.normalizeString(index.name)} +
                    '-'+${index.id}">
-                                <div style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
+                                <div class="equal-height-card" style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">
                                         <img th:src="${index.url}" th:alt="${index.name}" class="image-square">
                                     </div>

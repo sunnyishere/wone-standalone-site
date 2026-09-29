@@ -93,9 +93,14 @@
     <div class="am-container phone-container-top am-margin-bottom am-margin-top">
         <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
              style="background:#FFFFFF;">
-            <h1 class="am-text-bold " th:text="${article.title}"></h1>
-            <div class=" am-text-left">
-                <div class="am-padding-top-xs">
+            <div class="detail-page-heading">
+                <h1 class="am-text-bold" th:text="${article.title}"></h1>
+                <p class="detail-page-subtitle"
+                   th:if="${not #strings.isEmpty(article.description)}"
+                   th:text="${article.description}"></p>
+            </div>
+            <div class="solution-detail-meta am-text-left">
+                <div class="solution-detail-author am-padding-top-xs">
                     <span th:title="${article.author}" aria-hidden="false" th:aria-label="${article.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
                     <a th:title="${article.author}" th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
                                    '/' :
@@ -103,6 +108,17 @@
                     <span th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}"  class="am-padding-left" style="color:#999999;"
                        th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></span>
                 </div>
+                <span class="solution-google-review-wrap">
+                    <a class="solution-google-review" href="https://www.google.com/preferences/source"
+                       th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
+                       target="_blank" rel="noopener noreferrer" th:aria-label="${advanced['add.us.on.google']}"
+                       aria-describedby="solution-google-tooltip">
+                        <span class="am-icon-google" aria-hidden="true"></span>
+                        <span th:text="${advanced['add.us.on.google']}"></span>
+                    </a>
+                    <span id="solution-google-tooltip" class="solution-google-tooltip" role="tooltip"
+                          th:text="${advanced['google.preferred.source.description']}"></span>
+                </span>
             </div>
             <br>
             <div class="am-padding-top am-padding-bottom-xl">

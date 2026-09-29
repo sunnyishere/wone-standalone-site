@@ -213,12 +213,15 @@
 
 
 <div>
-    <div class="am-container phone-title am-hide-sm-only" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
+    <div class="am-container phone-title am-hide-sm-only home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
             <div class="am-text-center">
                 <div class="am-u-sm-12">
                     <h2 class="inline-header"><span class="am-text-xl am-text-bold"
-                                                    th:text="${prodBrand.eName} + '   ' + ${advanced['products']}"></span>
+                                                    th:text="${homeConfig != null and homeConfig.products != null and homeConfig.products.title != null and homeConfig.products.title != '' ? homeConfig.products.title : prodBrand.eName + '   ' + advanced['products']}"></span>
                     </h2>
+                    <p class="home-config-description"
+                       th:if="${homeConfig != null and homeConfig.products != null and homeConfig.products.description != null and homeConfig.products.description != ''}"
+                       th:text="${homeConfig.products.description}"></p>
                 </div>
             </div>
     </div>
@@ -247,15 +250,15 @@
                     </div>
                     <div class="cont pc-active">
 
-                        <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                        <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                             style="margin: 0 0;">
-                            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                            <li class="equal-height-card-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                                 th:if="${not #lists.isEmpty(featuredProducts)}"
                                 th:each="prod : ${featuredProducts}">
 
-                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                     <a
-                                       class="inline-a-link"
+                                       class="equal-height-card-link inline-a-link"
                                        th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
@@ -273,11 +276,11 @@
 
                             </li>
                             <!-- 空状态处理 -->
-                            <li class="dd-hover4 am-margin-top"
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
                                 th:if="${#lists.isEmpty(featuredProducts)}"
                                 th:each="i : ${#numbers.sequence(1, 5)}"
                                 style="padding: 0 10px !important;">
-                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                     <div class="image-box">
                                         <img class="image-square" style="background: #afb4b7">
                                     </div>
@@ -304,15 +307,15 @@
                         </div>
                     </div>
                     <div class="cont" th:each="category,stat : ${cateProd}" th:data-content-index="${stat.index + 1}">
-                        <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                        <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                             style="margin: 0 0;">
                             <!-- 产品列表循环 -->
-                            <li class="dd-hover4 am-margin-top"
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
                                 th:if="${not #lists.isEmpty(cateProd)}" th:each="product : ${category.prod}"
                                 style="padding: 0 10px !important;">
-                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                     <a
-                                       class="inline-a-link"
+                                       class="equal-height-card-link inline-a-link"
 
                                        th:href="${currentPathLang} +
                                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
@@ -334,11 +337,11 @@
                             </li>
 
                             <!-- 空状态处理 -->
-                            <li class="dd-hover4 am-margin-top"
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
                                 th:if="${#lists.isEmpty(category.prod)}"
                                 th:each="i : ${#numbers.sequence(1, 5)}"
                                 style="padding: 0 10px !important;">
-                                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                                     <div class="image-box">
                                         <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
                                     </div>
@@ -365,15 +368,112 @@
                 </div>
         </div>
 
-            <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
+        <!-- 首页四项数据 -->
+        <section class="home-stat-strip"
+                 th:if="${homeConfig != null and homeConfig.stats != null and
+                ((homeConfig.stats.expertise.value != null and homeConfig.stats.expertise.value != '') or
+                 (homeConfig.stats.countriesServed.value != null and homeConfig.stats.countriesServed.value != '') or
+                 (homeConfig.stats.manufacturingBases.value != null and homeConfig.stats.manufacturingBases.value != '') or
+                 (homeConfig.stats.maxVoltage.value != null and homeConfig.stats.maxVoltage.value != ''))}">
+            <div class="am-container">
+                <ul class="home-stat-list">
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.expertise.value != null and homeConfig.stats.expertise.value != ''}">
+                        <strong th:text="${homeConfig.stats.expertise.value}"></strong>
+                        <span th:text="${advanced['years.of.expertise']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.countriesServed.value != null and homeConfig.stats.countriesServed.value != ''}">
+                        <strong th:text="${homeConfig.stats.countriesServed.value}"></strong>
+                        <span th:text="${advanced['countries.served']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.manufacturingBases.value != null and homeConfig.stats.manufacturingBases.value != ''}">
+                        <strong th:text="${homeConfig.stats.manufacturingBases.value}"></strong>
+                        <span th:text="${advanced['manufacturing.bases']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.maxVoltage.value != null and homeConfig.stats.maxVoltage.value != ''}">
+                        <strong th:text="${homeConfig.stats.maxVoltage.value}"></strong>
+                        <span th:text="${advanced['max.voltage.rating']}"></span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 首页证书资料：左侧展示文案和资料入口，右侧展示前两条关联资料及资料列表入口。 -->
+        <section class="home-certificate-section"
+                 th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+            <div class="am-container home-certificate-layout">
+                <div class="home-certificate-copy">
+<!--                    <div class="home-certificate-eyebrow">Certificates &amp; Type Tests</div>-->
+                    <h2 class="home-certificate-title"
+                        th:if="${homeConfig.certificates.title != null and homeConfig.certificates.title != ''}"
+                        th:text="${homeConfig.certificates.title}"></h2>
+                    <p class="home-certificate-description"
+                       th:if="${homeConfig.certificates.description != null and homeConfig.certificates.description != ''}"
+                       th:text="${homeConfig.certificates.description}"></p>
+                    <ul class="home-certificate-list"
+                        th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+                        <li th:each="library : ${certificateLibraries}">
+                            <a class="inline-a-link"
+                               th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${library.slugTitle} + '-' + ${library.id}"
+                               th:title="${library.name}">
+                                <span class="home-certificate-list__icon">✓</span>
+                                <span class="dd-clamp-text-2" th:text="${library.name}"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="home-certificate-visual"
+                     th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+                    <a class="inline-a-link home-certificate-card home-certificate-card--back"
+                       th:if="${#lists.size(certificateLibraries) > 1}"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${certificateLibraries[1].slugTitle} + '-' + ${certificateLibraries[1].id}"
+                       th:title="${certificateLibraries[1].name}">
+                        <img class="home-certificate-card__image"
+                             th:if="${certificateLibraries[1].icon != null and certificateLibraries[1].icon != ''}"
+                             th:src="${certificateLibraries[1].icon}"
+                             th:alt="${certificateLibraries[1].name}" loading="lazy">
+                        <span class="home-certificate-card__shade"></span>
+                        <span class="home-certificate-card__name dd-clamp-text-2"
+                              th:text="${certificateLibraries[1].name}"></span>
+                    </a>
+
+                    <a class="inline-a-link home-certificate-card home-certificate-card--front"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${certificateLibraries[0].slugTitle} + '-' + ${certificateLibraries[0].id}"
+                       th:title="${certificateLibraries[0].name}">
+                        <img class="home-certificate-card__image"
+                             th:if="${certificateLibraries[0].icon != null and certificateLibraries[0].icon != ''}"
+                             th:src="${certificateLibraries[0].icon}"
+                             th:alt="${certificateLibraries[0].name}" loading="lazy">
+                        <span class="home-certificate-card__shade"></span>
+                        <span class="home-certificate-card__name dd-clamp-text-2"
+                              th:text="${certificateLibraries[0].name}"></span>
+                    </a>
+
+                    <a class="inline-a-link home-certificate-card home-certificate-card--cta"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')}"
+                       th:title="${advanced['full'] + ' ' + advanced['documents']}">
+                        <strong th:text="${advanced['full'] + ' ' + advanced['documents']}"></strong>
+                        <span th:text="${advanced['view.all.certificates.and.type.test.documents']}"></span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+            <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;">
                     <div class="home-section-header__center">
                     <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
                         <h2 class="inline-header">
-                            <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 7]}"
-                                 th:text="${#lists.isEmpty(filtered) ?
-                                '' :
-                                (filtered[0].i18nName ?: '')}"></div>
+                            <div class="dd-clamp-text-1"
+                                 th:text="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.title != null and homeConfig.successCases.title != '' ? homeConfig.successCases.title :
+                                    (#lists.isEmpty(topNavPages.?[pageType == 7]) ? '' : (topNavPages.?[pageType == 7][0].i18nName ?: ''))}"></div>
                         </h2>
+                        <p class="home-config-description"
+                           th:if="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.description != null and homeConfig.successCases.description != ''}"
+                           th:text="${homeConfig.successCases.description}"></p>
                     </div>
                     </div>
                     <div class="home-section-header__action am-padding-top-xs">
@@ -388,12 +488,12 @@
                     </div>
             </div>
             <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
-                <ul class="am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-padding-sm  ">
-                    <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-padding-sm  ">
+                    <li class="equal-height-card-item dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
                         th:if="${not #lists.isEmpty(successCases)}" th:each="success : ${successCases}">
-                        <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                        <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                             <a
-                               class="inline-a-link"
+                               class="equal-height-card-link inline-a-link"
                                th:href="
                             ${currentPathLang} +
                             (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
@@ -423,10 +523,10 @@
 
                     </li>
 
-                    <li class="dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                    <li class="equal-height-card-item dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
                         th:if="${#lists.isEmpty(successCases)}"
                         th:each="i : ${#numbers.sequence(1, 4)}">
-                        <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                        <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                             <div class="image-box2">
                                 <img alt="No Data" src="" class="image-square" style="background: #afb4b7">
                             </div>
@@ -440,15 +540,17 @@
     <!--Rockwill Solutions -->
     <div class="" style="background-color: #FFFFFF;">
 
-        <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
+        <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
                 <div class="home-section-header__center">
                 <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
                     <h2 class="inline-header">
-                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 3]}"
-                             th:text="${#lists.isEmpty(filtered) ?
-                                '' :
-                                (filtered[0].i18nName ?: '')}"></div>
+                        <div class="dd-clamp-text-1"
+                             th:text="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.title != null and homeConfig.solutions.title != '' ? homeConfig.solutions.title :
+                                (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '' : (topNavPages.?[pageType == 3][0].i18nName ?: ''))}"></div>
                     </h2>
+                    <p class="home-config-description"
+                       th:if="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.description != null and homeConfig.solutions.description != ''}"
+                       th:text="${homeConfig.solutions.description}"></p>
                 </div>
                 </div>
                 <div class="home-section-header__action am-padding-top-xs">
@@ -551,39 +653,85 @@
         </div>
     </div>
 
-    <!--Rockwill News -->
-    <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
-                <div class="home-section-header__center">
+    <!-- 支持的厂商：按独立站原型使用左对齐浅灰卡片布局。 -->
+    <section class="home-manufacturer-section"
+             th:if="${homeConfig != null and homeConfig.supportedManufacturers != null and
+                ((homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != '') or
+                 (homeConfig.supportedManufacturers.description != null and homeConfig.supportedManufacturers.description != '') or
+                 (homeConfig.manufacturers != null and not #lists.isEmpty(homeConfig.manufacturers)))}">
+        <div class="am-container phone-title home-section-header">
+            <div class="home-section-header__center">
                 <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
-                    <h2 class="inline-header">
-                        <div class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 5]}"
-                             th:text="${#lists.isEmpty(filtered) ?
-                                '' :
-                                (filtered[0].i18nName ?: '')}"></div>
-                    </h2>
+                    <h2 class="inline-header"
+                        th:if="${homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != ''}"
+                        th:text="${homeConfig.supportedManufacturers.title}"></h2>
+                    <p class="home-manufacturer-description"
+                       th:if="${homeConfig.supportedManufacturers.description != null and homeConfig.supportedManufacturers.description != ''}"
+                       th:text="${homeConfig.supportedManufacturers.description}"></p>
                 </div>
-                </div>
-                <div class="home-section-header__action am-padding-top-xs">
-                    <a th:title="${advanced['view.all']}" aria-hidden="false"
-                       th:aria-label="${advanced['view.all']}"
-                       th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
-                 '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) })">
-                        <span style="color: #000000;text-decoration: underline;"
-                              th:text="${advanced['view.all']}"></span>
-                        <span class="p-icon-a-067  am-padding-left-sm"></span>
-                    </a>
-                </div>
+            </div>
         </div>
-    <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
-            <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+        <ul class="home-manufacturer-list"
+            th:if="${homeConfig.manufacturers != null and not #lists.isEmpty(homeConfig.manufacturers)}">
+            <li class="home-manufacturer-item" th:each="manufacturer : ${homeConfig.manufacturers}">
+                <strong th:text="${manufacturer.abbreviation}"></strong>
+                <span th:text="${manufacturer.fullName}"></span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- News and blog: share one section and switch between the original card lists. -->
+    <section class="home-news-blog-section">
+        <div class="home-news-blog-heading home-config-heading">
+            <h2 th:text="${homeConfig != null and homeConfig.newsBlog != null and
+                    homeConfig.newsBlog.title != null and homeConfig.newsBlog.title != ''
+                    ? homeConfig.newsBlog.title
+                    : ((#lists.isEmpty(topNavPages.?[pageType == 5]) ? 'News' : (topNavPages.?[pageType == 5][0].i18nName ?: 'News'))
+                       + ' &amp; '
+                       + (#lists.isEmpty(topNavPages.?[pageType == 8]) ? 'Blog' : (topNavPages.?[pageType == 8][0].i18nName ?: 'Blog')))}"></h2>
+            <p class="home-config-description"
+               th:if="${homeConfig != null and homeConfig.newsBlog != null and
+                    homeConfig.newsBlog.description != null and homeConfig.newsBlog.description != ''}"
+               th:text="${homeConfig.newsBlog.description}"></p>
+        </div>
+        <div class="home-news-blog-toolbar">
+            <div aria-hidden="true"></div>
+            <div class="home-news-blog-tabs" role="tablist" aria-label="News and blog">
+                <button type="button" class="home-news-blog-tab is-active" role="tab"
+                        aria-selected="true" data-news-blog-tab="news"
+                        th:text="${advanced['news']}"></button>
+                <button type="button" class="home-news-blog-tab" role="tab"
+                        aria-selected="false" data-news-blog-tab="blog"
+                        th:text="${advanced['blogs']}"></button>
+            </div>
+            <div class="home-news-blog-actions">
+                <a class="home-news-blog-view-all" role="link" data-news-blog-action="news"
+                   th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
+                     '/' :
+                     ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) })">
+                    <span th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067"></span>
+                </a>
+                <a class="home-news-blog-view-all" role="link" data-news-blog-action="blog" hidden
+                   th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==8])) ?
+                     '/' :
+                     ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==8][0].pageName), ' ', '-')) })">
+                    <span th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="home-news-blog-panel is-active" role="tabpanel" data-news-blog-panel="news">
+            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+            <ul class="home-news-blog-list am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                 style="margin: 0 0 20px 0;">
-                <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                     th:if="${not #lists.isEmpty(news)}" th:each="index : ${news}">
 
-                    <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <div class="home-news-blog-card" style="background-color: #f9f9f9;padding: 15px;border-radius: 12px;">
                         <a
-                           class="inline-a-link" th:href="
+                           class="home-news-blog-card__link inline-a-link" th:href="
                         ${currentPathLang} +
                         (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
@@ -598,7 +746,7 @@
                             </span>
                             <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
                                   th:text="${index.content}"></span>
-                            <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                            <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
                            <span th:if="${index.created != null}"
                                  th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
                             </div>
@@ -607,10 +755,10 @@
 
                 </li>
 
-                <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important; "
+                <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important; "
                     th:if="${#lists.isEmpty(news)}"
                     th:each="i : ${#numbers.sequence(1, 6)}">
-                    <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <div class="home-news-blog-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">
                             <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
                         </div>
@@ -618,43 +766,24 @@
                             <div></div>
                         </div>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"></span>
-                        <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                        <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
                             <span></span>
                         </div>
                     </div>
                 </li>
 
             </ul>
-        </div>
-
-    <div class="am-container phone-title home-section-header" style="padding: 30px 30px 0 30px;">
-        <div class="home-section-header__center">
-            <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
-                <h2 class="inline-header">
-                    <span class="dd-clamp-text-1" th:with="filtered=${topNavPages.?[pageType == 8]}"
-                         th:text="${#lists.isEmpty(filtered) ?'' : (filtered[0].i18nName ?: '')}"></span>
-                </h2>
             </div>
         </div>
-        <div class="home-section-header__action am-padding-top-xs">
-            <a th:title="${advanced['view.all']}" aria-hidden="false"
-               th:aria-label="${advanced['view.all']}"
-               th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==8])) ?
-                 '/' :
-                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==8][0].pageName), ' ', '-')) })">
-                        <span style="color: #000000;text-decoration: underline;"
-                              th:text="${advanced['view.all']}"></span>
-                <span class="p-icon-a-067  am-padding-left-sm"></span>
-            </a>
-        </div>
-    </div>
-    <div th:if="${not #lists.isEmpty(blogs)}" class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
-        <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+
+        <div class="home-news-blog-panel" role="tabpanel" data-news-blog-panel="blog" hidden>
+            <div th:if="${not #lists.isEmpty(blogs)}" class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+        <ul class="home-news-blog-list am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
             style="margin: 0 0 20px 0;">
-            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+            <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                  th:each="index : ${blogs}">
-                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
-                    <a class="inline-a-link" th:href="
+                <div class="home-news-blog-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="home-news-blog-card__link inline-a-link" th:href="
                         ${currentPathLang} +
                         (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
            '/' :
@@ -670,7 +799,7 @@
                             </span>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
                               th:text="${index.content}"></span>
-                        <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                        <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
                            <span th:if="${index.created != null}"
                                  th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
                         </div>
@@ -678,12 +807,61 @@
                 </div>
             </li>
         </ul>
-    </div>
+            </div>
+        </div>
+    </section>
     <div class="am-container am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
         <div style="background:#FFFFFF;padding: 0 1.6rem">
             <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
         </div>
     </div>
+
+    <!-- 首页联系方式：复用首页管理中的联系方式配置。 -->
+    <section class="home-contact-panel"
+             th:if="${homeConfig != null and homeConfig.contact != null and
+                ((homeConfig.contact.email != null and homeConfig.contact.email != '') or
+                 (homeConfig.contact.title != null and homeConfig.contact.title != '') or
+                 (homeConfig.contact.description != null and homeConfig.contact.description != '') or
+                 (homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != '') or
+                 (homeConfig.contact.headquartersFactory != null and homeConfig.contact.headquartersFactory != '') or
+                 (homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''))}">
+        <div class="home-contact-layout">
+            <div class="home-contact-copy">
+                <h2 class="home-contact-title"
+                    th:if="${homeConfig.contact.title != null and homeConfig.contact.title != ''}"
+                    th:text="${homeConfig.contact.title}"></h2>
+                <p class="home-contact-description"
+                   th:if="${homeConfig.contact.description != null and homeConfig.contact.description != ''}"
+                   th:text="${homeConfig.contact.description}"></p>
+                <ul class="home-contact-list">
+            <li th:if="${homeConfig.contact.email != null and homeConfig.contact.email != ''}">
+                <span class="home-contact-icon"><i class="am-icon-envelope-o"></i></span>
+                <strong th:text="${advanced['your.email']}"></strong>
+                <span class="home-contact-value"><a th:href="'mailto:' + ${homeConfig.contact.email}"
+                         th:text="${homeConfig.contact.email}"></a></span>
+            </li>
+            <li th:if="${homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != ''}">
+                <span class="home-contact-icon"><i class="am-icon-phone"></i></span>
+                <strong th:text="${advanced['phone'] + ' / WhatsApp'}"></strong>
+                <span class="home-contact-value" th:text="${homeConfig.contact.phoneWhatsapp}"></span>
+            </li>
+            <li th:if="${homeConfig.contact.headquartersFactory != null and homeConfig.contact.headquartersFactory != ''}">
+                <span class="home-contact-icon"><i class="am-icon-map-marker"></i></span>
+                <strong th:text="${advanced['headquarters.factory']}"></strong>
+                <span class="home-contact-value" th:text="${homeConfig.contact.headquartersFactory}"></span>
+            </li>
+            <li th:if="${homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''}">
+                <span class="home-contact-icon"><i class="am-icon-globe"></i></span>
+                <strong th:text="${advanced['global.support']}"></strong>
+                <span class="home-contact-value" th:text="${homeConfig.contact.globalSupport}"></span>
+            </li>
+                </ul>
+            </div>
+            <div class="home-contact-rfq">
+                <th:block th:replace="home-inquiry :: homeInquiry"></th:block>
+            </div>
+        </div>
+    </section>
 
     <input type="hidden" id="topNavPageName"
            th:value="${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')}">

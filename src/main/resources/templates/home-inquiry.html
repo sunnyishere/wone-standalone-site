@@ -1,0 +1,91 @@
+<form class="home-rfq-form" id="homeRequestForm" th:fragment="homeInquiry" novalidate>
+    <input type="hidden" name="bizId" value="site-home">
+    <input type="hidden" name="attachFile" id="home-fileName">
+    <input type="hidden" name="attachUrl" id="home-fileUrl">
+
+    <div class="home-rfq-header">
+        <h3 th:text="${advanced['get.quotes.with.rfq'] ?: 'GET QUOTES WITH RFQ'}">GET QUOTES WITH RFQ</h3>
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-name">
+        <label for="home-input-name">
+            <span th:text="${advanced['your.name'] ?: 'Your Name'}">Your Name</span> <em>*</em>
+        </label>
+        <input type="text" id="home-input-name" name="name" class="home-rfq-control"
+               th:placeholder="${advanced['your.name'] ?: 'Your Name'}" autocomplete="off">
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-email">
+        <label for="home-input-email">
+            <span th:text="${advanced['your.email'] ?: 'Your Email'}">Your Email</span> <em>*</em>
+        </label>
+        <input type="email" id="home-input-email" name="email" class="home-rfq-control"
+               th:placeholder="${advanced['your.email'] ?: 'Your Email'}" autocomplete="off">
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-country">
+        <label id="home-country-label" th:text="${advanced['your.country'] ?: 'Country'}">Country</label>
+        <div class="home-rfq-country-control" id="home-country-select">
+            <button type="button" class="home-rfq-control home-rfq-country-trigger"
+                    id="home-country-trigger" aria-labelledby="home-country-label home-country-text"
+                    aria-haspopup="listbox" aria-expanded="false">
+                <span class="home-rfq-country-icon p-icon-a-232" aria-hidden="true"></span>
+                <span id="home-country-text">China</span>
+                <span class="home-rfq-country-arrow" aria-hidden="true"></span>
+            </button>
+            <div class="home-rfq-country-options" id="home-country-options" role="listbox"
+                 aria-labelledby="home-country-label" hidden></div>
+            <input type="hidden" id="home-input-country" name="country" value="CN" data-phone="86">
+        </div>
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-phone">
+        <label for="home-input-phone">
+            <span th:text="${advanced['your.phone'] ?: 'Your Phone'}">Your Phone</span> <em>*</em>
+        </label>
+        <div class="home-rfq-phone-control">
+            <span class="home-rfq-phone-icon p-icon-a-233" aria-hidden="true"></span>
+            <span class="home-rfq-phone-prefix" id="home-phone-prefix">+86</span>
+            <input type="tel" id="home-input-phone" name="phone" class="home-rfq-control home-rfq-phone-input"
+                   th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" autocomplete="off">
+        </div>
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-org">
+        <label for="home-input-orgName">
+            <span th:text="${advanced['org.name'] ?: 'Organization Name'}">Organization Name</span> <em>*</em>
+        </label>
+        <input type="text" id="home-input-orgName" name="orgName" class="home-rfq-control"
+               th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" autocomplete="off">
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-title">
+        <label for="home-input-title" th:text="${advanced['job.title'] ?: 'Job Title'}">Job Title</label>
+        <input type="text" id="home-input-title" name="title" class="home-rfq-control"
+               th:placeholder="${advanced['job.title'] ?: 'Your job title'}" autocomplete="off">
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-message">
+        <label for="home-input-message" th:text="${advanced['your.message'] ?: 'Message'}">Message</label>
+        <textarea id="home-input-message" name="message" class="home-rfq-control" rows="4"
+                  th:placeholder="${advanced['your.message'] ?: 'Your Message'}"></textarea>
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-attachment">
+        <label for="home-attachment" th:text="${advanced['upload.file'] ?: 'Attachment'}">Attachment</label>
+        <input type="file" id="home-attachment" name="attachment"
+               class="home-rfq-file-input"
+               multiple
+               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.jpg,.jpeg,.png">
+        <div class="home-rfq-upload-area" id="homeUploadArea" tabindex="0" role="button">
+            <span class="p-icon-a-237" aria-hidden="true"></span>
+            <span id="homeUploadText" th:text="${advanced['upload.file'] ?: 'Click to upload file'}">Click to upload file</span>
+        </div>
+        <div class="home-rfq-upload-items" id="homeUploadItems" aria-live="polite"></div>
+    </div>
+
+    <div class="home-rfq-field home-rfq-field-submit">
+        <button type="submit" class="home-rfq-submit" th:text="${advanced['send.now']}">Send Now</button>
+        <p class="home-rfq-feedback" aria-live="polite"></p>
+    </div>
+</form>

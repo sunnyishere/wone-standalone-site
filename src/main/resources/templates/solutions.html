@@ -102,87 +102,64 @@ basePath = ${websitePath + pageName}">
         </div>
     </div>
 
-    <div class="am-container phone-container-all phone-clear-padding am-margin-top">
-        <div style="margin: 0 10px 30px 10px;">
-            <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
-                 th:if="${not #lists.isEmpty(pageData.rows)}"
-                 th:each="index : ${pageData.rows}">
-                    <div class="" style="background-color: #FFFFFF;border-radius: 12px;">
-                        <div class="am-g dd-hover4 am-padding" style="width: 100%;">
-                            <div style="am-cf">
-                                <div class="am-fl am-margin-right">
-                                    <div class="phone-bottom" style="width: 100px;height: 100px;">
-                                        <img th:src="${index.iconUrl}" th:alt="${index.title}" class="am-img-responsive"
-                                             style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
-                                    </div>
-                                </div>
-                                <div class="" style="height: 100px;">
-                                    <a class="inline-a-link"
-                                       th:aria-label="${index.i18nTitle}" th:title="${index.i18nTitle}"
-                                            th:href="${currentPathLang} + ${
-    (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
-        '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
-    ) +
-    #normalizer.normalizeString(index.slugTitle) + '-' + index.id
-}">
-                                    <div class="dd-clamp-text-1 am-text-bold">
-                                        <h2 class="inline-header" th:text="${index.i18nTitle}"></h2>
-                                    </div>
-                                    <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
-                                         th:text="${index.content}">
-                                    </div>
-                                    </a>
-                                    <div class="am-padding-top-xs am-cf am-text-sm">
-                                        <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
-                                            <span class="am-icon-user"></span>
-                                            <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
-                                               th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+    <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
+        <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails phone-clear-padding phone-clear-margin"
+            style="margin: 0 0 20px 0;padding: 10px">
+            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                th:if="${not #lists.isEmpty(pageData.rows)}"
+                th:each="index : ${pageData.rows}">
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="inline-a-link" th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
+                       th:href="${currentPathLang} + ${
+                        (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
+                            '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
+                        ) +
+                        #normalizer.normalizeString(index.slugTitle) + '-' + index.id
+                    }">
+                        <div class="image-box3">
+                            <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" class="image-square">
+                        </div>
+                        <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                            <div><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
+                        </div>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem"
+                              th:text="${index.content}"></span>
+                    </a>
+                    <div class="am-padding-top-xs am-cf am-text-sm">
+                        <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                            <span class="am-icon-user"></span>
+                            <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
+                               th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
                                                '/' :
                                                ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" style="border: none">
-                                               <span th:text="${index.author}"></span>
-                                            </a>
-                                        </div>
-                                        <div class="am-fr" style="color:#999999">
-                                        <span th:if="${index.created != null}"
-                                              th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                <span th:text="${index.author}"></span>
+                            </a>
                         </div>
-                    </div>
-
-            </div>
-            <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
-                 th:if="${#lists.isEmpty(pageData.rows)}"
-                 th:each="i : ${#numbers.sequence(1,15)}">
-                <div class="" style="background-color: #FFFFFF;border-radius: 12px;">
-                    <div class="am-g dd-hover4 am-padding" style="width: 100%;">
-                        <div style="am-cf">
-                            <div class="am-fl am-margin-right">
-                                <div class="phone-bottom" style="width: 100px;height: 100px;">
-                                    <img alt="No Data" class="am-img-responsive"
-                                         style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7">
-                                </div>
-                            </div>
-                            <div class="" style="height: 100px;">
-                                <div class="dd-clamp-text-1 am-text-bold"></div>
-                                <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C">
-                                </div>
-                                <div class="am-padding-top-xs am-cf am-text-sm">
-                                    <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
-
-                                    </div>
-                                    <div class="am-fr" style="color:#999999">
-                                        <span></span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="am-fr" style="color:#999999">
+                                <span th:if="${index.created != null}"
+                                      th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </li>
+
+            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                th:if="${#lists.isEmpty(pageData.rows)}"
+                th:each="i : ${#numbers.sequence(1, 6)}">
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <div class="image-box3">
+                        <img alt="No Data" class="image-square" style="background: #afb4b7">
+                    </div>
+                    <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                        <div></div>
+                    </div>
+                    <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem"></span>
+                    <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                        <span></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
     <div>
 

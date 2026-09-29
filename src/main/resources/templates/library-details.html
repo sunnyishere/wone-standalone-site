@@ -192,7 +192,7 @@
 
             <section class="library-detail-panel" th:if="${library.content != null and library.content != ''}">
                 <h2 class="library-detail-heading" th:text="${advanced['document.description'] ?: 'Document description'}">Document description</h2>
-                <div class="library-detail-content" th:utext="${library.content}"></div>
+                <div id="editor" class="library-detail-content" th:utext="${library.content}"></div>
             </section>
 
             <section class="library-detail-panel" th:if="${relatedProducts != null and not relatedProducts.isEmpty()}">

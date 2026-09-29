@@ -408,12 +408,6 @@ public class StaticPageService {
         log.info("Start generating details html files,detail:{}", sitePage.getPageName());
         List<CompletableFuture<Void>> futureList = new ArrayList<>();
         String cssQuery = getDetailCssQuery(sitePage.getPageType());
-        if (sitePage.getPageType() == 3) {
-            cssQuery = "a.inline-a-link";
-        } else if (sitePage.getPageType() == 2 || sitePage.getPageType() == 5 || sitePage.getPageType() == 7
-                || sitePage.getPageType() == 8) {
-            cssQuery = "li.dd-hover4 > a";
-        }
         if (ObjectUtils.isEmpty(cssQuery)) {
             log.error("Currently, only products, documents, news, solutions, Blog, and Success Reference are supported for static details.");
             return new ArrayList<>();
@@ -472,9 +466,9 @@ public class StaticPageService {
         String cssQuery = "";
         if (pageType == SitePage.SitePageType.DOCUMENTS) {
             cssQuery = "a.library-detail-link";
-        } else if (pageType == 3) {
+        } else if (pageType == 3 || pageType == 5 || pageType == 7 || pageType == 8) {
             cssQuery = "a.inline-a-link";
-        } else if (pageType == 2 || pageType == 5 || pageType == 7 || pageType == 8) {
+        } else if (pageType == 2) {
             cssQuery = "li.dd-hover4 > a";
         }
         return cssQuery;

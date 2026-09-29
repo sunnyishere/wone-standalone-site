@@ -1,0 +1,20 @@
+<th:block th:fragment="blogAuthor(blog)">
+    <section class="blog-author-card"
+             th:if="${blog != null and blog.authorId != null and not #strings.isEmpty(blog.author)}"
+             aria-labelledby="blog-author-heading">
+        <div class="blog-author-avatar" aria-hidden="true">
+            <img th:if="${not #strings.isEmpty(blog.authorAvatar)}"
+                 th:src="${blog.authorAvatar}"
+                 th:alt="${blog.author}">
+            <span th:unless="${not #strings.isEmpty(blog.authorAvatar)}"
+                  th:text="${#strings.substring(blog.author, 0, 1)}"></span>
+        </div>
+        <div class="blog-author-copy">
+            <h2 id="blog-author-heading">About the Author</h2>
+            <div class="blog-author-name" th:text="${blog.author}"></div>
+            <p class="blog-author-profile"
+               th:if="${not #strings.isEmpty(blog.authorProfile)}"
+               th:text="${blog.authorProfile}"></p>
+        </div>
+    </section>
+</th:block>

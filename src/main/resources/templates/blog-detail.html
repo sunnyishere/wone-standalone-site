@@ -79,9 +79,14 @@
     <div class="am-container phone-container-top am-margin-bottom am-margin-top-sm">
         <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
              style="background:#FFFFFF;">
-            <h1 class="am-text-bold " th:text="${blog.title}"></h1>
-            <div class=" am-text-left">
-                <div class="am-padding-top-xs">
+            <div class="detail-page-heading">
+                <h1 class="am-text-bold" th:text="${blog.title}"></h1>
+                <p class="detail-page-subtitle"
+                   th:if="${not #strings.isEmpty(blog.description)}"
+                   th:text="${blog.description}"></p>
+            </div>
+            <div class="solution-detail-meta am-text-left">
+                <div class="solution-detail-author am-padding-top-xs">
                     <span th:title="${blog.author}" aria-hidden="false" th:aria-label="${blog.author}" class="am-icon-user am-padding-right-xs" style="color:#5C779F;"></span>
                     <a th:title="${blog.author}" th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
                                    '/' :
@@ -90,12 +95,25 @@
                     <span th:title="${blog.title}" aria-hidden="false" th:aria-label="${blog.title}" class="am-padding-left" style="color:#999999;"
                        th:text="${#dates.format(blog.created, 'MM/dd/yyyy')}"></span>
                 </div>
+                <span class="solution-google-review-wrap">
+                    <a class="solution-google-review" href="https://www.google.com/preferences/source"
+                       th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
+                       target="_blank" rel="noopener noreferrer" th:aria-label="${advanced['add.us.on.google']}"
+                       aria-describedby="blog-google-tooltip">
+                        <span class="am-icon-google" aria-hidden="true"></span>
+                        <span th:text="${advanced['add.us.on.google']}"></span>
+                    </a>
+                    <span id="blog-google-tooltip" class="solution-google-tooltip" role="tooltip"
+                          th:text="${advanced['google.preferred.source.description']}"></span>
+                </span>
             </div>
             <br>
             <!-- 富文本-->
             <div class="am-padding-top am-padding-bottom-xl">
                 <div id="editor" th:utext="${blog.content}"></div>
             </div>
+
+            <th:block th:replace="section-blog-author :: blogAuthor(${blog})"></th:block>
 
             <th:block th:if="${not #lists.isEmpty(relatedProducts)}"
                       th:replace="section-related-cards :: relatedCards(${relatedProducts}, ${advanced['related']} + ' ' + ${advanced['products']}, 'Products More', ${productsPagePath})"></th:block>

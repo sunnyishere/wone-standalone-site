@@ -88,9 +88,9 @@
 <div class="header-height"></div>
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+        <ol class="am-breadcrumb am-breadcrumb-slash">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " title="Home" aria-hidden="false" aria-label="Home"> <span
-                    class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
+                    class="am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
             <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}"
                    aria-hidden="false" th:aria-label="${i18nName}">Products</a></li>
             <li th:if="${category1 != null}">

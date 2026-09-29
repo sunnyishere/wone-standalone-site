@@ -112,13 +112,13 @@ basePath =${websitePath +pageName}">
             <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                 th:if="${not #lists.isEmpty(pageData.rows)}"
                 th:each="index : ${pageData.rows}">
-                <a th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="inline-a-link" th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
                    th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
                    ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
                    ${index.id}">
-                    <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
                         <div class="image-box3">
                             <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" alt="" class="image-square">
                         </div>
@@ -126,23 +126,23 @@ basePath =${websitePath +pageName}">
                             <div><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
                         </div>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem" th:text="${index.content}"></span>
-                        <div class="am-padding-top-xs am-cf am-text-sm">
-                            <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
-                                <span class="am-icon-user"></span>
-                                <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
-                                   th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
-                                   '/' :
-                                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" style="border: none">
-                                    <span th:text="${index.author}"></span>
-                                </a>
-                            </div>
-                            <div class="am-fr" style="color:#999999">
-                                        <span th:if="${index.created != null}"
-                                              th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
-                            </div>
+                    </a>
+                    <div class="am-padding-top-xs am-cf am-text-sm">
+                        <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                            <span class="am-icon-user"></span>
+                            <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
+                               th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+                               '/' :
+                               ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" style="border: none">
+                                <span th:text="${index.author}"></span>
+                            </a>
+                        </div>
+                        <div class="am-fr" style="color:#999999">
+                                    <span th:if="${index.created != null}"
+                                          th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
                         </div>
                     </div>
-                </a>
+                </div>
             </li>
 
             <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"

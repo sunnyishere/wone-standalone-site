@@ -304,6 +304,7 @@ public class RockwillKnowledgeService {
         put("article", new String[]{"content", "title"});
         put("successCase", new String[]{"content", "title"});
         put("blog", new String[]{"content", "title"});
+        put("library", new String[]{"content", "name"});
     }};
 
     /**

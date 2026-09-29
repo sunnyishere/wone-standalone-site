@@ -87,6 +87,10 @@ public class StaticizeTriggerController {
                 log.warn("ignore delete event: {}", standaloneSyncEvent);
                 return ResponseEntity.ok("Static page generated accepted");
             }
+            if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.SITE) {
+                staticPageService.triggerGenPages(standaloneSyncEvent.getDeployDomain(), Collections.emptyMap());
+                return ResponseEntity.ok("Full site generation accepted");
+            }
             SyncContext syncContext = buildSyncContext(standaloneSyncEvent);
             if (syncContext == null) {
                 return ResponseEntity.ok("Static page generated accepted");
@@ -96,10 +100,10 @@ public class StaticizeTriggerController {
             /**
              *  PAGE即更新菜单时，仅需要更新列表及分类页即可
              */
-            if (standaloneSyncEvent.getEntityType() != StandaloneSyncEntityType.PAGE
-                    || standaloneSyncEvent.getEntityId() == SitePage.SitePageType.HOME) {
+//            if (standaloneSyncEvent.getEntityType() != StandaloneSyncEntityType.PAGE
+//                    || standaloneSyncEvent.getEntityId() == SitePage.SitePageType.HOME) {
                 collectHomePage(syncContext, standaloneSyncEvent, urlSet);
-            }
+//            }
             collectPaginationPages(syncContext, standaloneSyncEvent, urlSet);
             collectMainPages(syncContext, standaloneSyncEvent, urlSet);
             cloudflarePurgeService.purgeByUrls(standaloneSyncEvent.getDeployDomain(), new ArrayList<>(urlSet));
