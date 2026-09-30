@@ -58,7 +58,7 @@
                 <nav class="am-fl" style="margin-top: -5px;">
                     <a class="am-fl am-padding-right" th:href="${currentPathLang} + '/'" >
                         <img th:alt="${prodBrand.name}" th:src="${prodBrand.icon}"
-                             class="logo-square">
+                             class="logo-square" width="58" height="58">
                     </a>
                     <ul class="m-nav am-nav am-nav-pills am-fl" style="margin-top: 10px;">
                         <li th:each="navItem : ${topNavPages.?[pageType == 1]}"

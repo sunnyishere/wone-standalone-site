@@ -1,9 +1,9 @@
-<!-- PC端的右侧按钮 -->
+
 <div th:fragment="right-menu(param1)"
-     style="position: fixed; right: 0px; bottom: 15vh; background-color: #FFFFFFF2;
+     style="position: fixed; right: 0px; bottom: 15vh; width: 80px; background-color: #FFFFFFF2;
      border-radius: 10px; box-shadow: 0 0 10px 0px rgba(0, 0, 0, 0.16); z-index: 1;">
-    <!-- 动态遍历 siteMenuWidget 列表 -->
-    <div th:each="widget : ${siteMenuWidget}" class="home-hover" style="padding: 8px 10px; text-align: center;">
+
+    <div th:each="widget : ${siteMenuWidget.?[type != 4]}" class="home-hover" style="min-height: 68px; padding: 8px 10px; text-align: center;">
 
         <!-- WhatsApp (type=0) -->
         <div th:if="${widget.type == 0}">
@@ -30,7 +30,7 @@
             </a>
         </div>
 
-        <!-- 客服 (type=3) -->
+        <!-- Chat (type=3) -->
         <div class="chat-btn"
              th:if="${widget.type == 3}"
              th:data-details="${widget.details}">

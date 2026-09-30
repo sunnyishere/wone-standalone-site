@@ -226,6 +226,23 @@ public class RockwillKnowledgeService {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
                 if (model != null) {
+                    if (path.contains("Blog")
+                            && model.containsKey("pageData")) {
+                        Object pageData = model.get("pageData");
+                        if (pageData != null) {
+                            Map<String, Object> pageDataMap = (Map<String, Object>) pageData;
+                            Object rows = pageDataMap.get("rows");
+                            if (rows instanceof List) {
+                                List<Map<String, Object>> rowList = (List<Map<String, Object>>) rows;
+                                for (Map<String, Object> row : rowList) {
+                                    if (!row.containsKey("slugTitle") || row.get("slugTitle") == null) {
+                                        Object slugUrl = row.get("slugUrl");
+                                        row.put("slugTitle", slugUrl);
+                                    }
+                                }
+                            }
+                        }
+                    }
                     fillCommonModel(model, host);
                     handleDateKey(model);
                     handleLibraryFileSize(model);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='solution-detail'">
 
 <head>
     <meta charset="utf-8">
@@ -48,9 +48,9 @@
     <meta name="format-detection" content="telephone=no"/>
     <meta name="renderer" content="webkit"/>
 
-
+<!--    <th:block th:replace="head :: critical-detail"></th:block>-->
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
+<!--    <th:block th:replace="head :: faqStyle"></th:block>-->
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
     <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
@@ -75,8 +75,8 @@
 
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+        <ol class="am-breadcrumb am-breadcrumb-slash">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
                 <a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
@@ -161,7 +161,7 @@
                          th:if="${not #lists.isEmpty(articles)}"
                          th:each="scate : ${articles}">
                             <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
-                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div class="dd-hover4" style="width: 100%;padding: 1.6rem;margin: 0 auto;">
                                     <div style="am-cf">
                                         <div class="am-fl am-margin-right">
                                             <div class="phone-bottom" style="width: 100px;height: 100px;">

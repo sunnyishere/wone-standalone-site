@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='success-detail'">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <!-- 使用th:content避免属性值冲突 -->
+
     <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
 
-    <!-- 链接标签优化 -->
+
     <link rel="canonical" th:href="${websiteUrl}" />
     <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath + pageName + suffix}"/>
     <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
@@ -16,7 +16,7 @@
     </th:block>
     <meta name="description"
           th:content="${successCase.description} + '-' + ${prodBrand.eName}"/>
-    <!-- Open Graph元数据 - 改用th:attr设置内容值 -->
+
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
     <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
@@ -29,7 +29,7 @@
           th:if="${not #strings.isEmpty(successCase.keywords)}"
           th:content="${#strings.replace(successCase.keywords, '#', ',')}"/>
 
-    <!-- Twitter元数据 - 同样使用th:attr -->
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
     <meta name="twitter:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
@@ -41,13 +41,12 @@
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
 
-    <!-- 移动端适配 -->
+
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
 
 
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
     <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
@@ -72,8 +71,8 @@
 
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+        <ol class="am-breadcrumb am-breadcrumb-slash">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'}" th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
                 <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a>
             </li>
@@ -156,7 +155,7 @@
                          th:if="${not #lists.isEmpty(successCases)}"
                          th:each="scate : ${successCases}">
                             <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
-                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div class="dd-hover4" style="width: 100%;padding: 1.6rem;margin: 0 auto;">
                                     <div style="am-cf">
                                         <div class="am-fl am-margin-right">
                                             <div class="phone-bottom" style="width: 100px;height: 100px;">

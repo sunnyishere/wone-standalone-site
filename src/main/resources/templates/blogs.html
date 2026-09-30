@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='blog-list'">
 
 <head>
     <meta charset="utf-8">
@@ -42,8 +42,9 @@ basePath =${websitePath +pageName}">
           th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
           as="image"
           fetchpriority="high">
+<!--    <th:block th:replace="head :: critical-list"></th:block>-->
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
+<!--    <th:block th:replace="head :: faqStyle"></th:block>-->
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
 </head>
@@ -91,7 +92,7 @@ basePath =${websitePath +pageName}">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}"
                    aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span
-                    class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+                    class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}"
                    aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>

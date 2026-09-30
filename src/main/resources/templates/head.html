@@ -6,20 +6,26 @@
         <meta name="language" th:content="${langEName}">
         <meta http-equiv="Content-Language" th:content="${currentLang != null? currentLang:'en'}">
         <link rel="preconnect" href="https://oss.iee-business.com">
-        <script data-cfasync="false" th:inline="javascript">
-            (function () {
-                var version = /*[[${version}]]*/ '';
-                if (document.querySelector('link[href="/css/mini_iconfont.css"]')) {
-                    return;
-                }
-                var link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = '/css/mini_iconfont.css?v=' + version;
-                document.head.appendChild(link);
-            })();
-        </script>
-        <link rel="stylesheet" th:href="@{${'/css/amazeui.min.css?v=' + version}}">
-        <link rel="stylesheet" th:href="@{${'/css/style.css?v='+ version}}">
+        <th:block th:if="${templateType == null or #strings.isEmpty(templateType)}">
+            <link rel="stylesheet" th:href="@{${'/css/amazeui.min.css?v=' + version}}">
+            <link rel="stylesheet" th:href="@{${'/css/style.css?v=' + version}}">
+        </th:block>
+        <th:block th:unless="${templateType == null or #strings.isEmpty(templateType)}">
+            <link rel="stylesheet" th:href="@{${'/css/critical-' + templateType + '.css?v=' + version}}">
+            <script th:inline="javascript">
+                window.addEventListener('DOMContentLoaded', function () {
+                    var amazeuiLink = document.createElement('link');
+                    amazeuiLink.rel = 'stylesheet';
+                    amazeuiLink.href = /*[[@{${'/css/amazeui.min.css?v=' + version}}]]*/ '';
+                    document.head.appendChild(amazeuiLink);
+
+                    var styleLink = document.createElement('link');
+                    styleLink.rel = 'stylesheet';
+                    styleLink.href = /*[[@{${'/css/style.css?v=' + version}}]]*/ '';
+                    document.head.appendChild(styleLink);
+                });
+            </script>
+        </th:block>
         <link rel="icon" type="image/png" th:href="${prodBrand?.icon} ?: ''">
         <link rel="shortcut icon" th:href="${prodBrand?.icon} ?: ''">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,7 +35,7 @@
             }
         </style>
         <script>
-            window.i18n = window.i18n || {};  // 先声明变量
+            window.i18n = window.i18n || {};
         </script>
         <script th:inline="javascript">
             var fontColor = /*[[${fontColor}]]*/ "#FF5656";
@@ -154,7 +160,7 @@
                 gtag('config', 'AW-18052802292');
             </script>
 
-            <!-- Event snippet for 提交潜在客户表单 conversion page -->
+            <!-- Event snippet for conversion page -->
             <script>
                 window.addEventListener('load', function () {
                     document.querySelectorAll(".submit-btn").forEach(function(e){
@@ -189,15 +195,7 @@
 
     <th:block th:fragment="faqStyle">
         <style>
-            .faq-list{padding: 0;}
-            .faq-item{border-bottom: 1px solid #eee;padding: 6px 0}
-            .faq-question{cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;color:#333;line-height:1.6;user-select:none;}
-            .faq-arrow{flex-shrink:0;transition:transform .25s;font-size:16px;color:#999;margin-top:3px;}
-            .faq-answer{ display: grid;grid-template-rows: 0fr;overflow: hidden;transition: grid-template-rows 0.35s ease;}
-            .faq-content{min-height: 0;font-size:14px;color:#666;}
-            .faq-open .faq-question{color:var(--theme-wone);}
-            .faq-open .faq-answer {grid-template-rows: 1fr;}
-            .faq-open .faq-arrow {transform: rotate(180deg);}
+            .faq-list{padding:0}.faq-item{border-bottom:1px solid #eee;padding:6px 0}.faq-question{cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;color:#333;line-height:1.6;user-select:none}.faq-arrow{flex-shrink:0;transition:transform .25s;font-size:16px;color:#999;margin-top:3px}.faq-answer{display:grid;grid-template-rows:0fr;overflow:hidden;transition:grid-template-rows 0.35s ease}.faq-content{min-height:0;font-size:14px;color:#666}.faq-open .faq-question{color:var(--theme-wone)}.faq-open .faq-answer{grid-template-rows:1fr}.faq-open .faq-arrow{transform:rotate(180deg)}
         </style>
     </th:block>
 

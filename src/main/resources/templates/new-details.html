@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='news-detail'">
 
 <head>
     <meta charset="utf-8">
@@ -58,8 +58,8 @@
 <div class="header-height"></div>
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+        <ol class="am-breadcrumb am-breadcrumb-slash">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li class="am-active">
                 <a th:href="${currentPathLang} + '/'+${pageName}"  th:text="${i18nName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${pageName}"></a>
             </li>
@@ -124,7 +124,7 @@
                          th:if="${not #lists.isEmpty(newList)}"
                          th:each="news : ${newList}">
                             <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
-                                <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                                <div class="dd-hover4" style="width: 100%;padding: 1.6rem;margin:0 auto;">
                                     <div>
                                         <div class="am-fl am-margin-right">
                                             <div class="phone-bottom" style="width: 100px;height: 100px;">

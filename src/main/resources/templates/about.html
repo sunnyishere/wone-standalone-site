@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='about'">
 
 <head>
     <meta charset="utf-8">
@@ -37,7 +37,7 @@
           as="image"
           fetchpriority="high">
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
+<!--    <th:block th:replace="head :: faqStyle"></th:block>-->
     <style>
         .faq-header{font-size: 2.4rem;}
         .section-title{font-size: 2.4rem;}
@@ -71,8 +71,8 @@
 
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="p-icon-a-508 am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+        <ol class="am-breadcrumb am-breadcrumb-slash">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
         </ol>
     </div>
@@ -175,7 +175,7 @@
     <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
         <div style="padding-top: 2px;opacity: 0;">占位</div>
         <div class="am-padding">
-            <div data-am-widget="slider" class="am-slider am-slider-default"
+            <div data-am-widget="slider" class="am-slider am-slider-default cert-slider"
                  data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":300,"itemMargin":5}'>
                 <ul class="am-slides " style="padding-bottom: 36px">
                     <li class="am-margin-right" th:if="${not #lists.isEmpty(certificate)}"

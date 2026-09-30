@@ -1,6 +1,6 @@
 ﻿
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='product-detail'">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -63,13 +63,13 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
 
+    <link th:if="${not #lists.isEmpty(imageList) and imageList[0] != null and imageList[0] != '' and (videoUrl == null or videoUrl == '')}"
+          rel="preload"
+          th:href="${imageList[0]}"
+          as="image"
+          fetchpriority="high">
+
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
-    <style>
-        .prod-h2-bg {
-            padding: 6px 10px !important;
-        }
-    </style>
 
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
     <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
@@ -193,7 +193,7 @@
                 <h2 class="inline-header prod-h2-bg" th:text="${advanced['key.attributes']}"></h2>
             </div>
 
-            <div class="am-margin-bottom-sm" style="padding: 10px 0;">
+            <div style="padding: 10px 0;margin-bottom:1rem;">
                 <table class="am-table am-padding-top-sm">
                     <tbody>
                     <tr>
@@ -235,8 +235,8 @@
             <div id="target2" class="am-text-bold" >
                 <h2 class="inline-header prod-h2-bg" th:text="${advanced['description']}"></h2>
             </div>
-            <div id="editor" class="am-margin-bottom"
-                 style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
+            <div id="editor"
+                 style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;margin-bottom:1.6rem">
                 <div style="width: 100%;overflow-x: auto" th:utext="${prod.detail}">
                 </div>
             </div>
@@ -483,41 +483,41 @@
                     </div>
                 </div>
 
-                <!-- 型号列表 -->
-                <th:block th:if="${modelList != null && modelList.size() > 0}">
-                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
-                        <div class="am-g">
-                            <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
-                                <span th:text="${advanced['model']}">Model</span>
-                            </div>
-                            <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
-                                <!-- 循环遍历型号列表 -->
-                                <th:block th:each="item, stat : ${modelList}">
-                                    <th:block
-                                            th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
-                                        <div th:style="${isActive
-                        ? 'border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
-                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
-                                            <a aria-hidden="false"
-                                               th:aria-label="${item.modelName}"
-                                               th:title="${item.modelName}"
-                                               th:href="${currentPathLang +
-         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
-           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
-         #normalizer.normalizeString(item.name) +
-         '-' + item.prodId + '-series' + item.id}"
-                                               th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
-                                                <div style="padding: 10px 20px;">
-                                                    <span th:text="${item.modelName}"></span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </th:block>
-                                </th:block>
-                            </div>
-                        </div>
-                    </div>
-                </th:block>
+
+<!--                <th:block th:if="${modelList != null && modelList.size() > 0}">-->
+<!--                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">-->
+<!--                        <div class="am-g">-->
+<!--                            <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">-->
+<!--                                <span th:text="${advanced['model']}">Model</span>-->
+<!--                            </div>-->
+<!--                            <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">-->
+<!--                                -->
+<!--                                <th:block th:each="item, stat : ${modelList}">-->
+<!--                                    <th:block-->
+<!--                                            th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">-->
+<!--                                        <div th:style="${isActive-->
+<!--                        ? 'border: 1px solid var(&#45;&#45;theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'-->
+<!--                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">-->
+<!--                                            <a aria-hidden="false"-->
+<!--                                               th:aria-label="${item.modelName}"-->
+<!--                                               th:title="${item.modelName}"-->
+<!--                                               th:href="${currentPathLang +-->
+<!--         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :-->
+<!--           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +-->
+<!--         #normalizer.normalizeString(item.name) +-->
+<!--         '-' + item.prodId + '-series' + item.id}"-->
+<!--                                               th:style="${isActive} ? 'color: var(&#45;&#45;theme-wone) !important;' : ''">-->
+<!--                                                <div style="padding: 10px 20px;">-->
+<!--                                                    <span th:text="${item.modelName}"></span>-->
+<!--                                                </div>-->
+<!--                                            </a>-->
+<!--                                        </div>-->
+<!--                                    </th:block>-->
+<!--                                </th:block>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </th:block>-->
 
                 <!-- 文档/文件列表 -->
                 <th:block th:if="${faLibraryList != null and faLibraryList != null and #lists.size(faLibraryList) > 0}">
@@ -956,19 +956,26 @@
     const stickyBar = document.querySelector('.sticky-bar');
     const bottomBlock = document.querySelector('.sticky-bottom');
 
+    let scrollFrame;
+    let lastStickyTop = '';
     function handleScroll() {
-        const bottomBlockTop = bottomBlock.getBoundingClientRect().top;
-
-        const stickyBarHeight = stickyBar.offsetHeight;
-
-        if (bottomBlockTop <= stickyBarHeight) {
-            stickyBar.style.top = `-${stickyBarHeight - bottomBlockTop}px`;
-        } else {
-            stickyBar.style.top = '0';
+        if (scrollFrame) {
+            return;
         }
+        scrollFrame = requestAnimationFrame(function () {
+            scrollFrame = null;
+            const bottomBlockTop = bottomBlock.getBoundingClientRect().top;
+            const stickyBarHeight = stickyBar.offsetHeight;
+            const stickyTop = bottomBlockTop <= stickyBarHeight
+                ? `-${stickyBarHeight - bottomBlockTop}px`
+                : '0';
+            if (stickyTop !== lastStickyTop) {
+                stickyBar.style.top = stickyTop;
+                lastStickyTop = stickyTop;
+            }
+        });
     }
 
-    handleScroll();
     window.addEventListener('scroll', handleScroll);
 </script>
 </body>

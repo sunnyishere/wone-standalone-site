@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang : 'en'}">
+<html class="no-js" th:lang="${currentLang != null ? currentLang : 'en'}" th:with="templateType='documents-detail'">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -35,7 +35,6 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <th:block th:replace="head :: commonHead"></th:block>
-    <th:block th:replace="head :: faqStyle"></th:block>
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}"></script>
     <style>
         .library-detail-page { padding-bottom: 35px; }
@@ -118,7 +117,7 @@
 
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+        <ol class="am-breadcrumb am-breadcrumb-slash">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:text="${advanced['home.button']}" th:title="${advanced['home.button']}"></a></li>
             <li><a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName ?: 'Documents'}" th:title="${i18nName ?: 'Documents'}"></a></li>
             <li class="am-active" th:if="${library.eName != null and library.eName != ''}">

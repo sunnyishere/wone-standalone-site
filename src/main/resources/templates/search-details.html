@@ -14,18 +14,14 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-    <!--防某度-->
     <th:block th:replace="head :: commonHead"></th:block>
 </head>
 
 <body class="body-bg">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
-    <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='serach')"></th:block>
-    <!-- 手机-->
     <th:block th:replace="phone-en :: phone-header"></th:block>
 
-    <!-- 侧边栏内容 -->
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height"></div>
@@ -33,7 +29,7 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/"> <span class="p-icon-a-508 am-padding-right-xs"></span> Home</a></li>
+            <li><a href="/"> <span class="am-padding-right-xs"></span> Home</a></li>
             <li>search</li>
             <li class="am-active" th:if="${not #strings.isEmpty(category1)}">
 
