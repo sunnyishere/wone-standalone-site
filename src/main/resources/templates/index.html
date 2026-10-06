@@ -210,7 +210,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
             'detail/'+
-           ${#normalizer.normalizeString(prod.name)} +
+           ${#normalizer.resolveSlugUrl(prod.slugUrl, prod.name)} +
            '-'+${prod.id}">
                                         <div class="image-box">
                                             <img th:alt="${prod.i18nName}" th:data-echo="${prod.url}"
@@ -269,7 +269,7 @@
         '/' :
         ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
           'detail/'+
-        ${#normalizer.normalizeString(product.name)} +
+        ${#normalizer.resolveSlugUrl(product.slugUrl, product.name)} +
         '-' +
         ${product.id}">
                                         <div class="image-box">
@@ -364,7 +364,7 @@
                         th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
                         <li th:each="library : ${certificateLibraries}">
                             <a class="inline-a-link"
-                               th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${library.slugTitle} + '-' + ${library.id}"
+                               th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(library.slugUrl, library.name)} + '-' + ${library.id}"
                                th:title="${library.name}">
                                 <span class="home-certificate-list__icon">✓</span>
                                 <span class="dd-clamp-text-2" th:text="${library.name}"></span>
@@ -377,7 +377,7 @@
                      th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
                     <a class="inline-a-link home-certificate-card home-certificate-card--back"
                        th:if="${#lists.size(certificateLibraries) > 1}"
-                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${certificateLibraries[1].slugTitle} + '-' + ${certificateLibraries[1].id}"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(certificateLibraries[1].slugUrl, certificateLibraries[1].name)} + '-' + ${certificateLibraries[1].id}"
                        th:title="${certificateLibraries[1].name}">
                         <img class="home-certificate-card__image"
                              th:if="${certificateLibraries[1].icon != null and certificateLibraries[1].icon != ''}"
@@ -389,7 +389,7 @@
                     </a>
 
                     <a class="inline-a-link home-certificate-card home-certificate-card--front"
-                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${certificateLibraries[0].slugTitle} + '-' + ${certificateLibraries[0].id}"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(certificateLibraries[0].slugUrl, certificateLibraries[0].name)} + '-' + ${certificateLibraries[0].id}"
                        th:title="${certificateLibraries[0].name}">
                         <img class="home-certificate-card__image"
                              th:if="${certificateLibraries[0].icon != null and certificateLibraries[0].icon != ''}"
@@ -446,15 +446,7 @@
                             (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(
-               #strings.replace(
-                   #strings.replace(
-                       #strings.trim(success.slugTitle),
-                       '/', '-'
-                   ),
-                   ' ', '-'
-               )
-           )} + '-' +
+           ${#normalizer.resolveSlugUrl(success.slugUrl, (success.seoTitle != null and !#strings.isEmpty(success.seoTitle)) ? success.seoTitle : success.title)} + '-' +
            ${success.id}">
                                 <div class="image-box2">
                                     <img th:data-echo="${success.iconUrl}" th:alt="${success.title}"
@@ -538,7 +530,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(article.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.resolveSlugUrl(article.slugUrl, article.title)} + '-' +
            ${article.id}">
                                         <span class="dd-clamp-text-1 am-text-bold" th:text="${article.i18nTitle}"></span>
                                         <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
@@ -683,7 +675,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.resolveSlugUrl(index.slugUrl, index.title)} + '-' +
            ${index.id}">
                             <div class="image-box3">
                                 <img th:data-echo="${index.iconUrl}" th:alt="${index.title}" src="https://oss.iee-business.com/landing/img/space.png"
@@ -735,7 +727,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(index.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.resolveSlugUrl(index.slugUrl, index.title)} + '-' +
            ${index.id}">
                         <div class="image-box3">
                             <img th:data-echo="${index.iconUrl}" th:alt="${index.title}"

@@ -148,7 +148,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(blog.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.resolveSlugUrl(blog.slugUrl, blog.title)} + '-' +
            ${blog.id}">
                                             <span class="dd-clamp-text-1 am-text-bold" th:text="${blog.i18nTitle}">Resistance
                                                 and

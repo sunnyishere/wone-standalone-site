@@ -9,18 +9,7 @@
     <meta name="keywords" th:content="${tdkKeywords != null ? #strings.listJoin(tdkKeywords, ',') : ''}"/>
     <meta name="description" th:content="${prod.description} ?: ''"/>
 
-    <link rel="canonical"
-          th:if="${websitePath != null and pageName != null and suffix != null}"
-          th:href="${#strings.concat(
-          #strings.endsWith(websitePath, '/') ?
-              #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
-
-          (currentLang != null && currentLang != 'en_US') ? ('/' + currentLang) : '',
-
-          '/' + pageName,
-
-          #strings.startsWith(suffix, '/') ? suffix : '/' + suffix
-      )}"/>
+    <link rel="canonical" th:href="${websiteUrl}"/>
 
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
@@ -28,16 +17,7 @@
 
     <meta property="og:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta property="og:description" th:content="${prod.description}"/>
-    <meta property="og:url" th:content="${#strings.concat(
-          #strings.endsWith(websitePath, '/') ?
-              #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
-
-          (currentLang != null && currentLang != 'en_US') ? ('/' + currentLang) : '',
-
-          '/' + pageName,
-
-          #strings.startsWith(suffix, '/') ? suffix : '/' + suffix
-      )}"/>
+    <meta property="og:url" th:content="${websiteUrl}"/>
     <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
     <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
               th:each="transLang : ${langList}" >
@@ -88,7 +68,7 @@
 <div class="header-height"></div>
 <nav class="m-cat-nav">
     <div class="am-container">
-        <ol class="am-breadcrumb am-breadcrumb-slash">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " title="Home" aria-hidden="false" aria-label="Home"> <span
                     class="am-padding-right-xs" th:text="${advanced['home.button']}"></span> </a></li>
             <li><a th:href="${currentPathLang} + '/'+${pageName}" th:text="${i18nName}" th:title="${i18nName}"
@@ -273,7 +253,7 @@
                      style="border-top: 1px solid #E6E6E6;margin-top: 10px;padding: 10px 0;">
                     <div th:each="item : ${faLibraryList}">
                         <div class="product-library-card"
-                             th:data-detail-url="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName + '/detail/' + item.slugTitle + '-' + item.id})"
+                             th:data-detail-url="${currentPathLang} + (${#strings.isEmpty(documentsPageName) ? '/' : '/' + documentsPageName + '/detail/' + #normalizer.resolveSlugUrl(item.slugUrl, item.name) + '-' + item.id})"
                              th:title="${item.name}"
                              role="link"
                              tabindex="0"
@@ -483,41 +463,41 @@
                     </div>
                 </div>
 
-
-<!--                <th:block th:if="${modelList != null && modelList.size() > 0}">-->
-<!--                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">-->
-<!--                        <div class="am-g">-->
-<!--                            <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">-->
-<!--                                <span th:text="${advanced['model']}">Model</span>-->
-<!--                            </div>-->
-<!--                            <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">-->
-<!--                                -->
-<!--                                <th:block th:each="item, stat : ${modelList}">-->
-<!--                                    <th:block-->
-<!--                                            th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">-->
-<!--                                        <div th:style="${isActive-->
-<!--                        ? 'border: 1px solid var(&#45;&#45;theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'-->
-<!--                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">-->
-<!--                                            <a aria-hidden="false"-->
-<!--                                               th:aria-label="${item.modelName}"-->
-<!--                                               th:title="${item.modelName}"-->
-<!--                                               th:href="${currentPathLang +-->
-<!--         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :-->
-<!--           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +-->
-<!--         #normalizer.normalizeString(item.name) +-->
-<!--         '-' + item.prodId + '-series' + item.id}"-->
-<!--                                               th:style="${isActive} ? 'color: var(&#45;&#45;theme-wone) !important;' : ''">-->
-<!--                                                <div style="padding: 10px 20px;">-->
-<!--                                                    <span th:text="${item.modelName}"></span>-->
-<!--                                                </div>-->
-<!--                                            </a>-->
-<!--                                        </div>-->
-<!--                                    </th:block>-->
-<!--                                </th:block>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </th:block>-->
+                <!-- 型号列表 -->
+                <th:block th:if="${modelList != null && modelList.size() > 0}">
+                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
+                        <div class="am-g">
+                            <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
+                                <span th:text="${advanced['model']}">Model</span>
+                            </div>
+                            <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
+                                <!-- 循环遍历型号列表 -->
+                                <th:block th:each="item, stat : ${modelList}">
+                                    <th:block
+                                            th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
+                                        <div th:style="${isActive
+                        ? 'border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
+                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
+                                            <a aria-hidden="false"
+                                               th:aria-label="${item.modelName}"
+                                               th:title="${item.modelName}"
+                                               th:href="${currentPathLang +
+         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
+           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
+         #normalizer.resolveSlugUrl(prod.slugUrl, prod.name) +
+         '-' + item.prodId + '-series' + item.id}"
+                                               th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
+                                                <div style="padding: 10px 20px;">
+                                                    <span th:text="${item.modelName}"></span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </th:block>
 
                 <!-- 文档/文件列表 -->
                 <th:block th:if="${faLibraryList != null and faLibraryList != null and #lists.size(faLibraryList) > 0}">
@@ -707,7 +687,7 @@
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
            'detail/'+
-           ${#normalizer.normalizeString(prod.name)} +
+           ${#normalizer.resolveSlugUrl(prod.slugUrl, prod.name)} +
            '-'+${prod.id}"
                                style="border: none">
                                 <div style="padding: 0 15px 0 0; border-radius: 12px;">
@@ -752,7 +732,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#strings.toLowerCase(#strings.replace(#strings.trim(item.slugTitle), ' ', '-'))} + '-' +
+           ${#normalizer.resolveSlugUrl(item.slugUrl, item.title)} + '-' +
            ${item.id}">
                             <div class="phone-bg-white" style="border-radius: 12px; border: 1px solid #E9E9E9;">
                                 <div class="am-g dd-hover4 phone-clear-padding" style="padding: 15px 0px;">

@@ -111,8 +111,8 @@
                        (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
                        '/' :
                        ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-                       ${#normalizer.normalizeString(index.slugTitle)} + '-' +
-                       ${index.id}"
+                        ${#normalizer.resolveSlugUrl(index.slugUrl, (index.seoTitle != null and !#strings.isEmpty(index.seoTitle)) ? index.seoTitle : index.title)} + '-' +
+                   ${index.id}"
                     >
                         <div class="image-box3">
                             <img th:alt="${index.title}" th:src="${index.iconUrl}" alt="" class="image-square">

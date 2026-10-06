@@ -103,7 +103,7 @@
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                     'detail/'+
-                   ${#normalizer.normalizeString(index.name)} +
+                   ${#normalizer.resolveSlugUrl(index.slugUrl, index.name)} +
                    '-'+${index.id}">
                                 <div class="equal-height-card" style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">

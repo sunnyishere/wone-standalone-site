@@ -113,7 +113,7 @@ basePath = ${websitePath + pageName}">
                         (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '/' :
                             '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-') + '/'
                         ) +
-                        #normalizer.normalizeString(index.slugTitle) + '-' + index.id
+                        #normalizer.resolveSlugUrl(index.slugUrl, index.title) + '-' + index.id
                     }">
                         <div class="image-box3">
                             <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" class="image-square">

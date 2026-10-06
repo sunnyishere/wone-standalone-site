@@ -192,7 +192,7 @@
                              th:each="item : ${pageData.rows}"
                              th:data-detail-url="${currentPathLang} + '/' +
                              ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' +
-                             ${item.slugTitle} + '-' + ${item.id}"
+                             ${#normalizer.resolveSlugUrl(item.slugUrl, item.name)} + '-' + ${item.id}"
                              th:title="${item.name}"
                              role="link"
                              tabindex="0">
@@ -200,7 +200,7 @@
                         <a class="library-detail-link"
                            th:href="${currentPathLang} + '/' +
                            ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' +
-                           ${item.slugTitle} + '-' + ${item.id}"
+                           ${#normalizer.resolveSlugUrl(item.slugUrl, item.name)} + '-' + ${item.id}"
                            th:title="${item.name}"
                            tabindex="-1"
                            aria-hidden="true"></a>

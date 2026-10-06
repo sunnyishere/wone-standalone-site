@@ -6,13 +6,7 @@
     <title th:text="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
     <meta name="description" th:content="${library.description ?: library.name}">
     <meta name="keywords" th:content="${library.label ?: ''}">
-    <link rel="canonical"
-          th:if="${websitePath != null and pageName != null and suffix != null}"
-          th:href="${#strings.concat(
-              #strings.endsWith(websitePath, '/') ? #strings.substring(websitePath, 0, #strings.length(websitePath) - 1) : websitePath,
-              (currentLang != null and not #strings.startsWith(currentLang, 'en')) ? ('/' + currentLang) : '',
-              '/' + pageName,
-              #strings.startsWith(suffix, '/') ? suffix : '/' + suffix)}">
+    <link rel="canonical" th:href="${websiteUrl}"/>
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large">
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
@@ -210,7 +204,7 @@
                 <h2 class="library-detail-heading" th:text="${(advanced['related'] ?: 'Related') + ' ' + (advanced['documents'] ?: 'Documents')}">Related Documents</h2>
                 <div class="library-related-list">
                     <a class="library-related-item" th:each="item : ${relatedLibraries}"
-                       th:href="${currentPathLang} + '/' + ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' + ${item.slugTitle} + '-' + ${item.id}"
+                       th:href="${currentPathLang} + '/' + ${#strings.replace(#strings.trim(pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(item.slugUrl, item.name)} + '-' + ${item.id}"
                        th:title="${item.name}">
                         <img class="library-related-image" th:src="${item.icon != null and item.icon != '' ? item.icon : '/images/case-bg.jpg'}" th:alt="${item.name}">
                         <span>

@@ -139,7 +139,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
-           ${#normalizer.normalizeString(news.slugTitle)} + '-' +
+           ${#normalizer.resolveSlugUrl(news.slugUrl, news.title)} + '-' +
            ${news.id}">
                                             <span class="dd-clamp-text-1 am-text-bold" th:text="${news.i18nTitle}">Resistance
                                                 and

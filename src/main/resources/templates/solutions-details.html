@@ -176,7 +176,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
-           ${#normalizer.normalizeString(scate.slugTitle)} + '-' +
+           ${#normalizer.resolveSlugUrl(scate.slugUrl, scate.title)} + '-' +
            ${scate.id}">
                                             <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.i18nTitle}">
                                                 Resistance and

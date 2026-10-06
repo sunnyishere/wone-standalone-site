@@ -170,7 +170,7 @@
                         (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
            '/' :
            ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
-           ${#normalizer.normalizeString(scate.slugTitle)} + '-' +
+           ${#normalizer.resolveSlugUrl(scate.slugUrl, (scate.seoTitle != null and !#strings.isEmpty(scate.seoTitle)) ? scate.seoTitle : scate.title)} + '-' +
            ${scate.id}">
                                             <div class="dd-clamp-text-1 am-text-bold" th:text="${scate.i18nTitle}">
                                                 Resistance and
