@@ -84,13 +84,13 @@
                 </div>
 
                 <div class="hero-embla__overlay">
-                    <div class="am-text-center am-show-sm-only" style="margin: 10% auto; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <div class="am-text-center am-show-sm-only" th:with="rkBtnRight=${currentHost != null and currentHost.contains('www.rockwill.com')}" style="margin: 10% auto; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                         <div th:style="'font-size: 20px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
                              th:text="${index.title}"> </div>
                         <div th:style="'font-size: 15px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
                              th:text="${index.description}"></div>
                         <div class="am-padding-top"
-                             th:style="'display: flex; justify-content: ' + (${index.fontPosition == 'left' ? 'flex-start' : 'center'}) + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
+                             th:style="'display: flex; justify-content: ' + (${index.fontPosition == 'left' ? (rkBtnRight ? 'flex-end' : 'flex-start') : 'center'}) + '; ' + (${index.fontPosition == 'left' ? (rkBtnRight ? 'margin-right: 20px;' : 'margin-left: 20px;') : ''})"
                              data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" style="height: 40px; width: 100%;">
                             <span class="dd-clamp-text-1"
                                   th:style="'border-radius: 40px; padding: 0px 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);' + (${index.fontPosition == 'left' ? 'margin-left: 0;' : ''})">

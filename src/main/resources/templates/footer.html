@@ -2,8 +2,8 @@
     <div class="site-footer-main">
         <div class="am-container footer-grid">
             <section class="footer-brand-column">
-                <h2 class="footer-brand-name"
-                    th:text="${footerConfig != null and footerConfig.title != null and footerConfig.title != '' ? footerConfig.title : (prodBrand != null and prodBrand.eName != null and prodBrand.eName != '' ? prodBrand.eName : brandName)}"></h2>
+                <span class="footer-brand-name"
+                    th:text="${footerConfig != null and footerConfig.title != null and footerConfig.title != '' ? footerConfig.title : (prodBrand != null and prodBrand.eName != null and prodBrand.eName != '' ? prodBrand.eName : brandName)}"></span>
                 <p class="footer-brand-description"
                    th:if="${footerConfig != null and footerConfig.description != null and footerConfig.description != ''}"
                    th:text="${footerConfig.description}"></p>
@@ -27,7 +27,7 @@
             <section class="footer-nav-column"
                      th:if="${bottomNavItems != null and not #lists.isEmpty(bottomNavItems)}"
                      th:each="section : ${bottomNavItems}">
-                <h2 class="footer-column-title" th:text="${section.title}"></h2>
+                <span class="footer-column-title" th:text="${section.title}"></span>
                 <ul class="footer-link-list">
                     <li th:each="item : ${section.items}">
                         <a th:if="${item.containsKey('href')}"
@@ -43,7 +43,7 @@
                         ((footerContact.headquartersFactory != null and footerContact.headquartersFactory != '') or
                          (footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != '') or
                          (footerContact.email != null and footerContact.email != ''))}">
-                <h2 class="footer-column-title" th:text="${advanced['contact']}"></h2>
+                <span class="footer-column-title" th:text="${advanced['contact']}"></span>
                 <ul class="footer-contact-list">
                     <li th:if="${footerContact.headquartersFactory != null and footerContact.headquartersFactory != ''}">
                         <i class="am-icon-map-marker" aria-hidden="true"></i>
@@ -65,9 +65,9 @@
     <div class="m-footer-bottom">
         <div class="am-container">
             <div class="footer-copyright">
-                <span>&copy; <span th:text="${year}"></span>
-                    <span th:text="${brandName}"></span>. All rights reserved.</span>
-                <span class="footer-legal">
+                <div>&copy; <span th:text="${year}"></span>
+                    <span th:text="${brandName}"></span>. All rights reserved.</div>
+                <div class="footer-legal">
                     <a th:if="${footerConfig != null and footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != ''}"
                        th:href="${footerConfig.privacyPolicyUrl}" target="_blank" rel="noopener noreferrer"
                        th:text="${advanced['account.privacy.policy']}"></a>
@@ -83,7 +83,7 @@
                          (footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''))}"
                           aria-hidden="true">&middot;</span>
                     <span th:text="${currentHost}"></span>
-                </span>
+                </div>
             </div>
         </div>
     </div>

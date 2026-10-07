@@ -8,22 +8,20 @@
     <meta name="description" th:content="${pageContent} ?: ''"/>
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <th:block th:with="pn=${pageData?.pageNum ?: 1},
-    base = ${websitePath + (currentLang !=  null && currentLang != 'en_US' ? currentLang + '/' : '') + pageName},
-    slug = ${category != null ?
-        #strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id
-        : ''},
-    canonical = ${base + (slug != '' ? '/' + slug : '')}
+    base = ${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
+    slug = ${category != null ? #normalizer.normalizeString(category.name) + '-' + category.id : ''},
+    canonical = ${base + (slug != '' ? '/' + slug : '')},
+    canonicalUrl = ${pn > 1 ? canonical + '-' + pn : canonical}
     ">
-        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
-        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <link rel="canonical" th:href="${canonicalUrl}" />
+        <meta property="og:url" th:content="${canonicalUrl}"/>
         <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default"
-              th:href="${(websitePath + pageName) + (pn > 1 ? '-' + pn : '')}"/>
-    </th:block>
-    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
-              th:each="transLang : ${langList}"
-              th:with="pn=${pageData?.pageNum ?: 1}">
-        <link rel="alternate" th:hreflang="${transLang.lang}"
-              th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}"/>
+              th:href="${websitePath + pageName + (slug != '' ? '/' + slug : '') + (pn > 1 ? '-' + pn : '')}"/>
+        <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+                  th:each="transLang : ${langList}">
+            <link rel="alternate" th:hreflang="${transLang.lang}"
+                  th:href="${websitePath + (transLang.lang != 'en' ? transLang.lang + '/' : '') + pageName + (slug != '' ? '/' + slug : '') + (pn > 1 ? '-' + pn : '')}"/>
+        </th:block>
     </th:block>
     <meta property="og:title" th:content="${pageTitle}"/>
     <meta property="og:description" th:content="${pageContent}"/>
@@ -222,7 +220,7 @@
     totalPages=${pageData.totalPages},
     currentPage=${pageData.pageNum},
     requestUrl=${category != null
-        ? (#strings.toLowerCase(#strings.replace(#strings.trim(category.name), ' ', '-')) + '-' + category.id)
+        ? (#normalizer.normalizeString(category.name) + '-' + category.id)
         : pageName}
 )"></th:block>
             </div>
