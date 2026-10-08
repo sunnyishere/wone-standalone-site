@@ -157,11 +157,12 @@ public final class RichTextUtils {
      * @return 升级 https 后的内容；不含白名单前缀时原样返回
      */
     public static String upgradeOssToHttps(String html) {
-        if (StringUtils.isBlank(html) || !html.contains("http://oss.")) {
+        if (StringUtils.isBlank(html) || !html.contains("http://oss.") || html.contains("https://oss.iwone.cn")) {
             return html;
         }
         String cleaned = html;
         cleaned = cleaned.replaceAll("http://oss.iwone.cn", "https://oss.iee-business.com")
+                .replaceAll("https://oss.iwone.cn", "https://oss.iee-business.com")
                 .replaceAll("http://oss.iee-business.com", "https://oss.iee-business.com");
         return cleaned;
     }

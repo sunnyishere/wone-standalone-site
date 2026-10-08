@@ -323,6 +323,7 @@ public class RockwillKnowledgeService {
         put("blog", new String[]{"content", "title"});
         put("library", new String[]{"content", "name"});
     }};
+    private static final String[] FAQ_LIST_KEYS = {"prodFaqList", "pageFaqList"};
 
     /**
      * 定点清理富文本字段：剥离被粘贴的 HTML 文档骨架（{@code <!DOCTYPE>/<html>/<head>/<body>}），
@@ -353,6 +354,25 @@ public class RockwillKnowledgeService {
             String cleaned = RichTextUtils.stripDocumentSkeleton((String) content);
             cleaned = RichTextUtils.fillMissingAlt(cleaned, altText);
             entity.put(fieldNames[0], cleaned);
+        }
+        for (String faqKey : FAQ_LIST_KEYS) {
+            Object faqListObj = model.get(faqKey);
+            if (!(faqListObj instanceof List)) {
+                continue;
+            }
+            for (Object itemObj : (List<?>) faqListObj) {
+                if (!(itemObj instanceof Map)) {
+                    continue;
+                }
+                @SuppressWarnings("unchecked")
+                Map<String, Object> item = (Map<String, Object>) itemObj;
+                Object content = item.get("content");
+                if (!(content instanceof String) || StringUtils.isBlank((String) content)) {
+                    continue;
+                }
+                String cleaned = RichTextUtils.stripDocumentSkeleton((String) content);
+                item.put("content", cleaned);
+            }
         }
     }
 
