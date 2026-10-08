@@ -6,12 +6,12 @@
                 <div>
                     <div class="am-fr">
                         <ul class="m-nav am-nav am-nav-pills am-fl" style="margin-right: -10px;position: relative;z-index: 99999 !important;">
-                            <li class="am-dropdown" data-am-dropdown>
+                            <li id="pc-language-menu" class="am-dropdown" data-am-dropdown>
                                 <a title="English" aria-hidden="false" aria-label="English" style="color: var(--theme-menu-font-color) !important;">
                                     <span class="p-icon-a-104"></span>
                                     <span class="am-padding-right" th:text="${langName}">English</span>
                                 </a>
-                                <ul class="sub-menu am-text-sm">
+                                <ul id="site-language-list" class="sub-menu am-text-sm">
                                     <li class="menu-item">
 
                                         <nav class="" style="width: 100%;height: auto; max-height: 200px;overflow-y: scroll;">
@@ -22,14 +22,14 @@
                                                         ('/' + ${pageName} + ${suffix}) :
                                                         ('/' + ${item.lang} + '/' + ${pageName} + ${suffix})"
                                                        th:text="${item.langName}"
-                                                        th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                        th:classappend="${currentLang == item.lang} ? 'am-active' : ''">
                                                     </a>
                                                     <a th:unless="${suffix != null}"
                                                        th:href="${item.lang == 'en'} ?
                                                         ( ${pageName!='Home'?'/'+pageName:'/'}) :
                                                         ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
                                                        th:text="${item.langName}"
-                                                        th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
+                                                        th:classappend="${currentLang == item.lang} ? 'am-active' : ''">
                                                     </a>
                                                 </li>
                                             </ul>

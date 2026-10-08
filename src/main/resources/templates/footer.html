@@ -95,6 +95,31 @@
             gtag('js', new Date());
         }
         gtag('config', /*[[${gaTrackingId}]]*/ 'G-0HKGZJNMN6');
+        document.addEventListener('DOMContentLoaded', function () {
+            var languageList = document.getElementById('site-language-list');
+            var pcMenu = document.getElementById('pc-language-menu');
+            var mobileMenu = document.getElementById('mobile-language-menu');
+            if (!languageList || !pcMenu || !mobileMenu) {
+                return;
+            }
+
+            var mobileViewport = window.matchMedia('(max-width: 640px)');
+            function moveLanguageList() {
+                mobileMenu.classList.remove('active', 'am-active');
+                pcMenu.classList.remove('am-active');
+                languageList.classList.toggle('lang-list', mobileViewport.matches);
+                (mobileViewport.matches ? mobileMenu : pcMenu).appendChild(languageList);
+                if (!mobileViewport.matches && window.jQuery && window.jQuery.fn.offCanvas) {
+                    window.jQuery('#r-nav').offCanvas('close');
+                }
+            }
+            moveLanguageList();
+            if (mobileViewport.addEventListener) {
+                mobileViewport.addEventListener('change', moveLanguageList);
+            } else {
+                mobileViewport.addListener(moveLanguageList);
+            }
+        });
     </script>
 </footer>
 

@@ -660,6 +660,7 @@ public class StaticPageService {
             URL url = new URL(httpsUrl);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("HEAD");
+            connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36");
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             int responseCode = connection.getResponseCode();

@@ -3,39 +3,13 @@
         <nav class="am-offcanvas-content phone-menu-p">
 
             <ul class="am-nav am-nav-min lang-list-down">
-                <li class="am-dropdown lang-dropdown" data-am-dropdown>
+                <li id="mobile-language-menu" class="am-dropdown lang-dropdown" data-am-dropdown>
                     <div class="lang-trigger">
                         <span class="am-padding-left-0" th:text="${langName}">
                         </span>
                         <span class="tn-icon-down am-padding-left-xs am-text-xs dropdown-arrow"></span>
                     </div>
 
-                    <ul class="sub-menu lang-list am-text-sm">
-                        <li class="menu-item">
-                            <nav class="lang-list-container">
-                                <ul class="am-menu-nav am-avg-sm-1">
-                                    <li class="am-parent" th:each="item : ${langList}">
-                                        <a th:if="${suffix != null}"
-                                           th:href="${item.lang == 'en'} ?
-                                                        ('/' + ${pageName} + ${suffix}) :
-                                                        ('/' + ${item.lang} + '/' + ${pageName} + ${suffix})"
-                                           th:text="${item.langName}"
-                                           th:title="${item.langName}"
-                                           th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
-                                        </a>
-                                        <a th:unless="${suffix != null}"
-                                           th:href="${item.lang == 'en'} ?
-                                                        ( ${pageName!='Home'?'/'+pageName:'/'}) :
-                                                        ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"
-                                           th:text="${item.langName}"
-                                           th:title="${item.langName}"
-                                           th:classappend="${#httpServletRequest.getParameter('lang') == item.lang} ? 'am-active' : ''">
-                                        </a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </li>
-                    </ul>
                 </li>
             </ul>
 

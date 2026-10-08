@@ -353,6 +353,7 @@ public class RockwillKnowledgeService {
             String altText = alt instanceof String && StringUtils.isNotBlank((String) alt) ? (String) alt : null;
             String cleaned = RichTextUtils.stripDocumentSkeleton((String) content);
             cleaned = RichTextUtils.fillMissingAlt(cleaned, altText);
+            cleaned = RichTextUtils.upgradeOssToHttps(cleaned);
             entity.put(fieldNames[0], cleaned);
         }
         for (String faqKey : FAQ_LIST_KEYS) {

@@ -22,6 +22,11 @@ public final class RichTextUtils {
     private static final Pattern BODY_PATTERN = Pattern.compile("(?is)<body[^>]*>(.*?)</body>");
 
     /**
+     * 匹配 body 开闭标签，兜底处理缺少结束标签的粘贴内容
+     */
+    private static final Pattern BODY_TAG_PATTERN = Pattern.compile("(?i)</?body[^>]*>");
+
+    /**
      * 匹配文档骨架中的 head 区块
      */
     private static final Pattern HEAD_PATTERN = Pattern.compile("(?is)<head[^>]*>.*?</head>");
@@ -77,6 +82,9 @@ public final class RichTextUtils {
                 cleaned = replaced.toString();
             }
         }
+        cleaned = BODY_TAG_PATTERN.matcher(cleaned).replaceAll("");
+//        cleaned = cleaned.replaceAll("<h1", "<h2")
+//                .replaceAll("</h1>", "</h2>");
         if (StringUtils.containsIgnoreCase(cleaned, "<!doctype")
                 || StringUtils.containsIgnoreCase(cleaned, "<html")
                 || StringUtils.containsIgnoreCase(cleaned, "<head")) {
@@ -157,7 +165,7 @@ public final class RichTextUtils {
      * @return 升级 https 后的内容；不含白名单前缀时原样返回
      */
     public static String upgradeOssToHttps(String html) {
-        if (StringUtils.isBlank(html) || !html.contains("http://oss.") || html.contains("https://oss.iwone.cn")) {
+        if (StringUtils.isBlank(html) || (!html.contains("http://oss.") && !html.contains("https://oss.iwone.cn"))) {
             return html;
         }
         String cleaned = html;
