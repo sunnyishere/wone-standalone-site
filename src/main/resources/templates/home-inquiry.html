@@ -4,44 +4,64 @@
     <input type="hidden" name="attachUrl" id="home-fileUrl">
 
     <div class="home-rfq-header">
-        <h3 th:text="${advanced['get.quotes.with.rfq'] ?: 'GET QUOTES WITH RFQ'}">GET QUOTES WITH RFQ</h3>
+        <h3 th:text="${advanced['send.inquiry'] ?: 'Send inquiry'}">Send inquiry</h3>
     </div>
 
     <div class="home-rfq-field home-rfq-field-name">
-        <label for="home-input-name">
-            <span th:text="${advanced['your.name'] ?: 'Your Name'}">Your Name</span> <em>*</em>
+        <label class="sr-only" for="home-input-name">
+            <span th:text="${advanced['your.name'] ?: 'Your Name'}">Your Name</span>
         </label>
-        <input type="text" id="home-input-name" name="name" class="home-rfq-control"
-               th:placeholder="${advanced['your.name'] ?: 'Your Name'}" autocomplete="off">
+        <div class="home-rfq-input-control">
+            <span class="home-rfq-input-icon home-rfq-input-icon--required p-icon-a-230" aria-hidden="true">
+                <span class="home-rfq-required">*</span>
+            </span>
+            <input type="text" id="home-input-name" name="name" class="home-rfq-control" required aria-required="true"
+                   th:placeholder="${advanced['your.name'] ?: 'Your Name'}" autocomplete="off">
+        </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-email">
-        <label for="home-input-email">
-            <span th:text="${advanced['your.email'] ?: 'Your Email'}">Your Email</span> <em>*</em>
+        <label class="sr-only" for="home-input-email">
+            <span th:text="${advanced['your.email'] ?: 'Your Email'}">Your Email</span>
         </label>
-        <input type="email" id="home-input-email" name="email" class="home-rfq-control"
-               th:placeholder="${advanced['your.email'] ?: 'Your Email'}" autocomplete="off">
+        <div class="home-rfq-input-control">
+            <span class="home-rfq-input-icon home-rfq-input-icon--required p-icon-a-2311" aria-hidden="true">
+                <span class="home-rfq-required">*</span>
+            </span>
+            <input type="email" id="home-input-email" name="email" class="home-rfq-control" required aria-required="true"
+                   th:placeholder="${advanced['your.email'] ?: 'Your Email'}" autocomplete="off">
+        </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-country">
-        <label id="home-country-label" th:text="${advanced['your.country'] ?: 'Country'}">Country</label>
+        <label class="sr-only" id="home-country-label" th:text="${advanced['your.country'] ?: 'Country'}">Country</label>
         <div class="home-rfq-country-control" id="home-country-select">
             <button type="button" class="home-rfq-control home-rfq-country-trigger"
                     id="home-country-trigger" aria-labelledby="home-country-label home-country-text"
-                    aria-haspopup="listbox" aria-expanded="false">
+                    aria-haspopup="dialog" aria-controls="home-country-dropdown" aria-expanded="false">
                 <span class="home-rfq-country-icon p-icon-a-232" aria-hidden="true"></span>
                 <span id="home-country-text">China</span>
                 <span class="home-rfq-country-arrow" aria-hidden="true"></span>
             </button>
-            <div class="home-rfq-country-options" id="home-country-options" role="listbox"
-                 aria-labelledby="home-country-label" hidden></div>
+            <div class="home-rfq-country-dropdown" id="home-country-dropdown" role="dialog"
+                 aria-labelledby="home-country-label" hidden>
+                <input type="search" class="home-rfq-country-search" id="home-country-search"
+                       placeholder="Search country" aria-label="Search country" autocomplete="off"
+                       th:placeholder="${advanced['search.country'] ?: 'Search country'}"
+                       th:attr="aria-label=${advanced['search.country'] ?: 'Search country'}"
+                       aria-controls="home-country-options">
+                <div class="home-rfq-country-options" id="home-country-options" role="listbox"
+                     aria-labelledby="home-country-label"></div>
+                <div class="home-rfq-country-empty" id="home-country-empty" role="status" hidden
+                     th:text="${advanced['no.countries.found'] ?: 'No countries found'}">No countries found</div>
+            </div>
             <input type="hidden" id="home-input-country" name="country" value="CN" data-phone="86">
         </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-phone">
-        <label for="home-input-phone">
-            <span th:text="${advanced['your.phone'] ?: 'Your Phone'}">Your Phone</span> <em>*</em>
+        <label class="sr-only" for="home-input-phone">
+            <span th:text="${advanced['your.phone'] ?: 'Your Phone'}">Your Phone</span>
         </label>
         <div class="home-rfq-phone-control">
             <span class="home-rfq-phone-icon p-icon-a-233" aria-hidden="true"></span>
@@ -52,27 +72,36 @@
     </div>
 
     <div class="home-rfq-field home-rfq-field-org">
-        <label for="home-input-orgName">
-            <span th:text="${advanced['org.name'] ?: 'Organization Name'}">Organization Name</span> <em>*</em>
+        <label class="sr-only" for="home-input-orgName">
+            <span th:text="${advanced['org.name'] ?: 'Organization Name'}">Organization Name</span>
         </label>
-        <input type="text" id="home-input-orgName" name="orgName" class="home-rfq-control"
-               th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" autocomplete="off">
+        <div class="home-rfq-input-control">
+            <span class="home-rfq-input-icon p-icon-a-234" aria-hidden="true"></span>
+            <input type="text" id="home-input-orgName" name="orgName" class="home-rfq-control"
+                   th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" autocomplete="off">
+        </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-title">
-        <label for="home-input-title" th:text="${advanced['job.title'] ?: 'Job Title'}">Job Title</label>
-        <input type="text" id="home-input-title" name="title" class="home-rfq-control"
-               th:placeholder="${advanced['job.title'] ?: 'Your job title'}" autocomplete="off">
+        <label class="sr-only" for="home-input-title" th:text="${advanced['job.title'] ?: 'Job Title'}">Job Title</label>
+        <div class="home-rfq-input-control">
+            <span class="home-rfq-input-icon p-icon-a-235" aria-hidden="true"></span>
+            <input type="text" id="home-input-title" name="title" class="home-rfq-control"
+                   th:placeholder="${advanced['job.title'] ?: 'Your job title'}" autocomplete="off">
+        </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-message">
-        <label for="home-input-message" th:text="${advanced['your.message'] ?: 'Message'}">Message</label>
-        <textarea id="home-input-message" name="message" class="home-rfq-control" rows="4"
-                  th:placeholder="${advanced['your.message'] ?: 'Your Message'}"></textarea>
+        <label class="sr-only" for="home-input-message" th:text="${advanced['your.message'] ?: 'Message'}">Message</label>
+        <div class="home-rfq-input-control">
+            <span class="home-rfq-input-icon p-icon-a-236" aria-hidden="true"></span>
+            <textarea id="home-input-message" name="message" class="home-rfq-control" rows="4"
+                      th:placeholder="${advanced['your.message'] ?: 'Your Message'}"></textarea>
+        </div>
     </div>
 
     <div class="home-rfq-field home-rfq-field-attachment">
-        <label for="home-attachment" th:text="${advanced['upload.file'] ?: 'Attachment'}">Attachment</label>
+        <label class="sr-only" for="home-attachment" th:text="${advanced['upload.file'] ?: 'Attachment'}">Attachment</label>
         <input type="file" id="home-attachment" name="attachment"
                class="home-rfq-file-input"
                multiple

@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum StandaloneSyncEntityType {
     PRODUCT(SitePage.SitePageType.PRODUCTS),
+    CATEGORY(SitePage.SitePageType.PRODUCTS), // 默认语言的产品分类更新
     SOLUTION(SitePage.SitePageType.SOLUTIONS),
     DOCUMENTS(SitePage.SitePageType.DOCUMENTS),
     NEWS(SitePage.SitePageType.NEWS),

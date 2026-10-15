@@ -20,7 +20,8 @@
             <div class="form-group" style="margin: 8px 0; width: 100%;">
                 <div class="input-with-icon" style="position: relative; width: 100%;">
                     <span class="input-icon p-icon-a-230" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
-                    <input type="text" id="input-name" name="name" class="form-control" autocomplete="off"
+                    <span aria-hidden="true" style="position: absolute; left: 27px; top: 9px; color: #dc2626; font: 700 14px/1 Arial, sans-serif; pointer-events: none;">*</span>
+                    <input type="text" id="input-name" name="name" class="form-control" autocomplete="off" aria-required="true"
                            style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
                            th:placeholder="${advanced['your.name'] ?: 'Your Name'}" required />
                 </div>
@@ -30,7 +31,8 @@
             <div class="form-group" style="margin: 8px 0; width: 100%;">
                 <div class="input-with-icon" style="position: relative; width: 100%;">
                     <span class="input-icon p-icon-a-2311" style="position: absolute; left: 12px; top: 55%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
-                    <input type="email" id="input-email" name="email" class="form-control" autocomplete="off"
+                    <span aria-hidden="true" style="position: absolute; left: 27px; top: 9px; color: #dc2626; font: 700 14px/1 Arial, sans-serif; pointer-events: none;">*</span>
+                    <input type="email" id="input-email" name="email" class="form-control" autocomplete="off" aria-required="true"
                            style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
                            th:placeholder="${advanced['your.email'] ?: 'Your Email'}" maxlength="32" oninput="this.value = this.value.slice(0, 32);" required />
                 </div>
@@ -41,6 +43,7 @@
                 <div class="input-with-icon" style="position: relative; width: 100%;">
                     <span class="input-icon p-icon-a-232" style="position: absolute; left: 12px; top: 53%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
                     <select id="input-country" name="country" class="form-control"
+                            th:attr="data-search-placeholder=${advanced['search.country'] ?: 'Search country'},data-empty-message=${advanced['no.countries.found'] ?: 'No countries found'}"
                             style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\\\"http://www.w3.org/2000/svg\\\" width=\\\"14\\\" height=\\\"14\\\" viewBox=\\\"0 0 24 24\\\" fill=\\\"none\\\" stroke=\\\"%23777\\\" stroke-width=\\\"2\\\" stroke-linecap=\\\"round\\\"><polyline points=\\\"6 9 12 15 18 9\\\"></polyline></svg>'); background-repeat: no-repeat; background-position: right 12px center;"
                     th:placeholder="${advanced['your.country']}" required>
                     </select>
@@ -54,7 +57,7 @@
                     <span class="phone-prefix" id="phonePrefix" style="position: absolute; left: 32px; top: 50%; transform: translateY(-50%); color: #777; font-weight: 500; pointer-events: none;">+86</span>
                     <input type="tel" id="input-phone" name="phone" class="form-control"
                            style="width: 100%; padding: 12px 12px 12px 75px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
-                           th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16);"  required />
+                           th:placeholder="${advanced['your.phone'] ?: 'Your Phone'}" maxlength="12" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16);" />
                 </div>
             </div>
 
@@ -64,7 +67,7 @@
                     <span class="input-icon p-icon-a-234" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #777; pointer-events: none;"></span>
                     <input type="text" id="input-orgName" name="orgName" class="form-control" autocomplete="off"
                            style="width: 100%; padding: 12px 12px 12px 38px; border-radius: 6px; font-size: 15px; outline: none; border: 1px solid #ddd; background: #fff;"
-                           th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" required />
+                           th:placeholder="${advanced['org.name'] ?: 'Your organization name'}" />
                 </div>
             </div>
 

@@ -195,6 +195,15 @@ public class StaticizeTriggerController {
                 collectDetailPages(file, syncContext, standaloneSyncEvent, urlSet);
                 continue;
             }
+            if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.CATEGORY) {
+                // 仅失效默认语言的分类目录；detail、series 和语言目录保持原样。
+                // 分类名称/排序也影响侧栏，因此同时失效其他分类页及其分页。
+                if (file.getName().matches(".+-\\d+(-\\d+)?")) {
+                    deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
+                            "/" + syncContext.pageName + "/" + file.getName(), urlSet);
+                }
+                continue;
+            }
             if (syncContext.isProd) {
                 collectProductPages(file, syncContext, standaloneSyncEvent, urlSet);
             } else if (file.getName().contains("-" + standaloneSyncEvent.getEntityId())) {

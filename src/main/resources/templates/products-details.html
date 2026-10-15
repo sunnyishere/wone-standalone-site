@@ -104,11 +104,27 @@
     <div class="am-container phone-clear-padding" style="padding: 0 3%;">
 
         <div class="am-u-sm-12 am-u-md-7 am-u-lg-7 phone-clear-margin" style="padding: 0 15px;">
-            <div style="background-color: #FFFFFF;margin-bottom:5px;margin-top: 25px">
+            <div class="detail-page-heading" style="background-color: #FFFFFF;margin-top: 25px">
                 <div class="dd-clamp-text-2 am-text-bold am-text-lg"
                      style="min-height: 40px;max-height: 40px;">
                     <h1 class="inline-header" th:text="${prod.name}"></h1>
                 </div>
+                <p class="detail-page-subtitle"
+                   th:if="${not #strings.isEmpty(prod.description)}"
+                   th:text="${prod.description}"></p>
+            </div>
+            <div class="solution-detail-meta am-margin-bottom">
+                <span class="solution-google-review-wrap">
+                    <a class="solution-google-review" href="https://www.google.com/preferences/source"
+                       th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
+                       target="_blank" rel="noopener noreferrer" th:aria-label="${advanced['add.us.on.google']}"
+                       aria-describedby="product-google-tooltip">
+                        <span class="am-icon-google" aria-hidden="true"></span>
+                        <span th:text="${advanced['add.us.on.google']}"></span>
+                    </a>
+                    <span id="product-google-tooltip" class="solution-google-tooltip" role="tooltip"
+                          th:text="${advanced['google.preferred.source.description']}"></span>
+                </span>
             </div>
 
             <!-- 视频+图片 -->
@@ -283,21 +299,25 @@
                                                 <span th:text="${item.faAssoc?.name}">分类名称</span>
                                             </div>
                                             <div th:if="${item.locale == 1}"
+                                                 th:text="${advanced['language.chinese']} ?: 'Chinese'"
                                                  class="am-text-left am-padding-top-sm am-padding-right-lg"
                                                  style="color: #767676;">
                                                 Chinese
                                             </div>
                                             <div th:if="${item.locale == 2}"
+                                                 th:text="${advanced['language.english']} ?: 'English'"
                                                  class="am-text-left am-padding-top-sm am-padding-right-lg"
                                                  style="color: #767676;">
                                                 English
                                             </div>
                                             <div th:if="${item.locale == 3}"
+                                                 th:text="${advanced['language.french']} ?: 'French'"
                                                  class="am-text-left am-padding-top-sm am-padding-right-lg"
                                                  style="color: #767676;">
                                                 French
                                             </div>
-                                            <span th:if="${item.locale != 1 and item.locale != 2 and item.locale != 3}">Unknown Language</span>
+                                            <span th:if="${item.locale != 1 and item.locale != 2 and item.locale != 3}"
+                                                  th:text="${advanced['language.unknown']} ?: 'Unknown Language'">Unknown Language</span>
                                         </div>
                                     </div>
                                     <div class="PC-24 product-library-action">
@@ -773,7 +793,7 @@
     </div>
 
     <div class="am-hide-lg-only"
-         style="position: fixed;bottom: 0; left : 0; right: 0; height: auto; width: 100%;background: #fff;">
+         style="position: fixed;bottom: 0; left : 0; right: 0; height: auto; width: 100%;background: #fff;z-index: 1;">
         <div class="am-text-center am-padding-top">
             <a aria-hidden="false"
                aria-label="Send inquiry"

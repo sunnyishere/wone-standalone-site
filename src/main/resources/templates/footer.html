@@ -1,5 +1,5 @@
 <footer class="m-footer" th:fragment="footer">
-    <div class="site-footer-main">
+    <div class="site-footer-main" th:if="${isHomeFooter == true}">
         <div class="am-container footer-grid">
             <section class="footer-brand-column">
                 <span class="footer-brand-name"
@@ -9,9 +9,13 @@
                    th:text="${footerConfig.description}"></p>
                 <div class="footer-socials"
                      th:if="${footerConfig != null and
-                        ((footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != '') or
+                        ((footerConfig['facebookUrl'] != null and footerConfig['facebookUrl'] != '') or
+                         (footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != '') or
                          (footerConfig.youtubeUrl != null and footerConfig.youtubeUrl != '') or
                          (footerConfig.whatsappUrl != null and footerConfig.whatsappUrl != ''))}">
+                    <a th:if="${footerConfig['facebookUrl'] != null and footerConfig['facebookUrl'] != ''}"
+                       th:href="${footerConfig['facebookUrl']}" target="_blank" rel="noopener noreferrer"
+                       title="Facebook" aria-label="Facebook"><i class="am-icon-facebook" aria-hidden="true"></i></a>
                     <a th:if="${footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != ''}"
                        th:href="${footerConfig.linkedinUrl}" target="_blank" rel="noopener noreferrer"
                        title="LinkedIn" aria-label="LinkedIn"><i class="am-icon-linkedin" aria-hidden="true"></i></a>
@@ -38,12 +42,16 @@
                 </ul>
             </section>
 
-            <section class="footer-contact-column"
+        </div>
+    </div>
+
+    <div class="m-footer-bottom">
+        <div class="am-container">
+            <section class="footer-contact-row"
                      th:if="${footerContact != null and
                         ((footerContact.headquartersFactory != null and footerContact.headquartersFactory != '') or
                          (footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != '') or
                          (footerContact.email != null and footerContact.email != ''))}">
-                <span class="footer-column-title" th:text="${advanced['contact']}"></span>
                 <ul class="footer-contact-list">
                     <li th:if="${footerContact.headquartersFactory != null and footerContact.headquartersFactory != ''}">
                         <i class="am-icon-map-marker" aria-hidden="true"></i>
@@ -51,19 +59,16 @@
                     </li>
                     <li th:if="${footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != ''}">
                         <i class="am-icon-phone" aria-hidden="true"></i>
-                        <span th:text="${footerContact.phoneWhatsapp}"></span>
+                        <a th:href="${'https://wa.me/' + footerContact.phoneWhatsapp.replaceAll('[^0-9]', '')}"
+                           target="_blank" rel="noopener noreferrer" th:text="${footerContact.phoneWhatsapp}"></a>
                     </li>
                     <li th:if="${footerContact.email != null and footerContact.email != ''}">
                         <i class="am-icon-envelope-o" aria-hidden="true"></i>
-                        <span th:text="${footerContact.email}"></span>
+                        <a th:href="|mailto:${#strings.trim(footerContact.email)}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
+                           th:text="${footerContact.email}"></a>
                     </li>
                 </ul>
             </section>
-        </div>
-    </div>
-
-    <div class="m-footer-bottom">
-        <div class="am-container">
             <div class="footer-copyright">
                 <div>&copy; <span th:text="${year}"></span>
                     <span th:text="${brandName}"></span>. All rights reserved.</div>

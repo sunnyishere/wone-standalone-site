@@ -811,7 +811,6 @@ $(document).ready(function () {
 
         // 5. 填充国家选项
         const countryList = Object.entries(COUNTRY_DATA);
-        let selectedIso2 = 'CN';
 
         // 保存所有选项引用
         countryOptions = [];
@@ -885,13 +884,13 @@ $(document).ready(function () {
             });
 
             option.addEventListener('mouseenter', () => {
-                if (option.dataset.iso2 !== selectedIso2) {
+                if (option.dataset.iso2 !== hiddenInput.value) {
                     option.style.backgroundColor = '#f5f5f5';
                 }
             });
 
             option.addEventListener('mouseleave', () => {
-                if (option.dataset.iso2 !== selectedIso2) {
+                if (option.dataset.iso2 !== hiddenInput.value) {
                     option.style.backgroundColor = '';
                 }
             });
@@ -921,6 +920,7 @@ $(document).ready(function () {
 
         // 设置默认选中
         selectCountry('China', 'CN', '86');
+        initializeRfqCountrySearch(selectContainer, selectedDisplay, dropdownPanel, originalSelect);
     };
 
     const setCountryByIP = async () => {
@@ -1218,7 +1218,7 @@ $(document).ready(function () {
         $('.form-error').remove();
         const phonePrefix = $('#phonePrefix').text().trim();
         const phoneNumber = $('#input-phone').val().trim();
-        const fullPhone = phonePrefix + phoneNumber;
+        const fullPhone = phoneNumber ? phonePrefix + phoneNumber : '';
 
         const formData = {
             bizId: $('#input-biz-id').val(),
@@ -1254,15 +1254,6 @@ $(document).ready(function () {
             hasError = true;
         }
 
-        if (!formData.orgName) {
-            showError($('#input-orgName'), i18n.ruleOrgName);
-            hasError = true;
-        }
-
-        if (!phoneNumber) {
-            showError($('#input-phone'), i18n.rulePhone);
-            hasError = true;
-        }
 
         if (hasError) {
             return;
@@ -1506,4 +1497,225 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
+    const searchArea = document.createElement('div');
+    searchArea.style.cssText = 'position:sticky;top:0;padding:8px;background:#fff;z-index:1;';
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.placeholder = originalSelect.getAttribute('data-search-placeholder') || 'Search country';
+    search.setAttribute('aria-label', search.placeholder);
+    search.autocomplete = 'off';
+    search.style.cssText = 'display:block;box-sizing:border-box;width:100%;height:38px;padding:8px 10px;border:1px solid #ddd;border-radius:4px;background:#fff;color:#111827;font:inherit;';
+    searchArea.appendChild(search);
+    panel.insertBefore(searchArea, panel.firstChild);
+    const empty = document.createElement('div');
+    empty.textContent = originalSelect.getAttribute('data-empty-message') || 'No countries found';
+    empty.setAttribute('role', 'status');
+    empty.style.cssText = 'display:none;padding:12px 18px;color:#777;';
+    panel.appendChild(empty);
+    trigger.tabIndex = 0;
+    trigger.setAttribute('role', 'button');
+    trigger.setAttribute('aria-expanded', 'false');
+    const options = Array.from(panel.querySelectorAll('.dropdown-option'));
+    const filter = () => {
+        const query = search.value.trim().toLowerCase();
+        let matches = 0;
+        options.forEach(option => {
+            const text = (option.dataset.countryName + ' ' + option.dataset.iso2 + ' +' + option.dataset.phone).toLowerCase();
+            const visible = text.includes(query);
+            option.style.display = visible ? '' : 'none';
+            if (visible) matches++;
+        });
+        empty.style.display = matches ? 'none' : 'block';
+        panel.scrollTop = 0;
+    };
+    search.addEventListener('input', filter);
+    trigger.addEventListener('click', () => {
+        const open = panel.style.display !== 'none';
+        trigger.setAttribute('aria-expanded', String(open));
+        if (open) {
+            search.value = '';
+            filter();
+            search.focus();
+        }
+    });
+    options.forEach(option => {
+        option.tabIndex = 0;
+        option.addEventListener('click', () => {
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        });
+        option.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                option.click();
+            }
+        });
+    });
+    container.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            panel.style.display = 'none';
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+        } else if (event.target === search && (event.key === 'Enter' || event.key === 'ArrowDown')) {
+            event.preventDefault();
+            const first = options.find(option => option.style.display !== 'none');
+            if (first) {
+                if (event.key === 'Enter') first.click();
+                else first.focus();
+            }
+        } else if (event.target === trigger && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            trigger.click();
+        }
+    });
+    // Keep native scrollbar interaction inside the dropdown's focus boundary.
+    panel.tabIndex = -1;
+    let interactingWithPanel = false;
+    panel.addEventListener('pointerdown', () => {
+        interactingWithPanel = true;
+    });
+    const finishPanelInteraction = () => {
+        setTimeout(() => { interactingWithPanel = false; }, 0);
+    };
+    document.addEventListener('pointerup', finishPanelInteraction);
+    document.addEventListener('pointercancel', finishPanelInteraction);
+    container.addEventListener('focusout', event => {
+        // Native scrollbar interaction can blur the search input without a new focus target.
+        // Close for focus moving outside; outside clicks are handled separately.
+        if (!interactingWithPanel && event.relatedTarget && !container.contains(event.relatedTarget)) {
+            panel.style.display = 'none';
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    document.addEventListener('click', event => {
+        if (!container.contains(event.target)) trigger.setAttribute('aria-expanded', 'false');
+    });
+}
 
+;
+// List infinite scroll
+(function () {
+    'use strict';
+
+    // Keep the next-page link usable if the browser cannot enhance the list.
+    if (!window.fetch || !window.IntersectionObserver || !window.AbortController) return;
+    var list = document.querySelector('[data-scroll-list]');
+    var status = document.querySelector('[data-list-load-status]');
+    if (!list || !status || !list.getAttribute('data-next-url')) return;
+    var nextLink = status.querySelector('[data-list-load-next]');
+
+    var chinese = /^zh/i.test(document.documentElement.lang);
+    var labels = chinese ? {
+        ready: '继续下滑加载更多', loading: '正在加载…',
+        done: '已全部加载', error: '加载失败，请重试', retry: '重试'
+    } : {
+        ready: 'Scroll for more', loading: 'Loading…',
+        done: 'All items loaded', error: 'Unable to load. Please retry.', retry: 'Retry'
+    };
+    // Translations are rendered into the static HTML from the advanced dictionary.
+    Object.keys(labels).forEach(function (key) {
+        var translated = status.getAttribute('data-label-' + key);
+        if (translated && translated.trim()) labels[key] = translated;
+    });
+    var message = status.querySelector('[data-list-load-message]');
+    var retry = status.querySelector('[data-list-load-retry]');
+    var nextUrl = list.getAttribute('data-next-url');
+    var currentPage = Number(list.getAttribute('data-page'));
+    var loading = false;
+    var failed = false;
+    retry.textContent = labels.retry;
+
+    function show(text) { message.textContent = text; }
+
+    function loadNext() {
+        if (loading || failed || !nextUrl) return;
+        var requestedUrl = new URL(nextUrl, window.location.href);
+        if (requestedUrl.origin !== window.location.origin) return;
+        loading = true;
+        retry.hidden = true;
+        list.setAttribute('aria-busy', 'true');
+        show(labels.loading);
+        var controller = new AbortController();
+        var timeout = window.setTimeout(function () { controller.abort(); }, 20000);
+        fetch(requestedUrl.href, { signal: controller.signal, credentials: 'same-origin' })
+            .then(function (response) {
+                if (!response.ok) throw new Error('List page request failed');
+                return response.text();
+            })
+            .then(function (html) {
+                var page = new DOMParser().parseFromString(html, 'text/html');
+                var incoming = page.querySelector('[data-scroll-list]');
+                // Only an explicitly marked empty next page is a completed list.
+                var pageInfo = page.querySelector('meta[name="list-scroll-page"]');
+                var canonical = page.querySelector('link[rel="canonical"]');
+                if (pageInfo && canonical && pageInfo.getAttribute('data-list-empty') === 'true' &&
+                    Number(pageInfo.getAttribute('data-page')) === currentPage + 1 &&
+                    new URL(canonical.getAttribute('href'), requestedUrl.href).pathname === requestedUrl.pathname) {
+                    nextUrl = '';
+                    list.setAttribute('data-next-url', '');
+                    show(labels.done);
+                    observer.disconnect();
+                    return;
+                }
+                // Reject error pages, stale first pages and other unexpected responses.
+                if (!incoming || Number(incoming.getAttribute('data-page')) !== currentPage + 1 ||
+                    !incoming.children.length) throw new Error('Invalid list page');
+                var following = incoming.getAttribute('data-next-url') || '';
+                if (following) {
+                    var followingUrl = new URL(following, requestedUrl.href);
+                    if (followingUrl.origin !== window.location.origin || followingUrl.href === requestedUrl.href)
+                        throw new Error('Invalid next page link');
+                    following = followingUrl.href;
+                }
+                var fragment = document.createDocumentFragment();
+                Array.prototype.forEach.call(incoming.children, function (card) {
+                    // Resolve relative links against the fetched page, not the first page.
+                    Array.prototype.forEach.call(card.querySelectorAll('[href], [src]'), function (element) {
+                        ['href', 'src'].forEach(function (attribute) {
+                            var value = element.getAttribute(attribute);
+                            if (value) element.setAttribute(attribute, new URL(value, requestedUrl.href).href);
+                        });
+                    });
+                    fragment.appendChild(document.importNode(card, true));
+                });
+                list.appendChild(fragment);
+                currentPage += 1;
+                nextUrl = following;
+                list.setAttribute('data-page', currentPage);
+                list.setAttribute('data-next-url', nextUrl);
+                show(nextUrl ? labels.ready : labels.done);
+                if (!nextUrl) observer.disconnect();
+            })
+            .catch(function () {
+                failed = true;
+                show(labels.error);
+                retry.hidden = false;
+            })
+            .then(function () {
+                window.clearTimeout(timeout);
+                loading = false;
+                list.setAttribute('aria-busy', 'false');
+                // Recheck after the new cards lay out, even if the sentinel stayed visible.
+                if (!failed && nextUrl) window.requestAnimationFrame(checkBottom);
+            });
+    }
+
+    function checkBottom() {
+        var bounds = status.getBoundingClientRect();
+        if (bounds.top < window.innerHeight && bounds.bottom > 0) loadNext();
+    }
+
+    var observer = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) loadNext();
+    }, { rootMargin: '0px' });
+    retry.addEventListener('click', function () {
+        failed = false;
+        loadNext();
+    });
+    if (nextLink) nextLink.hidden = true;
+    status.hidden = false;
+    show(labels.ready);
+    observer.observe(status);
+}());

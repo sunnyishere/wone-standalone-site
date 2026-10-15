@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var countryTrigger = form.querySelector('#home-country-trigger');
         var countryText = form.querySelector('#home-country-text');
         var countryOptions = form.querySelector('#home-country-options');
+        var countryDropdown = form.querySelector('#home-country-dropdown');
+        var countrySearch = form.querySelector('#home-country-search');
+        var countryEmpty = form.querySelector('#home-country-empty');
         var phonePrefix = form.querySelector('#home-phone-prefix');
         var uploadedFiles = [];
         var homeCountryInitialized = false;
@@ -173,11 +176,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function closeHomeCountryOptions() {
-            if (!countryOptions || !countryTrigger) {
+            if (!countryDropdown || !countryTrigger) {
                 return;
             }
-            countryOptions.hidden = true;
+            countryDropdown.hidden = true;
             countryTrigger.setAttribute('aria-expanded', 'false');
+        }
+
+        function filterHomeCountries() {
+            var query = countrySearch.value.trim().toLowerCase();
+            var matches = 0;
+            Array.prototype.forEach.call(countryOptions.querySelectorAll('.home-rfq-country-option'), function (option) {
+                option.hidden = option.getAttribute('data-search').indexOf(query) === -1;
+                if (!option.hidden) matches++;
+            });
+            countryEmpty.hidden = matches > 0;
+            countryOptions.scrollTop = 0;
         }
 
         function initHomeCountrySelect() {
@@ -192,6 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 option.className = 'home-rfq-country-option';
                 option.setAttribute('role', 'option');
                 option.setAttribute('data-iso2', data.iso2);
+                option.setAttribute('data-search', (name + ' ' + data.iso2 + ' +' + data.phone).toLowerCase());
                 option.textContent = name;
                 option.addEventListener('click', function () {
                     setHomeCountry(name, data);
@@ -203,16 +218,34 @@ document.addEventListener('DOMContentLoaded', function () {
             setHomeCountry('China', window.RFQ_COUNTRY_DATA.China || {iso2: 'CN', phone: '86'});
         }
 
-        if (countryTrigger) {
+        if (countryTrigger && countryDropdown && countrySearch) {
             countryTrigger.addEventListener('click', function () {
-                var opening = countryOptions.hidden;
-                countryOptions.hidden = !opening;
+                var opening = countryDropdown.hidden;
+                countryDropdown.hidden = !opening;
                 countryTrigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
-            });
-            countryTrigger.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape') {
-                    closeHomeCountryOptions();
+                if (opening) {
+                    countrySearch.value = '';
+                    filterHomeCountries();
+                    countrySearch.focus();
                 }
+            });
+            countrySearch.addEventListener('input', filterHomeCountries);
+            form.querySelector('#home-country-select').addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    closeHomeCountryOptions();
+                    countryTrigger.focus();
+                } else if (event.target === countrySearch && (event.key === 'Enter' || event.key === 'ArrowDown')) {
+                    event.preventDefault();
+                    var firstOption = countryOptions.querySelector('.home-rfq-country-option:not([hidden])');
+                    if (firstOption) {
+                        if (event.key === 'Enter') firstOption.click();
+                        else firstOption.focus();
+                    }
+                }
+            });
+            form.querySelector('#home-country-select').addEventListener('focusout', function (event) {
+                if (!this.contains(event.relatedTarget)) closeHomeCountryOptions();
             });
             document.addEventListener('click', function (event) {
                 if (!form.querySelector('#home-country-select').contains(event.target)) {
@@ -368,7 +401,6 @@ document.addEventListener('DOMContentLoaded', function () {
             var name = nameField.value.trim();
             var email = emailField.value.trim();
             var phone = phoneField.value.trim();
-            var orgName = orgNameField.value.trim();
             var firstInvalid = null;
 
             [nameField, emailField, phoneField, orgNameField, countryTrigger].forEach(clearFieldError);
@@ -389,14 +421,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 showFieldError(countryTrigger, getValidationMessage('ruleCountry', 'Please select your country'));
                 firstInvalid = firstInvalid || countryTrigger;
             }
-            if (!phone) {
-                showFieldError(phoneField, getValidationMessage('rulePhone', 'Please enter your phone number'));
-                firstInvalid = firstInvalid || phoneField;
-            }
-            if (!orgName) {
-                showFieldError(orgNameField, getValidationMessage('ruleOrgName', 'Please enter the organization name'));
-                firstInvalid = firstInvalid || orgNameField;
-            }
 
             if (firstInvalid) {
                 firstInvalid.focus();
@@ -409,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     params.append(field.name, field.value);
                 }
             });
-            params.set('phone', (phonePrefix ? phonePrefix.textContent.trim() : '+86') + phone.replace(/^\+/, ''));
+            params.set('phone', phone ? (phonePrefix ? phonePrefix.textContent.trim() : '+86') + phone.replace(/^\+/, '') : '');
 
             submit.disabled = true;
             feedback.textContent = 'Sending...';
@@ -443,3 +467,174 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     })();
+
+(function () {
+    'use strict';
+// Keep the accepted URL formats aligned with YoutubeVideoUtils on the backend.
+function youtubeVideoId(value) {
+  const text = (value || '').trim()
+  if (!text || text.length > 1000 || /[\s\\<>"{}|^`]/.test(text) || /%(?![0-9a-f]{2})/i.test(text)) return ''
+  try {
+    const parts = /^https:\/\/[^/?#]+([^?#]*)(?:\?([^#]*))?(?:#.*)?$/i.exec(text)
+    if (!parts) return ''
+    const url = new URL(text)
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return ''
+    const host = url.hostname.toLowerCase()
+    const path = parts[1]
+    let id = ''
+    if (host === 'youtu.be' || host === 'www.youtu.be') {
+      if (/^\/[A-Za-z0-9_-]{11}\/?$/.test(path)) id = path.slice(1, 12)
+    } else if (['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(host)) {
+      if (path === '/watch') {
+        const values = ((parts[2] || '').match(/(?:^|&)v=[^&]*/g) || []).map(part => part.replace(/^&?v=/, ''))
+        if (values.length !== 1) return ''
+        id = values[0]
+      } else if (/^\/(embed|shorts|live)\/[A-Za-z0-9_-]{11}\/?$/.test(path)) {
+        id = path.split('/')[2]
+      }
+    } else if (['youtube-nocookie.com', 'www.youtube-nocookie.com'].includes(host) && /^\/embed\/[A-Za-z0-9_-]{11}\/?$/.test(path)) {
+      id = path.split('/')[2]
+    }
+    return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : ''
+  } catch (e) {
+    return ''
+  }
+}
+
+function youtubeThumbnailUrl(id, level = 0) {
+  if (!/^[A-Za-z0-9_-]{11}$/.test(id)) return ''
+  const sizes = ['maxresdefault', 'hqdefault', 'mqdefault']
+  return 'https://i.ytimg.com/vi/' + id + '/' + sizes[Math.min(2, Math.max(0, level))] + '.jpg'
+}
+
+function youtubeEmbedUrl(id) {
+  return /^[A-Za-z0-9_-]{11}$/.test(id) ? 'https://www.youtube-nocookie.com/embed/' + id : ''
+}
+
+    function initialize() {
+        var section = document.querySelector('.home-strength-section');
+        if (!section) return;
+        var video = section.querySelector('[data-strength-video]');
+        if (!video) return;
+        var id = youtubeVideoId(video.getAttribute('data-strength-video'));
+        if (!id) { video.hidden = true; return; }
+        var image = video.querySelector('.home-strength-cover');
+        var placeholder = video.querySelector('.home-strength-cover-placeholder');
+        var level = 0;
+        function nextCover() {
+            image.hidden = true;
+            placeholder.hidden = false;
+            if (level < 2) {
+                level++;
+                image.src = youtubeThumbnailUrl(id, level);
+            }
+        }
+        image.addEventListener('error', nextCover);
+        image.addEventListener('load', function () {
+            if (image.naturalWidth <= 120) { nextCover(); return; }
+            image.hidden = false;
+            placeholder.hidden = true;
+        });
+        image.src = youtubeThumbnailUrl(id);
+        var play = video.querySelector('[data-strength-play]');
+        var dialog = section.querySelector('[data-strength-dialog]');
+        var player = dialog.querySelector('[data-strength-player]');
+        play.addEventListener('click', function (event) {
+            // Older browsers retain the normal YouTube link as a fallback.
+            if (typeof dialog.showModal !== 'function') return;
+            event.preventDefault();
+            if (dialog.open) return;
+            var frame = document.createElement('iframe');
+            frame.src = youtubeEmbedUrl(id) + '?autoplay=1';
+            frame.title = 'Manufacturing video';
+            frame.allow = 'autoplay; encrypted-media; picture-in-picture';
+            frame.allowFullscreen = true;
+            player.appendChild(frame);
+            dialog.showModal();
+        });
+        dialog.querySelector('[data-strength-close]').addEventListener('click', function () { dialog.close(); });
+        dialog.addEventListener('click', function (event) {
+            if (event.target === dialog) dialog.close();
+        });
+        dialog.addEventListener('close', function () {
+            while (player.firstChild) player.removeChild(player.firstChild);
+            play.focus();
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize);
+    else initialize();
+})();
+
+;
+(function () {
+    document.querySelectorAll('[data-strength-gallery]').forEach(function (gallery) {
+        var track = gallery.querySelector('[data-gallery-track]');
+        var items = track.querySelectorAll('.home-strength-gallery-item');
+        var controls = gallery.querySelector('[data-gallery-controls]');
+        var dots = gallery.querySelector('[data-gallery-dots]');
+        var previous = gallery.querySelector('[data-gallery-prev]');
+        var next = gallery.querySelector('[data-gallery-next]');
+        var targets = [];
+        var page = 0;
+        var frame;
+
+        function update() {
+            var nearest = 0;
+            targets.forEach(function (target, index) {
+                if (Math.abs(track.scrollLeft - target) < Math.abs(track.scrollLeft - targets[nearest])) nearest = index;
+            });
+            page = nearest;
+            previous.disabled = page === 0;
+            next.disabled = page === targets.length - 1;
+            Array.prototype.forEach.call(dots.children, function (dot, index) {
+                dot.setAttribute('aria-current', index === page ? 'true' : 'false');
+            });
+        }
+
+        function go(index) {
+            var targetPage = Math.max(0, Math.min(targets.length - 1, index));
+            track.scrollTo({ left: targets[targetPage], behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        }
+
+        function layout() {
+            var step = window.matchMedia('(max-width: 768px)').matches ? 1 : 4;
+            var max = Math.max(0, track.scrollWidth - track.clientWidth);
+            var origin = items[0].getBoundingClientRect().left;
+            targets = [];
+            for (var i = 0; i < items.length; i += step) {
+                var target = Math.min(max, items[i].getBoundingClientRect().left - origin);
+                if (!targets.length || target > targets[targets.length - 1] + 1) targets.push(target);
+            }
+            dots.textContent = '';
+            targets.forEach(function (_, index) {
+                var dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'home-strength-gallery-dot';
+                dot.setAttribute('aria-label', 'Gallery page ' + (index + 1));
+                dot.addEventListener('click', function () { go(index); });
+                dots.appendChild(dot);
+            });
+            controls.hidden = targets.length < 2;
+            update();
+        }
+
+        if (!items.length) return;
+        previous.addEventListener('click', function () { go(page - 1); });
+        next.addEventListener('click', function () { go(page + 1); });
+        track.addEventListener('keydown', function (event) {
+            var destination;
+            if (event.key === 'ArrowRight') destination = page + 1;
+            if (event.key === 'ArrowLeft') destination = page - 1;
+            if (event.key === 'Home') destination = 0;
+            if (event.key === 'End') destination = targets.length - 1;
+            if (destination !== undefined) { event.preventDefault(); go(destination); }
+        });
+        track.addEventListener('scroll', function () {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(update);
+        }, { passive: true });
+        if (typeof ResizeObserver !== 'undefined') new ResizeObserver(layout).observe(track);
+        else window.addEventListener('resize', layout);
+        layout();
+    });
+})();

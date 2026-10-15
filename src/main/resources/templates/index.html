@@ -30,10 +30,10 @@
     <th:block th:if="${langList != null and langList.size() > 1 }" th:each="transLang : ${langList}">
         <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${transLang.lang!= 'en'?websitePath+transLang.lang:indexPath}"/>
     </th:block>
-    <link th:if="${not #lists.isEmpty(banner)}" rel="preload"
-          th:href="${banner.get(0).imgUrl}"
-          as="image"
-          fetchpriority="high">
+    <link th:if="${not #lists.isEmpty(banner)}" rel="preload" as="image" fetchpriority="high"
+          media="(min-width: 641px)" th:href="${banner.get(0).imgUrl}">
+    <link th:if="${not #lists.isEmpty(banner)}" rel="preload" as="image" fetchpriority="high"
+          media="(max-width: 640px)" th:href="${#strings.isEmpty(banner.get(0)['h5ImgUrl']) ? banner.get(0).imgUrl : banner.get(0)['h5ImgUrl']}">
     <link rel="preconnect" href="https://oss.iee-business.com" crossorigin>
     <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
     <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
@@ -41,6 +41,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="banner :: bannerStyle"></th:block>
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
     </script>
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
@@ -63,72 +64,24 @@
 <!-- Banner -->
 <div class="hero-embla" id="heroEmbla">
     <div class="hero-embla__viewport">
-        <div class="hero-embla__container scroll-title">
-            <div th:if="${not #lists.isEmpty(banner)}"
-                 th:each="index, stat : ${banner}"
-                 class="hero-embla__slide">
-                <div class="hero-embla__media">
-                    <img th:if="${stat.index == 0}"
-                         th:src="${index.imgUrl}"
-                         th:alt="${index.title}"
-                         width="1920"
-                         height="680"
-                         fetchpriority="high"
-                         loading="eager">
-                    <img th:unless="${stat.index == 0}"
-                         th:src="${index.imgUrl}"
-                         th:alt="${index.title}"
-                         width="1920"
-                         height="680"
-                         loading="lazy">
-                </div>
-
-                <div class="hero-embla__overlay">
-                    <div class="am-text-center am-show-sm-only" th:with="rkBtnRight=${currentHost != null and currentHost.contains('www.rockwill.com')}" style="margin: 10% auto; height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div th:style="'font-size: 20px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
-                             th:text="${index.title}"> </div>
-                        <div th:style="'font-size: 15px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + '; ' + (${index.fontPosition == 'left' ? 'margin-left: 20px;' : ''})"
-                             th:text="${index.description}"></div>
-                        <div class="am-padding-top"
-                             th:style="'display: flex; justify-content: ' + (${index.fontPosition == 'left' ? (rkBtnRight ? 'flex-end' : 'flex-start') : 'center'}) + '; ' + (${index.fontPosition == 'left' ? (rkBtnRight ? 'margin-right: 20px;' : 'margin-left: 20px;') : ''})"
-                             data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" style="height: 40px; width: 100%;">
-                            <span class="dd-clamp-text-1"
-                                  th:style="'border-radius: 40px; padding: 0px 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);' + (${index.fontPosition == 'left' ? 'margin-left: 0;' : ''})">
-                                <a th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; display: inline-block; width: 100%; height: 100%; line-height: 40px;"
-                                   th:text="${advanced['contact.us']}"></a>
-                            </span>
-                        </div>
+        <div class="hero-embla__container">
+            <div th:if="${not #lists.isEmpty(banner)}" th:each="index, stat : ${banner}"
+                 class="hero-embla__slide hero-embla__slide--split">
+                <div class="banner-split">
+                    <div class="banner-split__copy" th:style="'color:' + ${index['displayFontColor'] ?: '#060606'}">
+                        <h2 th:text="${index.title}"></h2>
+                        <p th:text="${index.description}"></p>
+                        <a th:if="${index['buttonVisible'] == true}" class="banner-split__button"
+                           th:href="${index.jumpUrl}" th:text="${index['buttonTitle']}"
+                           target="_blank" rel="noopener noreferrer"></a>
                     </div>
-
-                    <div class="am-hide-sm-only"
-                         style="margin: 10% auto; height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                        <div class="hero-embla__content am-container">
-                            <div class="hero-embla__title"
-                                 th:text="${index.title}"
-                                 th:style="'font-size: 60px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'">
-                            </div>
-
-                            <div class="hero-embla__description"
-                                 th:text="${index.description}"
-                                 th:style="'font-size: 25px; font-weight: bold; color: ' + ${index.fontColor} + '; text-align: ' + ${index.fontPosition} + ';'"
-                                 th:styleappend="${index.fontPosition == 'center' ? 'margin-left: auto; margin-right: auto;' : ''}">
-                            </div>
-                        </div>
-
-                        <div th:if="${index.fontPosition == 'left'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top am-container" style="display: flex; justify-content: flex-start; align-items: center;">
-                            <span class="dd-clamp-text-1"
-                                  style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
-                                <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                            </span>
-                        </div>
-
-                        <div th:if="${index.fontPosition == 'center'}" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }" class="am-padding-top" style="display: flex; justify-content: center; align-items: center;">
-                            <span class="dd-clamp-text-1"
-                                  style="display:block;border-radius: 40px; padding: 0 16px; line-height: 40px; max-width: 300px; height: 40px; background-color: var(--theme-wone);cursor: pointer">
-                                <a href="javascript:void(0);" role="button" th:title="${index.title}" aria-hidden="false" th:aria-label="${index.title}" style="color: #FFFFFF; text-decoration: none;" th:text="${advanced['contact.us']}"></a>
-                            </span>
-                        </div>
-                    </div>
+                    <picture class="banner-split__picture">
+                        <source media="(max-width: 640px)" width="800" height="800"
+                                th:srcset="${#strings.isEmpty(index['h5ImgUrl']) ? index.imgUrl : index['h5ImgUrl']}">
+                        <img th:src="${index.imgUrl}" th:alt="${index.title}"
+                             width="1920" height="800"
+                             th:attr="fetchpriority=${stat.first ? 'high' : 'auto'},loading=${stat.first ? 'eager' : 'lazy'}">
+                    </picture>
                 </div>
             </div>
 
@@ -347,13 +300,109 @@
                 </ul>
             </div>
         </section>
+    
+        <th:block th:if="${homeConfig != null and homeConfig['manufacturingStrength'] != null}">
+            <th:block th:with="strength=${homeConfig['manufacturingStrength']}">
+                <section class="home-strength-section" th:if="${not #strings.isEmpty(strength['title']) and not #strings.isEmpty(strength['description']) and not #strings.isEmpty(strength['youtubeUrl'])}">
+                    <div class="am-container home-strength-layout" th:classappend="${!(not #strings.isEmpty(strength['youtubeUrl']) or (strength['dataCard1'] != null and (not #strings.isEmpty(strength['dataCard1']['value']) or not #strings.isEmpty(strength['dataCard1']['description']))) or (strength['dataCard2'] != null and (not #strings.isEmpty(strength['dataCard2']['value']) or not #strings.isEmpty(strength['dataCard2']['description']))))} ? 'home-strength-layout--copy-only' : ''">
+                        <div class="home-strength-visual" th:if="${not #strings.isEmpty(strength['youtubeUrl']) or (strength['dataCard1'] != null and (not #strings.isEmpty(strength['dataCard1']['value']) or not #strings.isEmpty(strength['dataCard1']['description']))) or (strength['dataCard2'] != null and (not #strings.isEmpty(strength['dataCard2']['value']) or not #strings.isEmpty(strength['dataCard2']['description'])))}">
+                            <div class="home-strength-video" th:if="${not #strings.isEmpty(strength['youtubeUrl'])}"
+                                 th:attr="data-strength-video=${strength['youtubeUrl']}">
+                                <img class="home-strength-cover" width="1280" height="720" decoding="async"
+                                     th:alt="${#strings.isEmpty(strength['title']) ? 'Manufacturing strength' : strength['title']}" hidden>
+                                <div class="home-strength-cover-placeholder" aria-hidden="true"></div>
+                                <a class="home-strength-play" th:href="${strength['youtubeUrl']}" target="_blank" rel="noopener noreferrer"
+                                   aria-label="Play video" data-strength-play>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z"/></svg>
+                                </a>
+                            </div>
+                            <div class="home-strength-cards">
+                                <th:block th:each="number : ${#numbers.sequence(1, 2)}">
+                                    <th:block th:with="card=${strength['dataCard' + number]}">
+                                        <div class="home-strength-card" th:classappend="${number == 1} ? 'home-strength-card--primary' : ''"
+                                             th:if="${card != null and (not #strings.isEmpty(card['value']) or not #strings.isEmpty(card['description']))}">
+                                            <strong th:if="${not #strings.isEmpty(card['value'])}" th:text="${card['value']}"></strong>
+                                            <span th:if="${not #strings.isEmpty(card['description'])}" th:text="${card['description']}"></span>
+                                        </div>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="home-strength-copy">
+                            <div class="home-strength-eyebrow" th:text="${advanced['manufacturing.strength']}">MANUFACTURING STRENGTH</div>
+                            <h2 class="home-strength-title" th:if="${not #strings.isEmpty(strength['title'])}" th:text="${strength['title']}"></h2>
+                            <p class="home-strength-description" th:if="${not #strings.isEmpty(strength['description'])}" th:text="${strength['description']}"></p>
+                            <ul class="home-strength-features">
+                                <th:block th:with="item=${strength['strengthItem1']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V9l6-4v16M10 21V3l8 4v14M2 21h20M14 10v2m0 3v2m4-5h2v9"/></svg></span>
+                                        <div>
+                                            <h3 th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></h3>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem2']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6l-9 9-4-4"/><path d="M21 12a9 9 0 1 1-6-8.5"/></svg></span>
+                                        <div>
+                                            <h3 th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></h3>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem3']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6a5 5 0 0 0-6 6L3 17a3 3 0 0 0 4 4l5-5a5 5 0 0 0 6-6l-3 3-4-4 3-3Z"/></svg></span>
+                                        <div>
+                                            <h3 th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></h3>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem4']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span>
+                                        <div>
+                                            <h3 th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></h3>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="am-container home-strength-gallery" th:if="${strength['images'] != null and not #lists.isEmpty(strength['images'])}" data-strength-gallery>
+                        <div class="home-strength-gallery-track" tabindex="0" role="region" aria-label="Company gallery" data-gallery-track>
+                            <figure class="home-strength-gallery-item" th:each="image : ${strength['images']}">
+                                <img th:src="${image['imageUrl']}" th:alt="${strength['title']}"
+                                     width="800" height="600" loading="lazy" decoding="async">
+                            </figure>
+                        </div>
+                        <div class="home-strength-gallery-controls" data-gallery-controls hidden>
+                            <button class="home-strength-gallery-arrow" type="button" aria-label="Previous images" data-gallery-prev>
+                                <i class="am-icon-angle-left" aria-hidden="true"></i>
+                            </button>
+                            <div class="home-strength-gallery-dots" aria-label="Gallery pages" data-gallery-dots></div>
+                            <button class="home-strength-gallery-arrow" type="button" aria-label="Next images" data-gallery-next>
+                                <i class="am-icon-angle-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <dialog class="home-strength-dialog" aria-label="Manufacturing video" data-strength-dialog>
+                        <button class="home-strength-close" type="button" aria-label="Close video" data-strength-close>&times;</button>
+                        <div class="home-strength-player" data-strength-player></div>
+                    </dialog>
+                </section>
+            </th:block>
+        </th:block>
 
         <!-- 首页证书资料：左侧展示文案和资料入口，右侧展示前两条关联资料及资料列表入口。 -->
         <section class="home-certificate-section"
                  th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
             <div class="am-container home-certificate-layout">
                 <div class="home-certificate-copy">
-<!--                    <div class="home-certificate-eyebrow">Certificates &amp; Type Tests</div>-->
+                    <div class="home-certificate-eyebrow" th:text="${advanced['certificates.type.tests']}">CERTIFICATES &amp; TYPE TESTS</div>
                     <h2 class="home-certificate-title"
                         th:if="${homeConfig.certificates.title != null and homeConfig.certificates.title != ''}"
                         th:text="${homeConfig.certificates.title}"></h2>
@@ -648,15 +697,17 @@
                    th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
                      '/' :
                      ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) })">
-                    <span th:text="${advanced['view.all']}"></span>
-                    <span class="p-icon-a-067"></span>
+                    <span style="color: #000000;text-decoration: underline;"
+                          th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067 am-padding-left-sm"></span>
                 </a>
                 <a class="home-news-blog-view-all" role="link" data-news-blog-action="blog" hidden
                    th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==8])) ?
                      '/' :
                      ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==8][0].pageName), ' ', '-')) })">
-                    <span th:text="${advanced['view.all']}"></span>
-                    <span class="p-icon-a-067"></span>
+                    <span style="color: #000000;text-decoration: underline;"
+                          th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067 am-padding-left-sm"></span>
                 </a>
             </div>
         </div>
@@ -762,7 +813,6 @@
                  (homeConfig.contact.title != null and homeConfig.contact.title != '') or
                  (homeConfig.contact.description != null and homeConfig.contact.description != '') or
                  (homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != '') or
-                 (homeConfig.contact.headquartersFactory != null and homeConfig.contact.headquartersFactory != '') or
                  (homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''))}">
         <div class="home-contact-layout">
             <div class="home-contact-copy">
@@ -776,18 +826,14 @@
             <li th:if="${homeConfig.contact.email != null and homeConfig.contact.email != ''}">
                 <span class="home-contact-icon"><i class="am-icon-envelope-o"></i></span>
                 <strong th:text="${advanced['your.email']}"></strong>
-                <span class="home-contact-value"><a th:href="'mailto:' + ${homeConfig.contact.email}"
+                <span class="home-contact-value"><a th:href="|mailto:${#strings.trim(homeConfig.contact.email)}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
                          th:text="${homeConfig.contact.email}"></a></span>
             </li>
             <li th:if="${homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != ''}">
                 <span class="home-contact-icon"><i class="am-icon-phone"></i></span>
                 <strong th:text="${advanced['phone'] + ' / WhatsApp'}"></strong>
-                <span class="home-contact-value" th:text="${homeConfig.contact.phoneWhatsapp}"></span>
-            </li>
-            <li th:if="${homeConfig.contact.headquartersFactory != null and homeConfig.contact.headquartersFactory != ''}">
-                <span class="home-contact-icon"><i class="am-icon-map-marker"></i></span>
-                <strong th:text="${advanced['headquarters.factory']}"></strong>
-                <span class="home-contact-value" th:text="${homeConfig.contact.headquartersFactory}"></span>
+                <span class="home-contact-value"><a th:href="${'https://wa.me/' + homeConfig.contact.phoneWhatsapp.replaceAll('[^0-9]', '')}"
+                         target="_blank" rel="noopener noreferrer" th:text="${homeConfig.contact.phoneWhatsapp}"></a></span>
             </li>
             <li th:if="${homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''}">
                 <span class="home-contact-icon"><i class="am-icon-globe"></i></span>
@@ -810,7 +856,9 @@
 <th:block th:replace="search :: search"></th:block>
 <th:block th:replace="inquiry :: inquiry"></th:block>
 <th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
-<th:block th:replace="footer :: footer"></th:block>
+<th:block th:with="isHomeFooter=${true}">
+    <th:block th:replace="footer :: footer"></th:block>
+</th:block>
 <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js" defer></script>
 <script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js" defer></script>
 <script>

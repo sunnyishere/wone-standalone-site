@@ -32,11 +32,11 @@
 
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
-    <link rel="preload"
-          th:href="${pageIcon != null and !#strings.isEmpty(pageIcon) ? pageIcon : '/images/case-bg.jpg'}"
-          as="image"
-          fetchpriority="high">
+    <th:block th:with="pageHeroes=${topNavPages.?[pageType == 6]}">
+        <th:block th:replace="banner :: pageBannerPreload"></th:block>
+    </th:block>
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="banner :: bannerStyle"></th:block>
 <!--    <th:block th:replace="head :: faqStyle"></th:block>-->
     <style>
         .faq-header{font-size: 2.4rem;}
@@ -67,9 +67,12 @@
 </header>
 <div class="header-height"></div>
 
-<th:block th:replace="banner :: pageBanner"></th:block>
+<h1 class="sr-only" th:text="${pageDescription}"></h1>
+<th:block th:with="pageHeroes=${topNavPages.?[pageType == 6]}">
+    <th:block th:replace="banner :: pageBanner"></th:block>
+</th:block>
 
-<nav class="m-cat-nav">
+<nav class="m-cat-nav" id="page-list-content">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>

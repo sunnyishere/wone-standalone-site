@@ -10,6 +10,14 @@
            data-am-modal="{target: '#search-modal', closeViaDimmer: 0, }">
             <span class="tn-icon-search am-text-lg am-padding-right"></span>
         </a>
+        <a class="mobile-google-button" href="https://www.google.com/preferences/source"
+           th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
+           target="_blank" rel="noopener noreferrer"
+           th:title="${advanced['add.us.on.google'] ?: 'Add Google'}"
+           th:aria-label="${advanced['add.us.on.google'] ?: 'Add Google'}"
+           style="color: var(--theme-wone);">
+            <i class="am-header-icon am-icon-google am-padding-right" aria-hidden="true"></i>
+        </a>
         <a title="MENU" aria-hidden="false" aria-label="MENU" href="#right-link" class="" data-am-offcanvas="{target: '#r-nav'}" style="color: var(--theme-wone);">
             <i class="am-header-icon am-icon-th-large"></i> MENU
         </a>

@@ -44,7 +44,12 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
+    <th:block th:with="pageHeroes=${topNavPages.?[pageType == 2]}">
+        <th:block th:replace="banner :: pageBannerPreload"></th:block>
+    </th:block>
     <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="list-infinite-scroll :: assets"></th:block>
+    <th:block th:replace="banner :: bannerStyle"></th:block>
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
     </script>
 </head>
@@ -61,31 +66,10 @@
 </header>
 <div class="header-height"></div>
 <h1 class="sr-only" th:text="${pageDescription}"></h1>
-<div class="am-hide-sm-only m-header-banner m-header-1"
-     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + ')'
-             + '; height: 300px; display: flex; align-items: center; justify-content: center;'
-             + 'background-size: cover; background-position: center; ' ">
-    <section class="am-container wone-text"
-             style="text-align: center;">
-        <hgroup data-am-scrollspy="{animation:'slide-bottom', delay: 200}">
-            <p class="dd-clamp-text-3 dd-clamp-text-3-left" style="font-size: 30px;font-weight: bold; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.5; position: relative; top: 80px;"
-               th:text="${pageDescription}"></p>
-        </hgroup>
-    </section>
-</div>
-<div class="am-show-sm-only m-header-banner-other m-header-1-other"
-     th:style="'background-image: url(' + (${pageIcon} ?: '/images/case-bg.jpg') + '); ' +
-               'height: 150px; width: 100%; position: relative;'">
-    <div style="position: absolute; top: 20%; left: 0; width: 100%; padding: 0 15px;
-                transform: translateY(-9%); text-align: center;">
-        <p class="dd-clamp-text-3"
-           style="font-size: 20px; font-weight: bold; color: #FFF;
-                  line-height: 1.4; margin: 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.7);"
-           th:text="${pageDescription}">
-        </p>
-    </div>
-</div>
-<nav class="m-cat-nav">
+<th:block th:with="pageHeroes=${topNavPages.?[pageType == 2]}">
+    <th:block th:replace="banner :: pageBanner"></th:block>
+</th:block>
+<nav class="m-cat-nav" id="page-list-content">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash">
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
@@ -121,13 +105,24 @@
 <div class="" style="">
     <div class="am-container am-padding phone-clear-padding"
          style="margin: 0px auto 20px !important;padding: 0 5px 0 20px !important;"
-         th:if="${not #strings.isEmpty(pageDetailedText)}">
-        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 10px;border-radius: 12px;"
-             th:text="${pageDetailedText}">
+         th:if="${!#strings.isEmpty(pageDetailedText) or (category != null and (!#strings.isEmpty(category.pcImgUrl) or !#strings.isEmpty(category.h5ImgUrl)))}"
+         th:with="categoryPcImage=${category != null ? category.pcImgUrl : null},
+                  categoryH5Image=${category != null ? category.h5ImgUrl : null},
+                  categoryDesktopImage=${!#strings.isEmpty(categoryPcImage) ? categoryPcImage : categoryH5Image},
+                  categoryMobileImage=${!#strings.isEmpty(categoryH5Image) ? categoryH5Image : categoryPcImage}">
+        <div class="product-category-image-region" th:if="${!#strings.isEmpty(categoryDesktopImage)}">
+            <picture class="product-category-picture">
+                <source media="(max-width: 640px)" th:srcset="${categoryMobileImage}">
+                <img th:src="${categoryDesktopImage}"
+                     th:alt="${category.i18nName ?: category.name}"
+                     width="1920" height="800" loading="lazy" decoding="async">
+            </picture>
         </div>
+        <div class="product-category-description am-text-lg"
+             th:if="${!#strings.isEmpty(pageDetailedText)}" th:text="${pageDetailedText}"></div>
     </div>
     <div class="am-container phone-clear-padding am-margin-top-sm">
-        <div class="am-u-md-3 am-u-sm-12">
+        <div class="am-u-md-3 am-u-sm-12" th:if="${category == null}">
             <!-- 数据存在时显示的色块（白色背景） -->
             <div
                     class="am-list admin-sidebar-list"
@@ -183,13 +178,14 @@
 
 
 
-        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
+        <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
+             th:classappend="${category == null ? 'am-u-md-9' : 'am-u-md-12'}"
              th:if="${not #lists.isEmpty(pageData.rows)}">
-            <div style="background:#FFFFFF;">
+            <div style="background:#FFFFFF;" class="product-list-no-pagination">
                 <div class="am-container phone-container-all phone-clear-padding am-margin-bottom" >
-                    <ul class="am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
-                        style="margin: 0 0;">
-                        <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                    <ul class="product-list-grid am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                        style="margin: 0 0;" data-scroll-list th:attr="data-page=${pageData.pageNum},data-next-url=${pageData.totalPages != null and pageData.pageNum < pageData.totalPages ? currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.normalizeString(category.name) + '-' + category.id : '') + '-' + (pageData.pageNum + 1) : ''}">
+                        <li class="dd-hover4 am-margin-top"
                             th:each="index : ${pageData.rows}">
                             <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}"
                                th:href="
@@ -200,7 +196,7 @@
            'detail/'+
            ${#normalizer.resolveSlugUrl(index.slugUrl, index.pName)} +
            '-'+${index.pid}">
-                                <div style="background-color: #F9F9F9;padding: 15px;border-radius: 12px;">
+                                <div class="product-card">
                                     <div class="image-box">
                                         <img th:alt="${index.pName}" th:src="${index.url}" alt="" class="image-square">
                                     </div>
@@ -208,21 +204,16 @@
                                         <span class="p-icon-a-087 am-padding-right-xs"style="color: #FFB400;font-size: 12px;"></span>
                                         <span class="am-text-bold" style="color: #07C160;font-size: 12px"  th:text="${advanced['whole.life.care.manager']}">Whole life care manager</span>
                                     </div>
-                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm" style="height: 5rem;"
+                                    <span class="product-card-name dd-clamp-text-2 am-padding-top-sm am-text-sm"
                                           th:text="${index.i18nName}"></span>
+                                    <p class="product-card-description" th:text="${index.description ?: ''}"></p>
                                 </div>
                             </a>
 
                         </li>
                     </ul>
                 </div>
-                <th:block th:replace="pagination :: pagination(
-    totalPages=${pageData.totalPages},
-    currentPage=${pageData.pageNum},
-    requestUrl=${category != null
-        ? (#normalizer.normalizeString(category.name) + '-' + category.id)
-        : pageName}
-)"></th:block>
+                <th:block th:replace="list-infinite-scroll :: controls(totalPages=${pageData.totalPages}, currentPage=${pageData.pageNum}, listPath=${currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.normalizeString(category.name) + '-' + category.id : '')})"></th:block>
             </div>
             <div class="am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
                 <div style="background:#FFFFFF;padding: 0 1.6rem">
@@ -232,7 +223,8 @@
         </div>
 
 
-        <div class="am-u-md-9 am-u-sm-12 am-margin-bottom-xl phone-clear-margin" style="background:#FFFFFF;"
+        <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin" style="background:#FFFFFF;"
+             th:classappend="${category == null ? 'am-u-md-9' : 'am-u-md-12'}"
              th:unless="${not #lists.isEmpty(pageData.rows)}">
 
             <!-- 产品列表为空时显示的占位背景 -->

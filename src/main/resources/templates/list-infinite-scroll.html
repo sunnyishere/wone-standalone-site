@@ -1,0 +1,25 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="assets">
+        <meta name="list-scroll-page"
+              th:attr="data-page=${pageData.pageNum},data-list-empty=${#lists.isEmpty(pageData.rows) ? 'true' : 'false'}">
+    </th:block>
+</head>
+<body>
+    <div th:fragment="controls(totalPages, currentPage, listPath)"
+         th:if="${totalPages != null and currentPage < totalPages}"
+         class="list-load-status" data-list-load-status
+         th:attr="data-label-ready=${advanced != null ? advanced['list.scroll.more'] : null},
+                  data-label-loading=${advanced != null ? advanced['list.loading'] : null},
+                  data-label-done=${advanced != null ? advanced['list.loaded.all'] : null},
+                  data-label-error=${advanced != null ? advanced['list.load.error'] : null},
+                  data-label-retry=${advanced != null ? advanced['list.load.retry'] : null}">
+        <span role="status" aria-live="polite" data-list-load-message></span>
+        <button type="button" data-list-load-retry hidden
+                th:text="${(advanced != null ? advanced['list.load.retry'] : null) ?: 'Retry'}">Retry</button>
+        <a data-list-load-next th:href="${listPath + '-' + (currentPage + 1)}"
+           th:text="${(advanced != null ? advanced['list.load.more'] : null) ?: 'Load more'}">Load more</a>
+    </div>
+</body>
+</html>
