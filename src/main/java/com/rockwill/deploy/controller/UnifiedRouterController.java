@@ -1,5 +1,6 @@
 package com.rockwill.deploy.controller;
 
+import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.service.RockwillKnowledgeService;
 import com.rockwill.deploy.service.StaticPageService;
 import com.rockwill.deploy.utils.PathPatternType;
@@ -43,6 +44,9 @@ public class UnifiedRouterController {
     @Autowired
     StaticPageService staticPageService;
 
+    @Autowired
+    BrandConfig brandConfig;
+
     @RequestMapping(value = "/page/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> routeRequest(HttpServletRequest request) throws IOException {
         String realUri = "";
@@ -75,30 +79,36 @@ public class UnifiedRouterController {
                     domainHtmlVo = rockwillKnowledgeService.getHome(realTimeRestTemplate, host);
                     break;
                 }
-//                if (isSearchPrefixRequest(forwardTarget.toString())) {
-//                    // /search-xxx 形态：关键词本地搜索
-//                    String keyword = extractParam(forwardTarget.toString(), "name");
-//                    keyword = keyword != null && keyword.startsWith("search-")
-//                            ? keyword.substring("search-".length()) : "";
-//                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(keyword, null, "1", null, host);
-//                    break;
-//                }
+                if (isSearchPrefixRequest(forwardTarget.toString())) {
+                    // /search-xxx 形态：关键词本地搜索；lang 优先取 URL 透传值，
+                    // 旧缓存页面（无语种隐藏域、旧 JS）不带语种时从 Referer 来源页解析兜底
+                    String keyword = extractParam(forwardTarget.toString(), "name");
+                    keyword = keyword != null && keyword.startsWith("search-")
+                            ? keyword.substring("search-".length()) : "";
+                    String lang = extractParam(forwardTarget.toString(), "lang");
+                    if (ObjectUtils.isEmpty(lang)) {
+                        lang = resolveLangFromReferer(request);
+                    }
+                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(keyword, null, "1", lang, host, null);
+                    break;
+                }
             case DETAIL:
             case CATEGORY_PAGINATION:
             case MULTI_LEVEL:
             case CATEGORY_WITH_ID:
             case MENU_WITH_PAGE:
             case SEARCH:
-//                if (pathPatternType == PathPatternType.SEARCH) {
-//                    // /search/xxx-xxx-id-page 形态：分类+关键词本地搜索
-//                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(
-//                            extractParam(forwardTarget.toString(), "searchKey"),
-//                            extractParam(forwardTarget.toString(), "categoryId"),
-//                            extractParam(forwardTarget.toString(), "pageNum"),
-//                            extractParam(forwardTarget.toString(), "lang"),
-//                            host);
-//                    break;
-//                }
+                if (pathPatternType == PathPatternType.SEARCH) {
+                    // /search/xxx-xxx-id-page 形态：分类+关键词本地搜索；categoryName 透传用于语种切换链接重构
+                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(
+                            extractParam(forwardTarget.toString(), "searchKey"),
+                            extractParam(forwardTarget.toString(), "categoryId"),
+                            extractParam(forwardTarget.toString(), "pageNum"),
+                            extractParam(forwardTarget.toString(), "lang"),
+                            host,
+                            extractParam(forwardTarget.toString(), "categoryName"));
+                    break;
+                }
                 domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString(),host);
                 break;
             case DEFAULT:
@@ -124,8 +134,8 @@ public class UnifiedRouterController {
         if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
             status = HttpStatus.NOT_FOUND;
         }
-        //静态化未存储，及时保存html文件
-        if (!realUri.startsWith("/search") && status != HttpStatus.NOT_FOUND) {
+        //静态化未存储，及时保存html文件（搜索页不做静态化，含语种前缀的搜索路径同样排除）
+        if (!isSearchUri(realUri) && status != HttpStatus.NOT_FOUND) {
             String savePrefix = realUri.substring(1);
             staticPageService.saveHtml(host,savePrefix, domainHtmlVo.getHtmlContent());
         }
@@ -138,6 +148,43 @@ public class UnifiedRouterController {
     private boolean isSearchPrefixRequest(String forwardTarget) {
         String name = extractParam(forwardTarget, "name");
         return name != null && name.startsWith("search-");
+    }
+
+    /**
+     * 旧缓存页面（无语种隐藏域、旧 JS）发起搜索时请求不带 lang，
+     * 从 Referer 来源页路径首段解析语种短码（如 https://host/de/products → de）兜底。
+     * 首段必须是 brand.languages 中配置的语种才返回，否则返回 null（按英语处理）。
+     */
+    private String resolveLangFromReferer(HttpServletRequest request) {
+        try {
+            String referer = request.getHeader(HttpHeaders.REFERER);
+            if (ObjectUtils.isEmpty(referer)) {
+                return null;
+            }
+            String path = URI.create(referer).getPath();
+            if (path == null || !path.startsWith("/")) {
+                return null;
+            }
+            int secondSlash = path.indexOf('/', 1);
+            String firstSeg = secondSlash > 0 ? path.substring(1, secondSlash) : path.substring(1);
+            if (!ObjectUtils.isEmpty(firstSeg) && brandConfig.getLanguages() != null
+                    && brandConfig.getLanguages().contains(firstSeg)) {
+                log.info("search lang resolved from referer:{}", firstSeg);
+                return firstSeg;
+            }
+        } catch (Exception e) {
+            log.warn("resolve search lang from referer failed", e);
+        }
+        return null;
+    }
+
+    /**
+     * 判断请求路径是否为搜索页（兼容语种前缀，如 /de/search-xxx）
+     */
+    private boolean isSearchUri(String realUri) {
+        int secondSlash = realUri.indexOf('/', 1);
+        String path = secondSlash > 0 ? realUri.substring(secondSlash) : realUri;
+        return path.startsWith("/search");
     }
 
     /**

@@ -20,7 +20,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang}" />
     <meta property="og:image" th:attr="content=${blog.iconUrl}" />
-    <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}" />
 
     <meta name="twitter:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta name="twitter:description" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />

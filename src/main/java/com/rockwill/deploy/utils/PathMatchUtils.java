@@ -118,7 +118,12 @@ public class PathMatchUtils {
         //搜索时直接转发请求
         if (normalizedPath.startsWith("/search-")) {
             matchResult.setPatternType(PathPatternType.MENU_WITHOUT_PAGE);
-            matchResult.setForwardTarget(PathPatternType.MENU_WITHOUT_PAGE.getForwardTarget() + "?name=" + normalizedPath.substring(1));
+            String target = PathPatternType.MENU_WITHOUT_PAGE.getForwardTarget() + "?name=" + normalizedPath.substring(1);
+            if (!ObjectUtils.isEmpty(lang)) {
+                // 透传站点短码，全码由 searchSiteContent 内基于 BrandConfig.mapLang 解析
+                target += "&lang=" + lang;
+            }
+            matchResult.setForwardTarget(target);
             return matchResult;
         }
         for (PathPattern pattern : patterns) {

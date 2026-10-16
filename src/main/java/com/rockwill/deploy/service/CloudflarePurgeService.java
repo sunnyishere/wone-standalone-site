@@ -97,6 +97,44 @@ public class CloudflarePurgeService {
         return purgeByUrls(domain, Collections.singletonList(url));
     }
 
+    /**
+     * 清理指定域名的全站缓存（purge_everything）。
+     * 注意：全站清除后无预热，所有 URL 回源，高并发时段慎用。
+     */
+    public boolean purgeEverything(String domain) {
+        try {
+            String zoneId = cloudflareProperties.getZoneIdByDomain(domain);
+            String apiToken = cloudflareProperties.getApiTokenByDomain(domain);
+            if (StringUtils.isBlank(zoneId) || StringUtils.isBlank(apiToken)) {
+                log.warn("Cloudflare zoneId or apiToken is empty for domain: {}", domain);
+                return false;
+            }
+            String apiUrl = cloudflareProperties.getApiUrl() + "/" + zoneId + "/purge_cache";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(apiToken);
+
+            Map<String, Object> body = Collections.singletonMap("purge_everything", true);
+            HttpEntity<String> requestEntity = new HttpEntity<>(JSON.toJSONString(body), headers);
+            log.info("Cloudflare purge everything request, domain: {}", domain);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    apiUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+            String responseBody = response.getBody();
+            boolean success = response.getStatusCode().is2xxSuccessful() && isCloudflareSuccess(responseBody);
+            log.info("Cloudflare purge everything response, domain: {}, success: {}, body: {}",
+                    domain, success, responseBody);
+            return success;
+        } catch (Exception e) {
+            log.error("Cloudflare purge everything failed, domain: {}", domain, e);
+            return false;
+        }
+    }
+
 
     /**
      * 执行单个批次的 Cloudflare purge 请求。

@@ -1,7 +1,7 @@
 <nav data-am-widget="header" class="am-header am-show-sm-only" th:fragment="phone-header"
      style="position: sticky; top: 0;right: 0;left: 0;">
     <div class="am-header-left am-header-nav">
-        <a href="/" title="Home" aria-hidden="false" aria-label="Home">
+        <a th:href="${currentPathLang==''?'/':currentPathLang}" title="Home" aria-hidden="false" aria-label="Home">
             <img th:src="${prodBrand.icon}" alt="Home" class="logo-square" width="32" height="32" style="width: 32px;height: 32px;">
         </a>
     </div>

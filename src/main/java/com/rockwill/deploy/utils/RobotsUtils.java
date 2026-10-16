@@ -19,8 +19,6 @@ public class RobotsUtils {
             "User-agent: *",
             "Allow: /",
             "Disallow: /cdn-cgi/",
-            "Disallow: /search/",
-            "Disallow: /search-",
             ""
     );
 

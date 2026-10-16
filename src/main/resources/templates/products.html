@@ -28,7 +28,7 @@
 
     <meta property="og:type" content="website"/>
     <meta property="og:locale" th:content="${currentLang}"/>
-    <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
     <meta name="twitter:description" th:content="${pageContent}"/>

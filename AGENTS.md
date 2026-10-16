@@ -1,5 +1,25 @@
 # AGENTS.md
 
+## ⚠️ 强制规则来源（每个新会话必须遵循）
+
+**编码规范、安全红线、开发流程、Review 检查清单统一管理在 `.claude/rules/common/`，每次新会话开始编码前先读取：**
+
+- [coding-style.md](.claude/rules/common/coding-style.md) — 包结构、命名、分层职责、模板/ slug 口径、i18n、Javadoc
+- [security.md](.claude/rules/common/security.md) — API 签名、模板 XSS、敏感信息、日志安全
+- [performance.md](.claude/rules/common/performance.md) — 静态化并发、CMS API 调用、线程池、空值健壮性
+- [development-workflow.md](.claude/rules/common/development-workflow.md) — Skill 映射表、CodeGraph 强制规则、完整/快速/Bug 修复流程
+- [git-workflow.md](.claude/rules/common/git-workflow.md) — 提交规范、文件跟踪状态、分支策略
+- [review-checklist.md](.claude/rules/common/review-checklist.md) — 30 秒自动扫描与检查维度
+- [project-constitution.md](.claude/rules/common/project-constitution.md) — 七大原则与禁止写法
+
+核心红线摘要（详见上述文件）：
+1. **接口**:新增 `/api/**` 端点 MUST 走签名拦截器；`/page/**` 新形态 MUST 先在 `PathMatchUtils` 注册正则（白名单机制，不放行任意路径）
+2. **模板**:链接 slug 一律 `#normalizer.normalizeString(...)`，禁止内联 `toLowerCase+replace` 拼接；模板链接 MUST 与静态文件命名同口径
+3. **分层**:Controller 只接参/校验/包装，编排归 Service，纯函数归 utils；新配置 MUST 进 Properties 类 + yml 默认值，禁止零散 `@Value`
+4. **安全**:`th:utext` 仅限 Jsoup 清洗后的 CMS 富文本；密钥/内网地址不入库不入日志；异常带栈不打敏感字段
+5. **流程**:写业务代码前挂对应 Skill（`wone-site-new` 等）；搜索/改码走 CodeGraph（先 `codegraph explore`，禁止直接 Grep；编码结束 `codegraph sync`）；交付前过 Review 检查清单
+6. **简洁**:只做被要求的事，不顺手重构无关代码
+
 ## 项目概述
 
 **wone-standalone-site** 是一个基于 Spring Boot 2.6.13（Java 8）的静态网站生成与部署服务。它从后端 CMS API 获取内容，通过 Thymeleaf 模板引擎渲染为 HTML，并将输出保存为静态文件，由 Nginx 对外提供服务。

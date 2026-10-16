@@ -20,7 +20,7 @@
     <meta property="og:type" content="article">
     <meta property="og:image" th:content="${library.icon}">
     <meta property="og:locale" th:content="${currentLang}">
-    <meta property="og:site_name" th:content="'@' + ${prodBrand.eName ?: 'DefaultBrand'}">
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}">
     <meta name="twitter:title" th:content="${library.name} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}">
     <meta name="twitter:description" th:content="${library.description ?: library.name}">
     <meta name="twitter:card" content="summary_large_image">

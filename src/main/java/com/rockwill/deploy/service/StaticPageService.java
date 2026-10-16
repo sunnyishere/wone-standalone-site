@@ -181,6 +181,7 @@ public class StaticPageService {
             log.error("Failed to generating {} html files", domain, e);
         }
         logGenStats(domain);
+
     }
 
     /**
@@ -194,7 +195,7 @@ public class StaticPageService {
         log.info("Static generation stats, site:{}, saved pages:{}, failed pages:{}",
                 domain, stats.savedCount.get(), stats.failedPages.size());
         for (Map.Entry<String, String> entry : stats.failedPages.entrySet()) {
-            log.warn("Static generation missed page, site:{}, page:{}, reason:{}",
+            log.info("Static generation missed page, site:{}, page:{}, reason:{}",
                     domain, entry.getKey(), entry.getValue());
         }
     }

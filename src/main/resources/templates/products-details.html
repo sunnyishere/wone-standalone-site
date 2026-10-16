@@ -25,7 +25,7 @@
     </th:block>
     <meta property="og:type" content="website"/>
     <meta property="og:locale" th:content="${currentLang}"/>
-    <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${prod.name} + '-' + ${prodBrand.eName}"/>
     <meta name="twitter:description" th:content="${prod.description}"/>
@@ -52,7 +52,6 @@
     <th:block th:replace="head :: commonHead"></th:block>
 
     <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}"></script>
-    <script type="application/ld+json" th:utext="${serviceSchemaJson != null ? serviceSchemaJson : '{}'}"></script>
     <script type="application/ld+json"
             th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}"></script>
     <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}"></script>
@@ -191,22 +190,17 @@
 
             <div style="padding: 10px 0;margin-bottom:1rem;">
                 <table class="am-table am-padding-top-sm">
-                    <tbody>
+                    <tbody id="spec-table-body">
                     <tr>
                         <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['brand']}">Brand</td>
-                        <td style="width: 55%;">
-                            <a aria-hidden="false"
-                               th:aria-label="${brand.name}"
-                               th:title="${brand.name}"
-                               th:href="${brandUrl}"
-                               th:text="${brand.name}">Brand Name</a>
+                        <td style="width: 55%;" th:text="${brand.name}">
                         </td>
                     </tr>
 
-                    <tr th:if="${model != null}">
+                    <tr id="model-no-row" th:if="${model != null}">
                         <td style="background-color: #F9F9F9; width: 45%;" th:text="${advanced['model.no']}">Model NO.
                         </td>
-                        <td style="width: 55%;" th:text="${model.name}">Model Name</td>
+                        <td id="model-no-value" style="width: 55%;" th:text="${model.name}">Model Name</td>
                     </tr>
 
                     <tr th:each="specKey : ${specKeyList}">
@@ -441,7 +435,7 @@
                                 th:if="${item.url != null}">
                                 <div style="background-color: #FFFFFF;padding: 10px 0;">
                                     <div class="phone-bottom" style="width: 165px;height: 234px;">
-                                        <img th:src="${item.url}" alt="" class="am-img-responsive"
+                                        <img th:src="${item.url}" th:alt="${item.name}" class="am-img-responsive"
                                              style="object-fit: cover;width: 165px;height: 234px;border-radius: 0;border: 1px solid #E9E9E9;">
                                     </div>
                                 </div>
@@ -459,7 +453,7 @@
                 <div style="border-bottom: 1px solid #E6E6E6;padding-bottom: 15px;">
                     <div>
                         <span class="am-text-xl am-text-bold" style="color: #F75755;"></span>
-                        <span class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;"
+                        <span id="userPrice" class="am-text-xl am-text-bold" style="margin-left: -4px;color: #F75755;"
                               th:text="${(userPrice != null && userPrice != '$Negotiable') ? userPrice : advanced['negotiable']}"></span>
                     </div>
                     <div class="am-padding-top-sm">
@@ -485,32 +479,30 @@
 
                 <!-- 型号列表 -->
                 <th:block th:if="${modelList != null && modelList.size() > 0}">
-                    <div style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
+                    <div class="am-hide-sm-only" style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
                         <div class="am-g">
                             <div class="am-text-bold am-text-lg am-padding-bottom" style="color: #1D1D1F;">
                                 <span th:text="${advanced['model']}">Model</span>
                             </div>
                             <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
-                                <!-- 循环遍历型号列表 -->
+                                <!-- 循环遍历型号列表：点击本地切换型号信息，不再跳转 -series 链接 -->
                                 <th:block th:each="item, stat : ${modelList}">
                                     <th:block
                                             th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
-                                        <div th:style="${isActive
-                        ? 'border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
-                        : 'border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
-                                            <a aria-hidden="false"
-                                               th:aria-label="${item.modelName}"
-                                               th:title="${item.modelName}"
-                                               th:href="${currentPathLang +
-         (#lists.isEmpty(topNavPages.?[pageType == 2]) ? '/' :
-           '/' + #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') + '/') +
-         #normalizer.resolveSlugUrl(prod.slugUrl, prod.name) +
-         '-' + item.prodId + '-series' + item.id}"
-                                               th:style="${isActive} ? 'color: var(--theme-wone) !important;' : ''">
-                                                <div style="padding: 10px 20px;">
-                                                    <span th:text="${item.modelName}"></span>
-                                                </div>
-                                            </a>
+                                        <div class="model-switch-item"
+                                             th:attr="data-model-id=${item.id}"
+                                             role="button"
+                                             tabindex="0"
+                                             th:aria-label="${item.modelName}"
+                                             th:title="${item.modelName}"
+                                             th:style="${isActive
+                        ? 'cursor: pointer;border: 1px solid var(--theme-wone)  ;background-color: #E6E6E;border-radius: 8px;margin-bottom: 10px;'
+                        : 'cursor: pointer;border: 1px solid #E6E6E6;background-color: #FFFFFF;border-radius: 8px;margin-bottom: 10px;'}">
+                                            <div th:style="${isActive}
+                        ? 'padding: 10px 20px;color: var(--theme-wone) !important;'
+                        : 'padding: 10px 20px;'">
+                                                <span th:text="${item.modelName}"></span>
+                                            </div>
                                         </div>
                                     </th:block>
                                 </th:block>
@@ -836,6 +828,115 @@
 <th:block th:replace="inquiry :: inquiry"></th:block>
 <th:block th:replace="right-menu :: right-menu(param1='Products_'+${prod.id})"></th:block>
 <th:block th:replace="footer :: footer"></th:block>
+
+<script th:inline="javascript" th:if="${modelSwitchDataJson != null}">
+    window.__modelSwitchData = JSON.parse(/*[[${modelSwitchDataJson}]]*/ '"{}"');
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var data = window.__modelSwitchData;
+        if (!data || !data.modelSpecMap) return;
+
+        var specKeyOrder = data.specKeyOrder;
+        var specKeyNames = data.specKeyNames;
+        var specValueMap = data.specValueMap;
+        var modelSpecMap = data.modelSpecMap;
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function applyActiveStyle(item, active) {
+            if (active) {
+                item.style.border = '1px solid var(--theme-wone)';
+                item.style.backgroundColor = '#E6E6E6';
+            } else {
+                item.style.border = '1px solid #E6E6E6';
+                item.style.backgroundColor = '#FFFFFF';
+            }
+            var label = item.querySelector('div');
+            if (label) {
+                label.style.color = active ? 'var(--theme-wone)' : '';
+            }
+        }
+
+        function switchModel(modelId) {
+            if (modelId === data.currentModelId) return;
+            var specMap = modelSpecMap[modelId];
+            var tbody = document.getElementById('spec-table-body');
+            if (!specMap || !tbody) return;
+            data.currentModelId = modelId;
+
+            var rows = tbody.querySelectorAll('tr');
+            var html = '';
+            // 品牌行（第一行）原样保留
+            if (rows.length > 0) {
+                html += rows[0].outerHTML;
+            }
+            // Model NO. 行
+            var modelRow = document.getElementById('model-no-row');
+            if (modelRow) {
+                var nameCell = modelRow.querySelector('td:first-child');
+                html += '<tr id="model-no-row"><td style="background-color: #F9F9F9; width: 45%;">'
+                    + escapeHtml(nameCell.textContent)
+                    + '</td><td id="model-no-value" style="width: 55%;">'
+                    + escapeHtml(data.modelNames[modelId] || '') + '</td></tr>';
+            }
+            // 规格行
+            for (var i = 0; i < specKeyOrder.length; i++) {
+                var specKeyId = specKeyOrder[i];
+                var specValueId = specMap[specKeyId];
+                var valueName = specValueId != null ? (specValueMap[specValueId] || '') : '';
+                html += '<tr><td style="background-color: #F9F9F9; width: 45%;">'
+                    + escapeHtml(specKeyNames[specKeyId] || '')
+                    + '</td><td style="width: 55%;">' + escapeHtml(valueName) + '</td></tr>';
+            }
+            // Series 行及自定义属性行原样保留
+            var specRowCount = 1 + (modelRow ? 1 : 0) + specKeyOrder.length;
+            for (var j = specRowCount; j < rows.length; j++) {
+                html += rows[j].outerHTML;
+            }
+            tbody.innerHTML = html;
+
+            var priceEl = document.getElementById('userPrice');
+            if (priceEl && data.modelPrices && data.modelPrices[modelId]) {
+                priceEl.textContent = data.modelPrices[modelId];
+            }
+
+            var items = document.querySelectorAll('.model-switch-item');
+            for (var k = 0; k < items.length; k++) {
+                applyActiveStyle(items[k], items[k].getAttribute('data-model-id') === modelId);
+            }
+        }
+
+        var modelListContainer = document.querySelector('.dd-scroll');
+        if (modelListContainer) {
+            modelListContainer.addEventListener('click', function (e) {
+                var target = e.target.closest('.model-switch-item');
+                if (target) {
+                    var modelId = target.getAttribute('data-model-id');
+                    if (modelId) switchModel(modelId);
+                }
+            });
+            modelListContainer.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter' && e.key !== ' ') {
+                    return;
+                }
+                var target = e.target.closest('.model-switch-item');
+                if (target) {
+                    e.preventDefault();
+                    var modelId = target.getAttribute('data-model-id');
+                    if (modelId) switchModel(modelId);
+                }
+            });
+        }
+    });
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

@@ -78,10 +78,11 @@ public class ThymeleafUtils {
      */
     public static String resolveSlugUrl(String slugFromDb, String title) {
         if (slugFromDb != null && !slugFromDb.trim().isEmpty()) {
-            return slugFromDb.trim();
+            return slugFromDb.trim().replace("|-", "").replace("：", "")
+                    .replace(":", "");
         }
         String slug = generateSmartSlug(title);
-        return (slug == null || slug.isEmpty()) ? "item" : slug;
+        return slug.isEmpty() ? "item" : slug;
     }
 
     /**

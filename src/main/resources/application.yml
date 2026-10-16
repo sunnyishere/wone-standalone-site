@@ -32,6 +32,13 @@ site-content:
   access-key: a59adea3b9e74c18abafe71013c591f1
   secret-key: 3c5cff8656234619ac5c733463d750c8
   page-size: 12
+  domains:
+    "[www.energy-rw.com]":
+      access-key: 4bc14829a15b4727a84d26fb3ed17b88
+      secret-key: 508d18700aa84f84a67ac6ada32b24a6
+    "[www.vziman.com]":
+      access-key: 6e2ac4c8692f4a0cac5cd4fbdcbf7a40
+      secret-key: 908653cacdf54bfd98815a3f7da7abde
 
 wcm-api: http://192.168.35.16/wcm-api/site/static/
 brand:
@@ -42,7 +49,7 @@ brand:
   request-log-dir: ./request-logs
   scheduler-enable: true #定时任务开启
   cron: "0 0 6 */3 * ?"
-  execute-on-start: true #启动时执行页面静态化
+  execute-on-start: false #启动时执行页面静态化
   execute-on-domain: www.test-static.com
   domain-list:
   secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c

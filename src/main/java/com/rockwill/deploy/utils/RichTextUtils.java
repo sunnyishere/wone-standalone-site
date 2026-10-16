@@ -1,6 +1,7 @@
 package com.rockwill.deploy.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,9 +48,10 @@ public final class RichTextUtils {
     private static final Pattern IMG_PATTERN = Pattern.compile("(?i)<img\\b[^>]*>");
 
     /**
-     * 匹配 img 标签上的 alt 属性
+     * 匹配 img 标签上的 alt 属性，并捕获其引号包裹的属性值（含引号本身）
      */
-    private static final Pattern ALT_ATTR_PATTERN = Pattern.compile("(?i)\\balt\\s*=");
+    private static final Pattern ALT_ATTR_VALUE_PATTERN =
+            Pattern.compile("(?i)\\balt\\s*=\\s*(\"[^\"]*\"|'[^']*')");
 
     private RichTextUtils() {
     }
@@ -100,9 +102,9 @@ public final class RichTextUtils {
     }
 
     /**
-     * 为富文本中缺失 alt 属性的 img 标签补齐 alt，兜底值用所在实体名称。
+     * 为富文本中缺失或为空 alt 的 img 标签补齐 alt，兜底值用所在实体名称。
      * <p>
-     * 仅补「完全缺失 alt 属性」的标签；已有 alt（含显式 {@code alt=""}）保持原样，
+     * 只有 alt 缺失、或显式为 {@code alt=""}（含纯空白）时才补齐；已有非空 alt 保持原样，
      * 不覆盖编辑侧的语义标注。同一字段内多张图共用同一兜底值。
      *
      * @param html   富文本字符串
@@ -122,14 +124,37 @@ public final class RichTextUtils {
         boolean changed = false;
         while (imgMatcher.find()) {
             String tag = imgMatcher.group(0);
-            if (!ALT_ATTR_PATTERN.matcher(tag).find()) {
-                tag = insertAltAttr(tag, escapedAlt);
+            String filled = fillAlt(tag, escapedAlt);
+            if (!filled.equals(tag)) {
+                tag = filled;
                 changed = true;
             }
             imgMatcher.appendReplacement(replaced, Matcher.quoteReplacement(tag));
         }
         imgMatcher.appendTail(replaced);
         return changed ? replaced.toString() : html;
+    }
+
+    /**
+     * 单个 img 标签内 alt 补齐：缺失则插入，已存在但为空则原位替换，非空则保持原样。
+     *
+     * @param tag       原始 img 标签
+     * @param escapedAlt 已转义的 alt 文本
+     * @return 补齐 alt 后的标签；无需改动时返回原标签
+     */
+    private static String fillAlt(String tag, String escapedAlt) {
+        Matcher altMatcher = ALT_ATTR_VALUE_PATTERN.matcher(tag);
+        if (altMatcher.find()) {
+            String quoted = altMatcher.group(1);
+            String inner = quoted.substring(1, quoted.length() - 1);
+            if (StringUtils.isNotBlank(inner)) {
+                return tag;
+            }
+            char quote = quoted.charAt(0);
+            String replacement = "alt=" + quote + escapedAlt + quote;
+            return altMatcher.replaceFirst(Matcher.quoteReplacement(replacement));
+        }
+        return insertAltAttr(tag, escapedAlt);
     }
 
     /**
@@ -173,5 +198,23 @@ public final class RichTextUtils {
                 .replaceAll("https://oss.iwone.cn", "https://oss.iee-business.com")
                 .replaceAll("http://oss.iee-business.com", "https://oss.iee-business.com");
         return cleaned;
+    }
+
+    /**
+     * 从富文本 HTML 中抽取纯文本：移除全部标签、解码 HTML 实体，并将连续空白折叠为单个空格。
+     * <p>
+     * 基于 Jsoup 解析（与 StaticPageService 同一依赖），块级元素边界由 Jsoup 以空格衔接，
+     * 避免「上一个答案。下一个问题」这类相邻文本被拼接成无法断句的长串。
+     * 入参为空或纯空白时原样返回。
+     *
+     * @param html 富文本字符串
+     * @return 抽取后的纯文本；入参为空时原样返回
+     */
+    public static String htmlToPlainText(String html) {
+        if (StringUtils.isBlank(html)) {
+            return html;
+        }
+        String text = Jsoup.parse(html).text();
+        return text.replaceAll("\\s+", " ").trim();
     }
 }

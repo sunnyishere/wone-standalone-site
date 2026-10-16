@@ -15,6 +15,25 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <th:block th:replace="head :: commonHead"></th:block>
+    <style>
+        .iee-empty-icon{font-size:28px;color:#9AA49F}
+        .iee-empty h2{font-size:22px;margin:12px 0 8px}
+        .iee-empty p{color:#777;max-width:620px;margin:0 auto}
+        .iee-empty-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:22px 0}
+        .iee-btn{border:1px solid #D8D8D8;background:#fff;color:#1D1D1F;border-radius:8px;padding:8px 13px;line-height:1.2;cursor:pointer}
+        .iee-btn:hover{border-color:#0DCB67;color:#07934A}
+        .iee-btn-primary{background:#0DCB67;border-color:#0DCB67;color:#fff;font-weight:600}
+        .iee-btn-primary:hover{background:#0AB75D;color:#fff}
+        .am-panel>a{display:block;padding:10px 15px;color:#333;text-decoration:none}
+        .admin-sidebar-sub li a{display:block;padding:8px 15px 8px 25px;color:#666;text-decoration:none}
+        .am-icon-angle-right,.am-icon-angle-down{float:right;margin-right:16px}
+        .admin-sidebar-sub li:has(a:hover),.admin-sidebar-sub li:has(a:focus){background-color:var(--theme-wone)}
+        .admin-sidebar-sub li:has(a:hover) a,.admin-sidebar-sub li:has(a:focus) a{color:#fff}
+        .product-card-description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;overflow-wrap:anywhere;font-size:13px;line-height:1.5;height:6em;max-height:6em;color:#666;margin:6px 0 0}
+@media (max-width:640px){
+.product-card-description{font-size:12px}
+}
+    </style>
 </head>
 
 <body class="body-bg">
@@ -29,8 +48,8 @@
 <nav class="m-cat-nav">
     <div class="am-container">
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
-            <li><a href="/"> <span class="am-padding-right-xs"></span> Home</a></li>
-            <li>search</li>
+            <li><a href="/"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li th:text="${searchNav}"></li>
             <li class="am-active" th:if="${not #strings.isEmpty(category1)}">
 
                 <a th:title="${category1.name}" aria-hidden="false" th:aria-label="${category1.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
@@ -59,7 +78,7 @@
              th:if="${association != null and #lists.size(association) > 0}">
             <!-- 分类数据存在时显示 -->
             <div class="am-list admin-sidebar-list"
-                    style="background-color: #FFFFFF; border-radius: 8px; min-height: 300px;">
+                    style="background-color: #FFFFFF; border-radius: 8px; ">
 
                 <div class="am-padding am-text-lg am-text-bold">Product Category</div>
                 <li class="am-panel am-padding-left"
@@ -81,7 +100,7 @@
                         <li th:each="subCategory : ${cate.children}"
                             th:style="${category2 != null and category2.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
                             <a th:title="${subCategory.name}" aria-hidden="false" th:aria-label="${subCategory.name}" th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:href="@{|/search/${#normalizer.normalizeString(subCategory.name)}-${selectValue}-${subCategory.id}-${pageData.pageNum}|}"
+                               th:href="@{|${currentPathLang}/search/${#normalizer.normalizeString(subCategory.name)}-${selectValue}-${subCategory.id}-${pageData.pageNum}|}"
                                th:text="${subCategory.name}"></a>
                         </li>
                     </ul>
@@ -91,11 +110,11 @@
 
         <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
              th:classappend="${association != null and not association.isEmpty()} ? ' am-u-md-9' : ' am-u-md-12'"
-             style="background:#FFFFFF;">
+             style="background:#FFFFFF;min-height: 660px;">
             <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
                 <!-- 产品列表存在时显示 -->
                 <div th:if="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}">
-                    <ul class="equal-height-card-list am-avg-sm-1 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                    <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                         style="margin: 0 0;">
                         <li class="equal-height-card-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                             th:each="index : ${pageData.rows}">
@@ -103,7 +122,7 @@
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
                     'detail/'+
-                   ${#normalizer.resolveSlugUrl(index.slugUrl, index.name)} +
+                   ${#normalizer.resolveSlugUrl(index.slugUrl, index.enName)} +
                    '-'+${index.id}">
                                 <div class="equal-height-card" style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">
@@ -115,6 +134,7 @@
                                     </div>
                                     <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
                                           th:text="${index.name}"></span>
+                                    <p class="product-card-description" th:text="${index.description ?: ''}"></p>
                                 </div>
                             </a>
                         </li>
@@ -123,9 +143,18 @@
 
                 <!-- 产品列表为空或 pageData 为 null 时显示空数据图片 -->
                 <div th:unless="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}"
-                     style="min-height: 380px; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <img th:src="@{/img/27.png}" src="/img/27.png" alt="The data is empty."
-                         style="display: block; width: 100%; max-width: 415px; height: auto;">
+                     style="min-height: 560px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+                    <div class="iee-empty-icon tn-icon-empty-search" aria-hidden="true">
+                        <span class="tn-icon-search"></span>
+                    </div>
+                    <p style="font-size: 20px;color:#000000;font-weight: bold;" th:text="${noResults} +${selectValue}"></p>
+                    <p th:text="${keptQuery}"></p>
+                    <div class="iee-empty-actions">
+                        <button class="iee-btn" type="button" data-trigger="modal-1"
+                                data-biz-id="site-search"
+                                data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"
+                                th:text="${sourcingRequest}"></button>
+                    </div>
                 </div>
             </div>
 
@@ -147,55 +176,10 @@
     </div>
 </div>
 
-<!-- 搜索弹窗-->
 <th:block th:replace="search :: search"></th:block>
-
-<!-- 弹窗-->
 <th:block th:replace="inquiry :: inquiry"></th:block>
-
-<!-- PC端的右侧按钮 -->
 <th:block th:replace="right-menu :: right-menu(param1='serach_'+${selectLabel})"></th:block>
-
-<!-- app端显示的下载按钮 -->
-<!--    <th:block th:replace="phone-down :: phone-down"></th:block>-->
-
-<!-- 底部导航   -->
 <th:block th:replace="footer :: footer"></th:block>
-
 </body>
 
-<style>
-    /* 主分类链接样式 */
-    .am-panel > a {
-        display: block;
-        padding: 10px 15px;
-        color: #333;
-        text-decoration: none;
-    }
-
-    /* 子分类链接样式 */
-    .admin-sidebar-sub li a {
-        display: block;
-        padding: 8px 15px 8px 25px;
-        color: #666;
-        text-decoration: none;
-    }
-
-    /* 图标浮动样式 */
-    .am-icon-angle-right, .am-icon-angle-down {
-        float: right;
-        margin-right: 16px;
-    }
-
-    /* 选中状态样式 */
-    .admin-sidebar-sub li:has(a:hover),
-    .admin-sidebar-sub li:has(a:focus) {
-        background-color: var(--theme-wone);
-    }
-
-    .admin-sidebar-sub li:has(a:hover) a,
-    .admin-sidebar-sub li:has(a:focus) a {
-        color: #fff;
-    }
-</style>
 </html>

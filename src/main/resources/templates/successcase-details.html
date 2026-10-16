@@ -23,7 +23,7 @@
     <meta property="og:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
     <meta property="og:image" th:attr="content=${successCase.iconUrl}" />
-    <meta property="og:site_name" th:attr="content='@' + ${prodBrand.eName}" />
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}" />
 
     <meta name="keywords"
           th:if="${not #strings.isEmpty(successCase.keywords)}"

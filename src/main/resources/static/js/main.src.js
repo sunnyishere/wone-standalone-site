@@ -118,7 +118,15 @@ $(function () {
         }
 
         const encodedTerm = encodeURIComponent(searchTerm);
-        const targetUrl = `/search-${encodedTerm}`;
+        // 携带当前语种前缀（en 为空串，其他语种形如 /de）；
+        // 隐藏域缺失时（旧缓存页面）按当前页 URL 首段解析语种前缀
+        let langPrefix = ($('.search-lang').val() || '').trim();
+        if (!langPrefix) {
+            const firstSeg = window.location.pathname.split('/')[1] || '';
+            langPrefix = /^[a-z]{2,3}$/.test(firstSeg) ? '/' + firstSeg : '';
+        }
+        langPrefix = langPrefix.replace(/\/+$/, '');
+        const targetUrl = `${langPrefix}/search-${encodedTerm}`;
 
         console.log(`搜索关键词: ${searchTerm}`);
         console.log(`跳转URL: ${targetUrl}`);
@@ -818,13 +826,9 @@ $(document).ready(function () {
         // 设置选中样式的函数
         const setOptionSelected = (option, isSelected) => {
             if (isSelected) {
-                option.style.backgroundColor = 'var(--theme-wone)';
-                option.style.color = '#ffffff';
-                option.style.fontWeight = '500';
+                option.classList.add('dropdown-option-selected');
             } else {
-                option.style.backgroundColor = '';
-                option.style.color = '';
-                option.style.fontWeight = '';
+                option.classList.remove('dropdown-option-selected');
             }
         };
 
@@ -972,11 +976,7 @@ $(document).ready(function () {
                         clearAllSelections();
                         const selectedOption = countryOptions.find(opt => opt.iso2 === userCountryISO2);
                         if (selectedOption) {
-                            const themeColor = getComputedStyle(document.documentElement)
-                                .getPropertyValue('--theme-wone').trim() || '#4f46e5';
-                            selectedOption.optionElement.style.backgroundColor = themeColor;
-                            selectedOption.optionElement.style.color = '#ffffff';
-                            selectedOption.optionElement.style.fontWeight = '500';
+                            selectedOption.optionElement.classList.add('dropdown-option-selected');
                         }
 
                         console.log('国家已设置为:', countryName);

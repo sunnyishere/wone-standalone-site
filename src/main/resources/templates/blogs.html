@@ -24,7 +24,7 @@ basePath =${websitePath +pageName}">
     </th:block>
     <meta property="og:type" content="website"/>
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
-    <meta property="og:site_name" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${title}"/>
     <meta name="twitter:description" th:content="${description}"/>

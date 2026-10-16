@@ -29,6 +29,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -442,16 +444,18 @@ public class RockwillKnowledgeService {
      * lang 为 mapLang 全码（en_US/fr_FR…）；分页 pageNum/pageSize（响应回显）；
      * 无 type 参数；响应结构 data.pageData.{rows,totalPages} + data.association。
      *
+     * @param host 当前请求归一化域名，用于取该域名对应的 site-content 配置（未配置时回退默认值）
      * @return 查询串；accessKey/secretKey 未配置时返回 null，由调用方走空结果兜底
      */
-    String buildSiteContentQuery(String lang, String keyword, String channelCid, int pageNum) {
-        if (StringUtils.isBlank(siteContentProperties.getAccessKey())
-                || StringUtils.isBlank(siteContentProperties.getSecretKey())) {
-            log.warn("site-content accessKey/secretKey is not configured, skip request");
+    String buildSiteContentQuery(String lang, String keyword, String channelCid, int pageNum, String host) {
+        String accessKey = siteContentProperties.getAccessKeyByDomain(host);
+        String secretKey = siteContentProperties.getSecretKeyByDomain(host);
+        if (StringUtils.isBlank(accessKey) || StringUtils.isBlank(secretKey)) {
+            log.warn("site-content accessKey/secretKey is not configured, host:{}, skip request", host);
             return null;
         }
         long reqTime = System.currentTimeMillis() / 1000L;
-        String sign = buildSiteContentSign(reqTime, siteContentProperties.getAccessKey(), siteContentProperties.getSecretKey());
+        String sign = buildSiteContentSign(reqTime, accessKey, secretKey);
         StringBuilder query = new StringBuilder();
         query.append("keyword=").append(urlEncode(StringUtils.defaultString(keyword)));
         String apiLang = resolveApiLang(lang);
@@ -465,7 +469,7 @@ public class RockwillKnowledgeService {
         if (siteContentProperties.getPageSize() != null) {
             query.append("&pageSize=").append(siteContentProperties.getPageSize());
         }
-        query.append("&accessKey=").append(urlEncode(siteContentProperties.getAccessKey()));
+        query.append("&accessKey=").append(urlEncode(accessKey));
         query.append("&reqTime=").append(reqTime);
         query.append("&sign=").append(sign);
         return query.toString();
@@ -500,12 +504,31 @@ public class RockwillKnowledgeService {
 
     /**
      * 站内搜索
+     * <p>
+     * 调用方传入站点语言短码（en/de/fr…，与 URL 语种前缀一致）；
+     * 上下文缓存与页面模型直接使用短码，搜索接口查询由
+     * {@link #buildSiteContentQuery} 内的 {@link #resolveApiLang}
+     * 基于 BrandConfig.mapLang 将短码解析为完整语种 code（de → de_DE）后发起。
+     *
+     * @param categoryName 分类搜索 URL 中的分类名段（/search/{categoryName}-{key}-{cid}-{page}），
+     *                     仅分类搜索分支透传，用于语种切换链接按 SEARCH 路由形态重构；普通搜索传 null
      */
-    public DomainHtmlVo searchSiteContent(String keyword, String channelCid, String pageNum, String lang, String host) {
+    public DomainHtmlVo searchSiteContent(String keyword, String channelCid, String pageNum, String lang, String host,
+                                          String categoryName) {
         Map<String, Object> model = new HashMap<>();
         fillCommonModel(model, host);
         int page = parsePageNum(pageNum);
         model.put("pageData", emptyPageData(page));
+        // 通用上下文缓存 miss（该语种尚无页面渲染收割过）时，先经后端 /home?lang=xx 链路预取一次，
+        // 其内部渲染成功后会收割 advanced 等语种级公共变量，避免搜索页渲染时 head.html 取 advanced 报空
+        if (siteCommonContextCache.get(host, lang) == null) {
+            try {
+                getFromApi(restTemplate,
+                        "/home" + (StringUtils.isBlank(lang) ? "" : "?lang=" + lang), host);
+            } catch (Exception e) {
+                log.warn("search page common context warmup failed, host:{}, lang:{}", host, lang, e);
+            }
+        }
         siteCommonContextCache.mergeInto(host, lang, model);
         fillSearchPageModel(model, lang, host);
         List<SitePage> topNavPages = new ArrayList<>(SiteMenuUtils.getMenuPages(host));
@@ -515,16 +538,24 @@ public class RockwillKnowledgeService {
             }
         }
         model.put("topNavPages", topNavPages);
-        if (StringUtils.isNotBlank(keyword)) {
-            if (StringUtils.isNotBlank(channelCid)) {
-                model.put("selectLabel", ThymeleafUtils.normalizeString(keyword) + "-" + channelCid);
-            } else {
-                model.put("selectLabel", ThymeleafUtils.normalizeString(keyword));
-            }
+        String normKeyword = StringUtils.isNotBlank(keyword)
+                ? ThymeleafUtils.normalizeString(keyword) : "";
+        if (StringUtils.isNotBlank(normKeyword)) {
+            model.put("selectLabel", StringUtils.isNotBlank(channelCid)
+                    ? normKeyword + "-" + channelCid : normKeyword);
+        }
+        // 语种切换链接基于当前搜索地址重构：
+        // 普通搜索 → /{lang}/search-{关键词}；分类搜索 → /{lang}/search/{分类名}-{关键词}-{分类ID}-{页码}
+        model.put("pageName", "search");
+        if (StringUtils.isNotBlank(channelCid) && StringUtils.isNotBlank(categoryName)) {
+            model.put("suffix", "/" + categoryName + "-" + normKeyword + "-" + channelCid + "-" + page);
+        } else {
+            model.put("suffix", StringUtils.isNotBlank(normKeyword) ? "-" + normKeyword : "");
         }
         Map<String, Object> pageData = new HashMap<>();
         try {
-            String query = buildSiteContentQuery(lang, keyword, channelCid, page);
+            // 传入短码，resolveApiLang 基于 BrandConfig.mapLang 解析为完整语种 code（de → de_DE）后再查询
+            String query = buildSiteContentQuery(lang, keyword, channelCid, page, host);
             if (query == null) {
                 return renderSearchPage(model, host);
             }
@@ -547,6 +578,10 @@ public class RockwillKnowledgeService {
             mapIfPresent(dataObject(body), "association", model);
             mapIfPresent(dataObject(body), "category1", model);
             mapIfPresent(dataObject(body), "category2", model);
+            mapIfPresent(dataObject(body), "noResults", model);
+            mapIfPresent(dataObject(body), "keptQuery", model);
+            mapIfPresent(dataObject(body), "searchNav", model);
+            mapIfPresent(dataObject(body), "sourcingRequest", model);
         } catch (Exception e) {
             log.error("siteContent list request exception, pageNum:{}, lang:{}", page, lang, e);
         }
@@ -643,6 +678,32 @@ public class RockwillKnowledgeService {
         domainHtmlVo.setHtmlContent(content);
         domainHtmlVo.setModelMap(model);
         return domainHtmlVo;
+    }
+
+    /**
+     * 按语种预热搜索页通用上下文缓存（启动时后台调用）：
+     * 逐语种经后端 /home?lang=xx 链路渲染一次 home，触发 SiteCommonContextCache 收割，
+     * 避免冷启动后首个非英语搜索触发同步预热造成首查延迟。
+     * 已缓存的语种跳过；单语种失败仅告警不阻断。
+     */
+    public void warmupCommonContext(String domain) {
+        try {
+            List<String> langs = SiteMenuUtils.getLangList(domain);
+            for (String lang : langs) {
+                if (siteCommonContextCache.get(domain, lang) != null) {
+                    continue;
+                }
+                try {
+                    getFromApi(restTemplate,
+                            "/home" + (StringUtils.isBlank(lang) ? "" : "?lang=" + lang), domain);
+                } catch (Exception e) {
+                    log.warn("warmup common context failed, domain:{}, lang:{}", domain, lang, e);
+                }
+            }
+            log.info("warmup common context done, domain:{}, langs:{}", domain, langs.size());
+        } catch (Exception e) {
+            log.warn("warmup common context error, domain:{}", domain, e);
+        }
     }
 
     private int parsePageNum(String pageNum) {

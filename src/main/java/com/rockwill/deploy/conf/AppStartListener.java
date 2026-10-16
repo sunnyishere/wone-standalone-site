@@ -37,10 +37,23 @@ public class AppStartListener implements ApplicationListener<ApplicationReadyEve
         }
         knowledgeService.getSiteMenu(brandConfig.getDomain());
         staticPageService.generateIndexPage(brandConfig.getDomain());
+        boolean fullGen = Boolean.TRUE.equals(brandConfig.getExecuteOnStart())
+                && brandConfig.getExecuteOnDomain() != null
+                && brandConfig.getExecuteOnDomain().contains(brandConfig.getDomain());
+        if (!fullGen) {
+            // 全量生成会逐语种渲染收割通用上下文；未启用时后台按语种预热搜索页缓存
+            taskExecutor.execute(() -> knowledgeService.warmupCommonContext(brandConfig.getDomain()));
+        }
         if (brandConfig.getDomainList()!=null && !brandConfig.getDomainList().isEmpty()){
             for (String domain : brandConfig.getDomainList()) {
                 knowledgeService.getSiteMenu(domain);
                 staticPageService.generateIndexPage(domain);
+                boolean domainFullGen = Boolean.TRUE.equals(brandConfig.getExecuteOnStart())
+                        && brandConfig.getExecuteOnDomain() != null
+                        && brandConfig.getExecuteOnDomain().contains(domain);
+                if (!domainFullGen) {
+                    taskExecutor.execute(() -> knowledgeService.warmupCommonContext(domain));
+                }
             }
         }
         if (brandConfig.getExecuteOnStart()) {

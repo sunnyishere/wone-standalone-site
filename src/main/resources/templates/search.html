@@ -9,6 +9,7 @@
             <div class="am-g">
                 <div class="am-u-lg-12">
                     <div class="am-input-group">
+                        <input type="hidden" class="search-lang" th:value="${currentPathLang} ?: ''">
                         <input type="text" placeholder="Search Products..." class="am-form-field search-input"
                                style="height: 60px;border: none;border-bottom: 1px solid var(--theme-wone);border-radius: 0;">
                         <span class="am-input-group-btn am-padding-left">

@@ -18,7 +18,7 @@
 
     <meta property="og:type" th:content="${pageName}"/>
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
-    <meta property="og:site_name" th:content="${pageContent}"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:content="${pageTitle}"/>
     <meta name="twitter:description" th:content="${pageContent}"/>
@@ -88,7 +88,7 @@
                 <div class="am-slider am-slider-default" data-am-flexslider="{playAfterPaused: 8000}" style="border-radius: 10px;overflow: hidden;position: relative;z-index: 0;">
                     <ul class="am-slides">
                         <li class="phone-banner-height" style="width: 100%;height: 340px;" th:if="${not #lists.isEmpty(pictures)}" th:each="pic : ${pictures}">
-                            <img th:alt="${pic.pictures}" th:src="${pic.pictures}" alt="" style="width: 100%;height: 100%;object-fit: cover;">
+                            <img th:alt="${prodBrand.eName}" th:src="${pic.pictures}" alt="" style="width: 100%;height: 100%;object-fit: cover;">
                         </li>
                         <li class="phone-banner-height" style="width: 100%;height: 340px;" th:if="${#lists.isEmpty(pictures)}" th:each="i : ${#numbers.sequence(1, 4)}">
                             <img alt="No Data" src="https://oss.iee-business.com/standalone/images/swiper-3.jpg" style="width: 100%;height: 100%;object-fit: cover;">

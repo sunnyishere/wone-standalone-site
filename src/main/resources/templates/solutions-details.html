@@ -28,10 +28,10 @@
     <meta property="og:type" content="article"/>
     <meta property="og:image" th:attr="content=${article.iconUrl}"/>
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
-    <meta property="og:site_name" th:attr="content='@'+${prodBrand.eName}"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
     <meta name="twitter:title" th:attr="content=${article.title}+'-'+${prodBrand.eName}"/>
-    <meta name="twitter:site" content="@Experts Electrical"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:image" th:attr="content=${article.iconUrl}"/>
     <meta name="twitter:creator" th:attr="content='@'+${prodBrand.eName}"/>
