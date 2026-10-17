@@ -29,7 +29,8 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="renderer" content="webkit">
     <th:block th:replace="head :: commonHead"></th:block>
-    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}"></script>
+    <script th:if="${faqPageSchemaJson != null and faqPageSchemaJson != '{}'}" type="application/ld+json" th:utext="${faqPageSchemaJson}"></script>
+    <script th:if="${librarySchemaJson != null and librarySchemaJson != '{}'}" type="application/ld+json" th:utext="${librarySchemaJson}"></script>
     <style>
         .library-detail-page { padding-bottom: 35px; }
         .library-detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }

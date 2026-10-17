@@ -223,6 +223,36 @@ public class StaticPageService {
 
 
     /**
+     * 生成指定语种的首页静态文件（同步事件触发后主动回填，取数口径与全量生成的语种首页一致）
+     *
+     * @param domain 独立站域名
+     * @param lang   语种代码（非空，如 "fr"）
+     */
+    public void generateLangIndexPage(String domain, String lang) {
+        if (ObjectUtils.isEmpty(lang)) {
+            return;
+        }
+        try {
+            for (SitePage sitePage : SiteMenuUtils.getMenuPages(domain)) {
+                if (sitePage.getPageType() != SitePage.SitePageType.HOME) {
+                    continue;
+                }
+                String pageName = prefixWithLang(lang, sitePage.getPageName());
+                DomainHtmlVo domainHtmlVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, pageName), domain);
+                if (domainHtmlVo != null && !ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
+                    saveHtml(domain, lang, domainHtmlVo.getHtmlContent());
+                } else {
+                    log.warn("Failed to request lang index content, site:{}, lang:{}", domain, lang);
+                }
+                return;
+            }
+            log.warn("Home page not found in menu data, skip lang index generation, site:{}, lang:{}", domain, lang);
+        } catch (Exception e) {
+            log.error("generate lang index html files exception, site:{}, lang:{}", domain, lang, e);
+        }
+    }
+
+    /**
      * 菜单及详情页面
      */
     public void generateMenuAndDetailPage(String lang, String domain, Map<Integer, Set<Long>> updatedIdsByType) {

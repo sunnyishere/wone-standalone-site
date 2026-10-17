@@ -51,11 +51,11 @@
 <!--    <th:block th:replace="head :: critical-detail"></th:block>-->
     <th:block th:replace="head :: commonHead"></th:block>
 <!--    <th:block th:replace="head :: faqStyle"></th:block>-->
-    <script type="application/ld+json" th:utext="${schemaJson != null ? schemaJson : '{}'}">
+    <script th:if="${schemaJson != null and schemaJson != '{}'}" type="application/ld+json" th:utext="${schemaJson}">
     </script>
-    <script type="application/ld+json" th:utext="${breadcrumbSchemaJson != null ? breadcrumbSchemaJson : '{}'}">
+    <script th:if="${breadcrumbSchemaJson != null and breadcrumbSchemaJson != '{}'}" type="application/ld+json" th:utext="${breadcrumbSchemaJson}">
     </script>
-    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    <script th:if="${faqPageSchemaJson != null and faqPageSchemaJson != '{}'}" type="application/ld+json" th:utext="${faqPageSchemaJson}">
     </script>
 </head>
 

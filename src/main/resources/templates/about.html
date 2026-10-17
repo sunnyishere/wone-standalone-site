@@ -55,7 +55,11 @@
             .about-cta-col .device-aware-link{ margin-top:36px; }
         }
     </style>
-    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    <script th:if="${schemaJson != null and schemaJson != '{}'}" type="application/ld+json" th:utext="${schemaJson}">
+    </script>
+    <script th:if="${faqPageSchemaJson != null and faqPageSchemaJson != '{}'}" type="application/ld+json" th:utext="${faqPageSchemaJson}">
+    </script>
+    <script th:if="${breadcrumbSchemaJson != null and breadcrumbSchemaJson != '{}'}" type="application/ld+json" th:utext="${breadcrumbSchemaJson}">
     </script>
 </head>
 

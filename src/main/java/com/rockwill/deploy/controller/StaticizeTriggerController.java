@@ -104,9 +104,10 @@ public class StaticizeTriggerController {
 //                    || standaloneSyncEvent.getEntityId() == SitePage.SitePageType.HOME) {
                 collectHomePage(syncContext, standaloneSyncEvent, urlSet);
 //            }
-            collectPaginationPages(syncContext, standaloneSyncEvent, urlSet);
-            collectMainPages(syncContext, standaloneSyncEvent, urlSet);
-            cloudflarePurgeService.purgeByUrls(standaloneSyncEvent.getDeployDomain(), new ArrayList<>(urlSet));
+                collectPaginationPages(syncContext, standaloneSyncEvent, urlSet);
+                collectMainPages(syncContext, standaloneSyncEvent, urlSet);
+                collectLangPages(syncContext, standaloneSyncEvent, urlSet);
+                cloudflarePurgeService.purgeByUrls(standaloneSyncEvent.getDeployDomain(), new ArrayList<>(urlSet));
         }
         return ResponseEntity.ok("success");
     }
@@ -129,7 +130,8 @@ public class StaticizeTriggerController {
                         pageName,
                         sitePage.getPageType() == SitePage.SitePageType.PRODUCTS,
                         rootPath,
-                        pagePath
+                        pagePath,
+                        ""
                 );
             }
         }
@@ -138,14 +140,21 @@ public class StaticizeTriggerController {
 
     /**
      * 收集站点首页文件。
-     * 同步事件发生后，首页通常会引用最新内容，因此需要删除根目录下的 index.html 并触发缓存清理。
+     * 同步事件发生后，首页通常会引用最新内容，因此需要删除 index.html 并触发缓存清理；
+     * 默认语言删除后立即重新生成，语种目录下删除 {语种}/index.html 后同样立即重新生成。
      */
     private void collectHomePage(SyncContext syncContext,
                                  StandaloneSyncEvent standaloneSyncEvent,
                                  Set<String> urlSet) {
         File homePage = new File(syncContext.rootPath, "index.html");
-        deleteAndRecord(homePage, standaloneSyncEvent.getDeployDomain(), "/", urlSet);
-        staticPageService.generateIndexPage(standaloneSyncEvent.getDeployDomain());
+        String homeUrlPath = syncContext.urlPrefix.isEmpty() ? "/" : syncContext.urlPrefix;
+        deleteAndRecord(homePage, standaloneSyncEvent.getDeployDomain(), homeUrlPath, urlSet);
+        if (syncContext.urlPrefix.isEmpty()) {
+            staticPageService.generateIndexPage(standaloneSyncEvent.getDeployDomain());
+        } else {
+            staticPageService.generateLangIndexPage(standaloneSyncEvent.getDeployDomain(),
+                    syncContext.urlPrefix.substring(1));
+        }
     }
 
     /**
@@ -164,7 +173,8 @@ public class StaticizeTriggerController {
             return;
         }
         for (File file : paginationDirs) {
-            deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(), "/" + file.getName(), urlSet);
+            deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
+                    syncContext.urlPrefix + "/" + file.getName(), urlSet);
         }
     }
 
@@ -181,7 +191,8 @@ public class StaticizeTriggerController {
         }
         for (File file : files) {
             if (isIndexFile(file)) {
-                deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(), "/" + syncContext.pageName, urlSet);
+                deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
+                        syncContext.urlPrefix + "/" + syncContext.pageName, urlSet);
                 continue;
             }
             if (!file.isDirectory()) {
@@ -196,11 +207,11 @@ public class StaticizeTriggerController {
                 continue;
             }
             if (standaloneSyncEvent.getEntityType() == StandaloneSyncEntityType.CATEGORY) {
-                // 仅失效默认语言的分类目录；detail、series 和语言目录保持原样。
+                // 分类目录匹配 {name}-{id}(-{p}) 形态，默认语言与各语种目录均按此规则失效。
                 // 分类名称/排序也影响侧栏，因此同时失效其他分类页及其分页。
                 if (file.getName().matches(".+-\\d+(-\\d+)?")) {
                     deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
-                            "/" + syncContext.pageName + "/" + file.getName(), urlSet);
+                            syncContext.urlPrefix + "/" + syncContext.pageName + "/" + file.getName(), urlSet);
                 }
                 continue;
             }
@@ -208,7 +219,7 @@ public class StaticizeTriggerController {
                 collectProductPages(file, syncContext, standaloneSyncEvent, urlSet);
             } else if (file.getName().contains("-" + standaloneSyncEvent.getEntityId())) {
                 deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
-                        "/" + syncContext.pageName + "/" + file.getName(), urlSet);
+                        syncContext.urlPrefix + "/" + syncContext.pageName + "/" + file.getName(), urlSet);
             }
         }
     }
@@ -225,7 +236,7 @@ public class StaticizeTriggerController {
         Long entityId = standaloneSyncEvent.getEntityId();
         if (fileName.contains("-" + entityId + "-series")) {
             deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
-                    "/" + syncContext.pageName + "/" + fileName, urlSet);
+                    syncContext.urlPrefix + "/" + syncContext.pageName + "/" + fileName, urlSet);
             return;
         }
         if ("detail".equals(fileName)) {
@@ -234,7 +245,7 @@ public class StaticizeTriggerController {
         }
         if (!fileName.contains("series")) {
             deleteAndRecord(file, standaloneSyncEvent.getDeployDomain(),
-                    "/" + syncContext.pageName + "/" + fileName, urlSet);
+                    syncContext.urlPrefix + "/" + syncContext.pageName + "/" + fileName, urlSet);
         }
     }
 
@@ -252,12 +263,40 @@ public class StaticizeTriggerController {
         }
         for (File detailFile : detailFiles) {
             deleteAndRecord(detailFile, standaloneSyncEvent.getDeployDomain(),
-                    "/" + syncContext.pageName + "/detail/" + detailFile.getName(), urlSet);
+                    syncContext.urlPrefix + "/" + syncContext.pageName + "/detail/" + detailFile.getName(), urlSet);
         }
     }
 
     private boolean isIndexFile(File file) {
         return file.isFile() && "index.html".equals(file.getName());
+    }
+
+    /**
+     * 收集其他语种目录下与当前同步事件对应的静态文件。
+     * 语种列表来自 SiteMenuUtils（getMenu 响应），各语种页面位于 {语种}/ 目录下，
+     * 目录结构与默认语言一致，复用默认语言的收集逻辑逐语种删除并记录待 purge URL。
+     *
+     * @param syncContext         默认语言的页面上下文
+     * @param standaloneSyncEvent 同步事件
+     * @param urlSet              待提交 Cloudflare 的 URL 集合
+     */
+    private void collectLangPages(SyncContext syncContext,
+                                  StandaloneSyncEvent standaloneSyncEvent,
+                                  Set<String> urlSet) {
+        for (String lang : SiteMenuUtils.getLangList(standaloneSyncEvent.getDeployDomain())) {
+            if (!StringUtils.hasText(lang)) {
+                continue;
+            }
+            File langRootPath = new File(syncContext.rootPath, lang);
+            if (!langRootPath.exists()) {
+                continue;
+            }
+            SyncContext langContext = new SyncContext(syncContext.pageName, syncContext.isProd,
+                    langRootPath, new File(langRootPath, syncContext.pageName), "/" + lang);
+            collectHomePage(langContext, standaloneSyncEvent, urlSet);
+            collectPaginationPages(langContext, standaloneSyncEvent, urlSet);
+            collectMainPages(langContext, standaloneSyncEvent, urlSet);
+        }
     }
 
     /**
@@ -276,19 +315,22 @@ public class StaticizeTriggerController {
 
     /**
      * 同步处理过程中使用的页面上下文。
-     * 封装栏目名称、是否产品页以及本地静态目录位置。
+     * 封装栏目名称、是否产品页、本地静态目录位置以及 URL 前缀（默认语言为空串，语种为 "/{lang}"）。
      */
     private static class SyncContext {
         private final String pageName;
         private final boolean isProd;
         private final File rootPath;
         private final File pagePath;
+        /** 记录待 purge URL 时使用的路径前缀：默认语言为 ""，语种目录为 "/{lang}" */
+        private final String urlPrefix;
 
-        private SyncContext(String pageName, boolean isProd, File rootPath, File pagePath) {
+        private SyncContext(String pageName, boolean isProd, File rootPath, File pagePath, String urlPrefix) {
             this.pageName = pageName;
             this.isProd = isProd;
             this.rootPath = rootPath;
             this.pagePath = pagePath;
+            this.urlPrefix = urlPrefix;
         }
     }
 }
