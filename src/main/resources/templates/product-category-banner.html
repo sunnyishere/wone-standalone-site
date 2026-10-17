@@ -1,0 +1,25 @@
+<th:block th:fragment="preload"
+          th:with="desktopImage=${!#strings.isEmpty(category.pcImgUrl) ? category.pcImgUrl : category.h5ImgUrl},
+                   mobileImage=${!#strings.isEmpty(category.h5ImgUrl) ? category.h5ImgUrl : category.pcImgUrl}">
+    <link th:if="${!#strings.isEmpty(desktopImage)}" rel="preload" as="image" fetchpriority="high"
+          media="(min-width: 641px)" th:href="${desktopImage}">
+    <link th:if="${!#strings.isEmpty(mobileImage)}" rel="preload" as="image" fetchpriority="high"
+          media="(max-width: 640px)" th:href="${mobileImage}">
+</th:block>
+
+<div th:fragment="banner" class="page-single-banner product-category-banner"
+     th:with="categoryTitle=${!#strings.isEmpty(category.i18nName) ? category.i18nName : category.name},
+              desktopImage=${!#strings.isEmpty(category.pcImgUrl) ? category.pcImgUrl : category.h5ImgUrl},
+              mobileImage=${!#strings.isEmpty(category.h5ImgUrl) ? category.h5ImgUrl : category.pcImgUrl}">
+    <div class="banner-split" th:classappend="${#strings.isEmpty(desktopImage)} ? 'product-category-banner--text-only'">
+        <div class="banner-split__copy" style="color: #060606;">
+            <h2 th:text="${categoryTitle}"></h2>
+            <p th:if="${!#strings.isEmpty(category.shortDesc)}" th:text="${category.shortDesc}"></p>
+        </div>
+        <picture class="banner-split__picture" th:if="${!#strings.isEmpty(desktopImage)}">
+            <source media="(max-width: 640px)" width="800" height="800" th:srcset="${mobileImage}">
+            <img th:src="${desktopImage}" th:alt="${categoryTitle}"
+                 width="1920" height="800" fetchpriority="high" loading="eager">
+        </picture>
+    </div>
+</div>

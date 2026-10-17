@@ -469,19 +469,22 @@ public class StaticPageService {
                 saveHtml(domain, detailUrl, subVo == null ? "" : subVo.getHtmlContent());
                 if (subVo != null) {
                     addWebSitemap(subVo.getHtmlContent(), "/" + detailUrl, getPriorityByPageType(sitePage.getPageType().intValue()), domain, lang, sitePage.getPageType().intValue());
-                    if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
-                        if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
-                            List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
-                            for (LinkedHashMap<String, Object> model : modelList) {
-                                String modelName = sitePage.getPageName() + subVo.getModelMap().get("suffix").toString().replace("/detail", "") + "-series" + model.get("id");
-                                if (!ObjectUtils.isEmpty(lang)) {
-                                    modelName = lang + "/" + modelName;
+                    // 型号链接（-series{id}）不再全量静态化，改由 /page/** 路由按需渲染
+                        /*
+                        if (detailUrl.contains(sitePage.getPageName() + "/detail")) {
+                            if (subVo.getModelMap() != null && subVo.getModelMap().containsKey("modelList")) {
+                                List<LinkedHashMap<String, Object>> modelList = (List<LinkedHashMap<String, Object>>) subVo.getModelMap().get("modelList");
+                                for (LinkedHashMap<String, Object> model : modelList) {
+                                    String modelName = sitePage.getPageName() + subVo.getModelMap().get("suffix").toString().replace("/detail", "") + "-series" + model.get("id");
+                                    if (!ObjectUtils.isEmpty(lang)) {
+                                        modelName = lang + "/" + modelName;
+                                    }
+                                    DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, modelName), domain);
+                                    saveHtml(domain, modelName, modelVo.getHtmlContent());
                                 }
-                                DomainHtmlVo modelVo = knowledgeService.getFromApi(jobRestTemplate, getApiPath(domain, modelName), domain);
-                                saveHtml(domain, modelName, modelVo.getHtmlContent());
                             }
                         }
-                    }
+                        */
                 }
             }, taskExecutor);
             futureList.add(detailTask);

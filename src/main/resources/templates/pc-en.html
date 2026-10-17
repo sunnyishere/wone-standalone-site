@@ -87,7 +87,8 @@
                        th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
                        target="_blank" rel="noopener noreferrer"
                        th:aria-label="${advanced['add.us.on.google'] ?: 'Add Google'}"
-                       aria-describedby="nav-google-tooltip">
+                       aria-describedby="nav-google-tooltip"
+                       style="background-color: var(--theme-wone)">
                         <span class="am-icon-google" aria-hidden="true"></span>
                         <span th:text="${advanced['add.us.on.google'] ?: 'Add Google'}">Add Google</span>
                     </a>
