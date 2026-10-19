@@ -1,9 +1,12 @@
 <div th:fragment="faqSection(faqList)"
+     th:with="plainHeading=${templateType != null and #strings.endsWith(templateType, '-list')}"
      th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}"
      style="background:#FFFFFF;margin-bottom: 15px;border-radius: 12px;">
 
     <div class="am-text-lg am-text-bold" style="padding: 12px 0;">
-        <h2 class="inline-header faq-header" th:text="${advanced['frequently.asked.questions']}">Frequently Asked Questions</h2>
+        <span th:if="${plainHeading}" class="inline-header faq-header" th:text="${advanced['frequently.asked.questions']}">Frequently Asked Questions</span>
+        <h2 th:if="${!plainHeading and templateType != 'about' and templateType != 'home'}" class="inline-header faq-header" th:text="${advanced['frequently.asked.questions']}">Frequently Asked Questions</h2>
+        <h3 th:if="${templateType == 'about' or templateType == 'home'}" class="inline-header faq-header" th:text="${advanced['frequently.asked.questions']}">Frequently Asked Questions</h3>
     </div>
 
     <div class="faq-list">

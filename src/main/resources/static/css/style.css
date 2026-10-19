@@ -533,7 +533,7 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .dd-hover4:hover{transform:scale(1.02)}
 .home-section-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .home-section-header__center{flex:1;min-width:0}
-.home-section-header__title h2{margin:0}
+.home-section-header__title h3{margin:0}
 .home-section-header__action{flex-shrink:0;padding-top:0!important}
 .home-section-header__action a{display:inline-flex;align-items:center;white-space:nowrap}
 .dd-active{color:var(--theme-wone)!important;border-bottom:2px solid var(--theme-wone)}
@@ -598,7 +598,7 @@ figure.effect-lily:hover p{-webkit-transition-delay:50ms;transition-delay:50ms;-
 .type-hover{border:1px solid #dbdbdb;background-color:#f9f9f9;border-radius:6px}
 .type-hover:hover{border:1px solid var(--theme-wone);background-color:rgb(from var(--theme-wone) r g b / 10%);color:var(--theme-wone);border-radius:6px}
 .tabs-new{margin:0 auto}
-.tabs-new h2{font-size:24px;color:#333;line-height:1;font-weight:400;padding-bottom:10px;padding-left:10px}
+.tabs-new h3{font-size:24px;color:#333;line-height:1;font-weight:400;padding-bottom:10px;padding-left:10px}
 .tabs-new .category{width:100%;position:relative;overflow:hidden}
 .tabs-new .category:after{content:"";position:absolute;width:100%;left:0;top:0;height:1px;z-index:2}
 .tabs-new .category:before{content:"";position:absolute;width:100%;left:0;bottom:16px;height:1px;margin-left:24px;background-color:#ededed;z-index:0}

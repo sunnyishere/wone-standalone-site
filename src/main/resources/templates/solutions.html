@@ -58,7 +58,6 @@ basePath = ${websitePath + pageName}">
     <th:block th:replace="phone-en2 :: r-nav"></th:block>
 </header>
 <div class="header-height"></div>
-<h1 class="sr-only" th:text="${pageDescription}"></h1>
 <th:block th:with="pageHeroes=${topNavPages.?[pageType == 3]}">
     <th:block th:replace="banner :: pageBanner"></th:block>
 </th:block>
@@ -98,7 +97,7 @@ basePath = ${websitePath + pageName}">
                             <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" class="image-square">
                         </div>
                         <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
-                            <div><h2 class="inline-header" th:text="${index.i18nTitle}"></h2></div>
+                            <div><span class="inline-header" th:text="${index.i18nTitle}"></span></div>
                         </div>
                         <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem"
                               th:text="${index.content}"></span>

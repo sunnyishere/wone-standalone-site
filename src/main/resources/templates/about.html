@@ -71,7 +71,6 @@
 </header>
 <div class="header-height"></div>
 
-<h1 class="sr-only" th:text="${pageDescription}"></h1>
 <th:block th:with="pageHeroes=${topNavPages.?[pageType == 6]}">
     <th:block th:replace="banner :: pageBanner"></th:block>
 </th:block>
@@ -105,7 +104,7 @@
 
     <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding about-cta-col">
         <div class="">
-            <div class="am-text-lg am-text-bold am-margin-top-sm" > <h2 class="inline-header"  th:text="${advanced['about.us']}"></h2>
+            <div class="am-text-lg am-text-bold am-margin-top-sm" > <h3 class="inline-header"  th:text="${advanced['about.us']}"></h3>
             </div>
         </div>
         <p th:text="${brand.profile}"/>
@@ -123,7 +122,7 @@
     <div class="am-container phone-title" style="padding: 20px 30px 20px 30px;">
         <div class="am-text-center">
             <div class="am-u-sm-12">
-                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['verified.profile']}"></h2></div>
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['verified.profile']}"></h3></div>
             </div>
         </div>
     </div>
@@ -175,7 +174,7 @@
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
         <div class="am-text-center">
             <div class="am-u-sm-12">
-                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['certifcations']}"></h2></div>
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['certifcations']}"></h3></div>
             </div>
         </div>
     </div>
@@ -207,7 +206,7 @@
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
         <div class="am-text-center">
             <div class="am-u-sm-12">
-                <div class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></div>
+                <div class="am-text-lg am-text-bold" ><h3 class="inline-header"  th:text="${advanced['members']}"></h3></div>
             </div>
         </div>
     </div>
@@ -266,7 +265,7 @@
     <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
         <div class="am-text-center">
             <div class="am-u-sm-12">
-                <div class="section-title am-text-bold" ><h2 class="inline-header"  th:text="${advanced['organization.structure']}"></h2></div>
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['organization.structure']}"></h3></div>
             </div>
         </div>
     </div>

@@ -13,8 +13,8 @@
               mobileImage=${!#strings.isEmpty(category.h5ImgUrl) ? category.h5ImgUrl : category.pcImgUrl}">
     <div class="banner-split" th:classappend="${#strings.isEmpty(desktopImage)} ? 'product-category-banner--text-only'">
         <div class="banner-split__copy" style="color: #060606;">
-            <h2 th:text="${categoryTitle}"></h2>
-            <p th:if="${!#strings.isEmpty(category.shortDesc)}" th:text="${category.shortDesc}"></p>
+            <h1 th:text="${categoryTitle}"></h1>
+            <h2 class="banner-split__description" th:if="${!#strings.isEmpty(category.shortDesc)}" th:text="${category.shortDesc}"></h2>
         </div>
         <picture class="banner-split__picture" th:if="${!#strings.isEmpty(desktopImage)}">
             <source media="(max-width: 640px)" width="800" height="800" th:srcset="${mobileImage}">

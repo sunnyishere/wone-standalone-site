@@ -2,8 +2,8 @@
 .page-single-banner{width:100%;overflow:hidden;background:#fff}
 .banner-split{display:grid;grid-template-columns:minmax(0,38fr) minmax(0,62fr);align-items:center;gap:20px;width:100%;max-width:1600px;margin:0 auto;padding:0 24px;box-sizing:border-box}
 .banner-split__copy{display:flex;min-width:0;padding-left:clamp(32px,8vw,152px);flex-direction:column;align-items:flex-start;justify-content:center;box-sizing:border-box;transform:translateY(-4px)}
-.banner-split__copy h2{max-width:440px;font-size:clamp(32px,2.3vw,44px);line-height:1.15;font-weight:700;margin:0 0 10px;color:inherit;overflow-wrap:anywhere}
-.banner-split__copy p{max-width:440px;font-size:clamp(18px,1.15vw,22px);line-height:1.45;margin:0;white-space:pre-line;overflow-wrap:anywhere;color:inherit}
+.banner-split__copy h1,.banner-split__copy .banner-split__title,.banner-split__copy h2:not(.banner-split__description){max-width:440px;font-size:clamp(32px,2.3vw,44px);line-height:1.15;font-weight:700;margin:0 0 10px;color:inherit;overflow-wrap:anywhere}
+.banner-split__copy p,.banner-split__copy .banner-split__description{max-width:440px;font-size:clamp(18px,1.15vw,22px);line-height:1.45;font-weight:400;margin:0;white-space:pre-line;overflow-wrap:anywhere;color:inherit}
 .banner-split__button{display:inline-block;max-width:100%;margin-top:18px;border:1px solid currentColor;border-radius:28px;padding:9px 24px;color:inherit;line-height:1.4;overflow-wrap:anywhere}
 .banner-split__button:hover,.banner-split__button:focus{color:var(--theme-wone);text-decoration:none;opacity:.72}
 .banner-split__picture{display:block;min-width:0;line-height:0}
@@ -17,8 +17,8 @@
     .banner-split__picture{order:-1;width:82vw;max-width:310px;margin:0 auto}
     .banner-split .banner-split__picture img{width:100%;height:auto;max-height:none;aspect-ratio:4/3;object-fit:contain}
     .banner-split__copy{width:100%;padding-left:0;transform:none}
-    .banner-split__copy h2{font-size:28px}
-    .banner-split__copy p{font-size:16px}
+    .banner-split__copy h1,.banner-split__copy .banner-split__title,.banner-split__copy h2:not(.banner-split__description){font-size:28px}
+    .banner-split__copy p,.banner-split__copy .banner-split__description{font-size:16px}
 }
 .hero-embla .hero-embla__slide--split{height:auto;min-height:0;background:#fff;overflow:visible}
 .hero-embla .hero-embla__container{align-items:stretch}
@@ -41,8 +41,8 @@
 <div class="page-single-banner" th:if="${!#strings.isEmpty(desktopImage)}">
     <div class="banner-split">
         <div class="banner-split__copy" style="color: #060606;">
-            <h2 th:text="${!#strings.isEmpty(pageHeroTitle) ? pageHeroTitle : i18nName}"></h2>
-            <p th:text="${pageHeroDescription != null ? pageHeroDescription : ''}"></p>
+            <h1 th:text="${!#strings.isEmpty(pageHeroTitle) ? pageHeroTitle : i18nName}"></h1>
+            <h2 class="banner-split__description" th:text="${pageHeroDescription != null ? pageHeroDescription : ''}"></h2>
             <a th:if="${pageButtonVisible == true}"
                class="banner-split__button" th:href="${pageButtonLink}"
                th:text="${pageButtonTitle}"></a>
