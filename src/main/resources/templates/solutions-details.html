@@ -9,7 +9,7 @@
            th:text="${article.title}+'-'+${prodBrand.eName}"></title>
 
     <meta name="description"
-          th:content="${article?.description == null ? article.title: article.description}"/>
+          th:content="${article?.description ?: ''}"/>
     <link rel="canonical" th:href="${websiteUrl}"/>
     <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath + pageName + suffix}"/>
     <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
@@ -39,10 +39,10 @@
 
     <!-- Open Graph描述 -->
     <meta property="og:description"
-          th:attr="content=${article?.description == null ? article.title: article.description}"/>
+          th:content="${article?.description ?: ''}"/>
     <!-- Twitter描述 -->
     <meta property="twitter:description"
-          th:attr="content=${article?.description == null ? article.title: article.description}"/>
+          th:content="${article?.description ?: ''}"/>
 
 
     <meta name="format-detection" content="telephone=no"/>

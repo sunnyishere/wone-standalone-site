@@ -6,11 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title th:text="${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
-    <meta name="description" th:content="${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="description" th:content="${blog.description} ?: ''" />
 
     <link rel="canonical" th:href="${websiteUrl}" />
     <meta property="og:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
-    <meta property="og:description" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta property="og:description" th:content="${blog.description} ?: ''" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
     <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
     <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
@@ -23,7 +23,7 @@
     <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}" />
 
     <meta name="twitter:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
-    <meta name="twitter:description" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:description" th:content="${blog.description} ?: ''" />
     <meta name="twitter:site" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
