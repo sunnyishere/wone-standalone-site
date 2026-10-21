@@ -8,6 +8,7 @@ import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.conf.GoogleTagProperties;
 import com.rockwill.deploy.conf.SiteContentProperties;
 import com.rockwill.deploy.render.TemplateEnginePageRenderer;
+import com.rockwill.deploy.utils.ArticleAboutUtils;
 import com.rockwill.deploy.utils.RichTextUtils;
 import com.rockwill.deploy.utils.SignUtils;
 import com.rockwill.deploy.utils.SiteMenuUtils;
@@ -249,6 +250,7 @@ public class RockwillKnowledgeService {
                     handleDateKey(model);
                     handleLibraryFileSize(model);
                     sanitizeRichText(model);
+                    ArticleAboutUtils.fillAboutSchema(model, host);
                     upgradeOssAssetsToHttps(model);
                     if (model.containsKey("prodFaqList")) {
                         model.put("pageFaqList", model.get("prodFaqList"));
