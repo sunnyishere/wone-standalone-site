@@ -49,11 +49,14 @@ brand:
   request-log-dir: ./request-logs
   scheduler-enable: true #定时任务开启
   cron: "0 0 6 */3 * ?"
-  execute-on-start: false #启动时执行页面静态化
+  execute-on-start: true #启动时执行页面静态化
   execute-on-domain: www.test-static.com
   domain-list:
   secret: 4e7f1a9c2d8b3e6f5a0c1b2d9e8f7a6c
   caseTranslateOnline: false
+  wcm-api-concurrency: 5 #发往知识库(wcm-api)请求的全局最大并发数
+  static-pool-core: 5 #静态化线程池核心线程数，静态化任务含本地渲染(CPU密集)，应与部署机器核数匹配(2核建议5~8)
+  static-pool-max: 8 #静态化线程池最大线程数，不得小于 wcm-api-concurrency
 
 cdn:
   enabled: true

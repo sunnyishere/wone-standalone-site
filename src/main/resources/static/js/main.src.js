@@ -110,7 +110,7 @@ $(function () {
         event.stopPropagation();
 
         const searchInput = $('.search-input');
-        const searchTerm = searchInput.val().trim().replace(/\s+/g, '-');
+        const searchTerm = searchInput.val().trim();
         if (!searchTerm) {
             alert('Please enter keywords');
             searchInput.focus();
@@ -126,7 +126,8 @@ $(function () {
             langPrefix = /^[a-z]{2,3}$/.test(firstSeg) ? '/' + firstSeg : '';
         }
         langPrefix = langPrefix.replace(/\/+$/, '');
-        const targetUrl = `${langPrefix}/search-${encodedTerm}`;
+        // 搜索 URL 统一为查询参数形态，关键词原样编码不再折叠空格为短横线
+        const targetUrl = `${langPrefix}/search?keyword=${encodedTerm}`;
 
         console.log(`搜索关键词: ${searchTerm}`);
         console.log(`跳转URL: ${targetUrl}`);

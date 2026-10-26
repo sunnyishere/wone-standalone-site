@@ -1,5 +1,7 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='product-list'">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }"
+      th:with="templateType='product-list',
+      langSwitchPath=${(category != null ? '/' + #normalizer.normalizeString(category.name) + '-' + category.id : '') + ((pageData?.pageNum != null and pageData.pageNum > 1) ? '-' + pageData.pageNum : '')}">
 
 <head>
     <meta charset="utf-8">

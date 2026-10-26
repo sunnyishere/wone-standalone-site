@@ -15,6 +15,7 @@ import com.rockwill.deploy.utils.SiteMenuUtils;
 import com.rockwill.deploy.utils.ThymeleafUtils;
 import com.rockwill.deploy.vo.AjaxResult;
 import com.rockwill.deploy.vo.DomainHtmlVo;
+import com.rockwill.deploy.vo.SearchScope;
 import com.rockwill.deploy.vo.SitePage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -48,6 +50,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -149,6 +153,36 @@ public class RockwillKnowledgeService {
     @Value("${wcm-api}")
     private String wcmApi;
 
+    /**
+     * 发往知识库（wcm-api）请求的全局并发闸门：静态化线程池的任务除了远程请求还包含
+     * 本地渲染与文件写入，压池会一并拖慢本地工作，故仅对 HTTP 调用限流。
+     * 许可数来自 brand.wcmApiConcurrency（未配置默认 5），见 initWcmApiSemaphore。
+     */
+    private Semaphore wcmApiSemaphore;
+
+    @PostConstruct
+    void initWcmApiSemaphore() {
+        wcmApiSemaphore = new Semaphore(brandConfig.resolveWcmApiConcurrency());
+    }
+
+    /**
+     * 在全局 wcm-api 并发许可内执行远程调用：获取许可阻塞等待（静态化为后台任务，可接受排队），
+     * 异常时在 finally 释放，调用方异常语义不变。
+     */
+    <T> T callWithWcmApiPermit(Supplier<T> call) {
+        try {
+            wcmApiSemaphore.acquire();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("interrupted while waiting for wcm-api permit", e);
+        }
+        try {
+            return call.get();
+        } finally {
+            wcmApiSemaphore.release();
+        }
+    }
+
 
     @Value("${cdn.enabled:true}")
     private boolean cdnEnabled;
@@ -174,12 +208,12 @@ public class RockwillKnowledgeService {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Deploy-Domain", domain);
             HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-            ResponseEntity<AjaxResult<JSONObject>> response = restTemplate.exchange(
+            ResponseEntity<AjaxResult<JSONObject>> response = callWithWcmApiPermit(() -> restTemplate.exchange(
                     wcmApi + "getMenu",
                     HttpMethod.GET,
                     requestEntity,
                     typeReference
-            );
+            ));
             AjaxResult<JSONObject> ajaxResult = response.getBody();
             if (ajaxResult != null) {
                 if (ajaxResult.getCode() == 200) {
@@ -211,7 +245,8 @@ public class RockwillKnowledgeService {
         if (path.startsWith("/")) {
             path = path.substring(1);
         }
-        log.info("request wcm  {} ", path);
+        final String apiPath = path;
+        log.info("request wcm  {} ", apiPath);
         try {
             ParameterizedTypeReference<AjaxResult<Map<String, Object>>> typeReference =
                     new ParameterizedTypeReference<AjaxResult<Map<String, Object>>>() {
@@ -219,12 +254,12 @@ public class RockwillKnowledgeService {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Deploy-Domain", host);
             HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-            ResponseEntity<AjaxResult<Map<String, Object>>> responseEntity = restTemplate.exchange(
-                    wcmApi + path,
+            ResponseEntity<AjaxResult<Map<String, Object>>> responseEntity = callWithWcmApiPermit(() -> restTemplate.exchange(
+                    wcmApi + apiPath,
                     HttpMethod.GET,
                     requestEntity,
                     typeReference
-            );
+            ));
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 AjaxResult<Map<String, Object>> result = responseEntity.getBody();
                 Map<String, Object> model = result.getData();
@@ -444,12 +479,13 @@ public class RockwillKnowledgeService {
      * 接口口径（实测 192.168.35.16 联调环境，GET /api/siteContent/search）：
      * keyword 必传（缺失时接口 state=fail "keyword is required"），服务端按关键词过滤；
      * lang 为 mapLang 全码（en_US/fr_FR…）；分页 pageNum/pageSize（响应回显）；
-     * 无 type 参数；响应结构 data.pageData.{rows,totalPages} + data.association。
+     * scope 为类型范围（SearchScope.code，归一化后非 ALL 才下发，缺失/ALL 时接口按全类型过滤）；
+     * 响应结构 data.pageData.{rows,totalPages} + data.association。
      *
      * @param host 当前请求归一化域名，用于取该域名对应的 site-content 配置（未配置时回退默认值）
      * @return 查询串；accessKey/secretKey 未配置时返回 null，由调用方走空结果兜底
      */
-    String buildSiteContentQuery(String lang, String keyword, String channelCid, int pageNum, String host) {
+    String buildSiteContentQuery(String lang, String keyword, String channelCid, SearchScope searchScope, int pageNum, String host) {
         String accessKey = siteContentProperties.getAccessKeyByDomain(host);
         String secretKey = siteContentProperties.getSecretKeyByDomain(host);
         if (StringUtils.isBlank(accessKey) || StringUtils.isBlank(secretKey)) {
@@ -467,9 +503,12 @@ public class RockwillKnowledgeService {
         if (StringUtils.isNotBlank(channelCid)) {
             query.append("&channelCid=").append(urlEncode(channelCid));
         }
-        query.append("&pageNum=").append(Math.max(1, pageNum));
+        if (!SearchScope.isAll(searchScope)) {
+            query.append("&scope=").append(urlEncode(searchScope.getCode()));
+        }
+        query.append("&pn=").append(Math.max(1, pageNum));
         if (siteContentProperties.getPageSize() != null) {
-            query.append("&pageSize=").append(siteContentProperties.getPageSize());
+            query.append("&ps=").append(siteContentProperties.getPageSize());
         }
         query.append("&accessKey=").append(urlEncode(accessKey));
         query.append("&reqTime=").append(reqTime);
@@ -512,12 +551,16 @@ public class RockwillKnowledgeService {
      * {@link #buildSiteContentQuery} 内的 {@link #resolveApiLang}
      * 基于 BrandConfig.mapLang 将短码解析为完整语种 code（de → de_DE）后发起。
      *
-     * @param categoryName 分类搜索 URL 中的分类名段（/search/{categoryName}-{key}-{cid}-{page}），
-     *                     仅分类搜索分支透传，用于语种切换链接按 SEARCH 路由形态重构；普通搜索传 null
+     * @param keyword 搜索关键词（原始值，模型中经 urlEncode 拼入分页/语种切换链接）
+     * @param channelCid 分类 ID（分类搜索时透传，空为全站搜索）
+     * @param scope 类型范围原始值（浏览器查询串，按 SearchScope.code 归一化，空/未知回退 ALL）
+     * @param pageNum 页码（空或非法按 1 处理）
+     * @param lang 站点语言短码（与 URL 语种前缀一致）
+     * @param host 当前请求归一化域名
      */
-    public DomainHtmlVo searchSiteContent(String keyword, String channelCid, String pageNum, String lang, String host,
-                                          String categoryName) {
+    public DomainHtmlVo searchSiteContent(String keyword, String channelCid, String scope, String pageNum, String lang, String host) {
         Map<String, Object> model = new HashMap<>();
+        SearchScope searchScope = resolveSearchScope(scope, host);
         fillCommonModel(model, host);
         int page = parsePageNum(pageNum);
         model.put("pageData", emptyPageData(page));
@@ -533,31 +576,47 @@ public class RockwillKnowledgeService {
         }
         siteCommonContextCache.mergeInto(host, lang, model);
         fillSearchPageModel(model, lang, host);
-        List<SitePage> topNavPages = new ArrayList<>(SiteMenuUtils.getMenuPages(host));
-        for (SitePage navItem : topNavPages) {
-            if (navItem.getI18nName() == null) {
-                navItem.setI18nName(navItem.getPageName());
+        // 顶部导航优先取通用上下文缓存（后端渲染完成态，i18nName 为该槽位语种译文）；
+        // 缓存未命中时回退本地菜单（getMenu 接口 i18nName 为空，补 pageName 兜底）
+        if (model.get("topNavPages") == null) {
+            List<SitePage> topNavPages = new ArrayList<>(SiteMenuUtils.getMenuPages(host));
+            for (SitePage navItem : topNavPages) {
+                if (navItem.getI18nName() == null) {
+                    navItem.setI18nName(navItem.getPageName());
+                }
             }
+            model.put("topNavPages", topNavPages);
         }
-        model.put("topNavPages", topNavPages);
+        model.put("currentScope", searchScope.getCode());
+        model.put("scopeTabs", buildScopeTabs(searchScope, host, model, keyword));
         String normKeyword = StringUtils.isNotBlank(keyword)
                 ? ThymeleafUtils.normalizeString(keyword) : "";
         if (StringUtils.isNotBlank(normKeyword)) {
             model.put("selectLabel", StringUtils.isNotBlank(channelCid)
                     ? normKeyword + "-" + channelCid : normKeyword);
         }
-        // 语种切换链接基于当前搜索地址重构：
-        // 普通搜索 → /{lang}/search-{关键词}；分类搜索 → /{lang}/search/{分类名}-{关键词}-{分类ID}-{页码}
+        // 搜索页 URL 为查询参数形态 /{lang}/search?keyword=&scope=&page=：
+        // searchKeywordParam（仅关键词）供类型 Tab 链接重组，
+        // searchQueryBase（关键词+类型）供分页组件追加 page 参数与语种切换重构链接，
+        // cid 为遗留参数仅在入口请求透传远程接口，页面生成的 URL 不再携带（过滤维度统一为 keyword+scope）
         model.put("pageName", "search");
-        if (StringUtils.isNotBlank(channelCid) && StringUtils.isNotBlank(categoryName)) {
-            model.put("suffix", "/" + categoryName + "-" + normKeyword + "-" + channelCid + "-" + page);
-        } else {
-            model.put("suffix", StringUtils.isNotBlank(normKeyword) ? "-" + normKeyword : "");
+        String searchKeywordParam = StringUtils.isNotBlank(keyword)
+                ? "keyword=" + urlEncode(keyword) : "";
+        StringBuilder queryBase = new StringBuilder(searchKeywordParam);
+        if (!SearchScope.isAll(searchScope)) {
+            if (queryBase.length() > 0) {
+                queryBase.append("&");
+            }
+            queryBase.append("scope=").append(searchScope.getCode());
         }
+        String searchQueryBase = queryBase.toString();
+        model.put("searchKeywordParam", searchKeywordParam);
+        model.put("searchQueryBase", searchQueryBase);
+        model.put("suffix", StringUtils.isNotBlank(searchQueryBase) ? "?" + searchQueryBase : "");
         Map<String, Object> pageData = new HashMap<>();
         try {
             // 传入短码，resolveApiLang 基于 BrandConfig.mapLang 解析为完整语种 code（de → de_DE）后再查询
-            String query = buildSiteContentQuery(lang, keyword, channelCid, page, host);
+            String query = buildSiteContentQuery(lang, keyword, channelCid, searchScope, page, host);
             if (query == null) {
                 return renderSearchPage(model, host);
             }
@@ -573,13 +632,11 @@ public class RockwillKnowledgeService {
                 log.error("siteContent list request rejected, msg:{}", body == null ? "empty body" : body.getString("msg"));
                 return renderSearchPage(model, host);
             }
-            mapToPageData(body, pageData, page);
+            mapToPageData(body, pageData, page, host, model);
             model.put("pageData", pageData);
 
             model.put("selectValue",keyword);
-            mapIfPresent(dataObject(body), "association", model);
-            mapIfPresent(dataObject(body), "category1", model);
-            mapIfPresent(dataObject(body), "category2", model);
+            // association/category1/category2（分类侧栏数据）随侧栏移除不再进入模板
             mapIfPresent(dataObject(body), "noResults", model);
             mapIfPresent(dataObject(body), "keptQuery", model);
             mapIfPresent(dataObject(body), "searchNav", model);
@@ -602,6 +659,156 @@ public class RockwillKnowledgeService {
                 model.put(key, value);
             }
         }
+    }
+
+    /**
+     * 归一化搜索 scope：空白按 ALL；未知 code（含已下线类型，如 formula）记 warn 日志后按 ALL 处理
+     *
+     * @param scope 浏览器查询串原始 scope 值
+     * @param host 当前请求归一化域名
+     * @return 归一化后的 scope 枚举，绝不返回 null
+     */
+    private SearchScope resolveSearchScope(String scope, String host) {
+        String code = StringUtils.trimToEmpty(scope);
+        SearchScope searchScope = SearchScope.fromCode(code);
+        if (StringUtils.isNotBlank(code) && !SearchScope.allCodes().contains(code)) {
+            log.warn("unknown search scope, fallback to all, host:{}, scope:{}", host, code);
+        }
+        return searchScope;
+    }
+
+    /**
+     * 组装搜索结果页类型 Tab 模型（顺序即 SearchScope 常量声明顺序）。
+     * label 经 {@link #resolveScopeLabel} 解析，href 携带当前关键词与 scope（ALL 省略 scope 参数）。
+     *
+     * @param current 当前归一化后的 scope
+     * @param host 当前请求归一化域名
+     * @param model 页面模型（读取 currentPathLang 拼 Tab 链接）
+     * @param keyword 搜索关键词原始值（Tab 链接携带，保持筛选上下文）
+     * @return Tab 模型列表，元素含 code/label/href/active
+     */
+    private List<Map<String, String>> buildScopeTabs(SearchScope current, String host, Map<String, Object> model, String keyword) {
+        Object langPath = model.get("currentPathLang");
+        String currentPathLang = langPath instanceof String ? (String) langPath : "";
+        List<Map<String, String>> tabs = new ArrayList<>();
+        for (SearchScope scope : SearchScope.values()) {
+            Map<String, String> tab = new HashMap<>();
+            tab.put("code", scope.getCode());
+            tab.put("label", resolveScopeLabel(scope, host, model));
+            tab.put("href", buildScopeTabHref(scope, currentPathLang, keyword));
+            tab.put("active", scope == current ? "true" : "false");
+            tabs.add(tab);
+        }
+        return tabs;
+    }
+
+    /**
+     * 解析类型 Tab 显示名称：ALL 取 advanced 字典 all 键（与首页 tabs-new 同源）；
+     * 其余 scope 经 pageType 映射匹配站点菜单页取 i18nName（与首页分类名称同源），
+     * 菜单缺失或名称为空时回退英文默认文案，不渲染空白。
+     *
+     * @param scope scope 枚举
+     * @param host 当前请求归一化域名
+     * @param model 页面模型（读取 advanced 语种字典）
+     * @return Tab 显示名称
+     */
+    private String resolveScopeLabel(SearchScope scope, String host, Map<String, Object> model) {
+        if (SearchScope.isAll(scope)) {
+            Object advanced = model.get("advanced");
+            if (advanced instanceof Map) {
+                Object all = ((Map<?, ?>) advanced).get("all");
+                if (all instanceof String && StringUtils.isNotBlank((String) all)) {
+                    return (String) all;
+                }
+            }
+            return scope.getDefaultLabel();
+        }
+        return resolveMenuI18nLabel(scope, host, model, scope.getDefaultLabel());
+    }
+
+    /**
+     * 按站点页面类型解析菜单 i18n 名称：scope 经 pageType 映射匹配菜单页取 i18nName
+     * （与类型 Tab、导航菜单名称同源），匹配不到或名称为空时返回调用方给定的回退文案。
+     * 数据源优先取 model 中合并自通用上下文缓存的 topNavPages（后端渲染完成态，
+     * i18nName 为该槽位语种译文），缓存未命中或无译文时回退 SiteMenuUtils 本地菜单。
+     *
+     * @param scope scope 枚举
+     * @param host 当前请求归一化域名
+     * @param model 页面模型（读取合并后的 topNavPages）
+     * @param fallback 菜单缺失或名称为空时的回退文案
+     * @return 菜单页 i18n 名称或回退文案
+     */
+    private String resolveMenuI18nLabel(SearchScope scope, String host, Map<String, Object> model, String fallback) {
+        if (scope.getPageType() != null) {
+            for (SitePage menuPage : topNavPagesForScope(model, host)) {
+                if (scope.getPageType().equals(menuPage.getPageType())
+                        && StringUtils.isNotBlank(menuPage.getI18nName())) {
+                    return menuPage.getI18nName();
+                }
+            }
+        }
+        return fallback;
+    }
+
+    /**
+     * 获取用于语种名称解析的菜单页列表：优先取 model 中合并自通用上下文缓存的
+     * topNavPages（元素为 Map 快照，按 pageType/i18nName/pageName 三字段还原），
+     * 缓存未命中或结构异常时回退 SiteMenuUtils 本地菜单。
+     *
+     * @param model 页面模型（读取合并后的 topNavPages）
+     * @param host 当前请求归一化域名（回退本地菜单时使用）
+     * @return 当前语种菜单页列表，非空
+     */
+    private List<SitePage> topNavPagesForScope(Map<String, Object> model, String host) {
+        Object cached = model.get("topNavPages");
+        if (cached instanceof List && !((List<?>) cached).isEmpty()) {
+            Object first = ((List<?>) cached).get(0);
+            if (!(first instanceof SitePage)) {
+                List<SitePage> restored = new ArrayList<>();
+                for (Object item : (List<?>) cached) {
+                    if (!(item instanceof Map)) {
+                        return SiteMenuUtils.getMenuPages(host);
+                    }
+                    Map<?, ?> entry = (Map<?, ?>) item;
+                    SitePage page = new SitePage();
+                    Object pageType = entry.get("pageType");
+                    if (pageType instanceof Number) {
+                        page.setPageType(((Number) pageType).longValue());
+                    }
+                    Object i18nName = entry.get("i18nName");
+                    page.setI18nName(i18nName instanceof String ? (String) i18nName : null);
+                    Object pageName = entry.get("pageName");
+                    page.setPageName(pageName instanceof String ? (String) pageName : null);
+                    restored.add(page);
+                }
+                return restored;
+            }
+            return (List<SitePage>) cached;
+        }
+        return SiteMenuUtils.getMenuPages(host);
+    }
+
+    /**
+     * 组装类型 Tab 跳转链接：{currentPathLang}/search?keyword=…&scope=…（页码固定第 1 页，scope 为 ALL 时省略）
+     *
+     * @param scope Tab 对应 scope
+     * @param currentPathLang 语种路径前缀（英语为空串）
+     * @param keyword 搜索关键词原始值
+     * @return Tab 跳转链接
+     */
+    private String buildScopeTabHref(SearchScope scope, String currentPathLang, String keyword) {
+        StringBuilder href = new StringBuilder(StringUtils.defaultString(currentPathLang)).append("/search");
+        List<String> params = new ArrayList<>();
+        if (StringUtils.isNotBlank(keyword)) {
+            params.add("keyword=" + urlEncode(keyword));
+        }
+        if (!SearchScope.isAll(scope)) {
+            params.add("scope=" + scope.getCode());
+        }
+        if (!params.isEmpty()) {
+            href.append('?').append(String.join("&", params));
+        }
+        return href.toString();
     }
 
     /**
@@ -637,21 +844,27 @@ public class RockwillKnowledgeService {
      * 响应到 pageData 的单点映射。
      * 实测 /api/siteContent/search 结构：data.pageData.rows（行数据）、
      * data.pageData.totalPages（总页数）、data.association（分类侧边栏，可空数组）。
-     * 行字段实测：{id, name, url}——与 search-details 模板的 index.name/index.url/index.id 直接对齐。
+     * 行字段实测：{id, name, url, type, description, slugUrl, enName}——type 为
+     * SearchScope.code，经 {@link #decorateRowType} 就地补充 typeLabel 展示字段。
      * 联调字段名变化时在此校准。
+     *
+     * @param body 远程接口响应体
+     * @param pageData 页面模型 pageData 容器
+     * @param page 当前页码（响应缺失页码字段时兜底）
+     * @param host 当前请求归一化域名（解析菜单页用于链接前缀）
+     * @param model 页面模型（读取合并后的 topNavPages，供 typeLabel/详情前缀按语种解析）
      */
-    private void mapToPageData(JSONObject body, Map<String, Object> pageData, int page) {
+    private void mapToPageData(JSONObject body, Map<String, Object> pageData, int page, String host, Map<String, Object> model) {
         JSONObject dataObj = dataObject(body);
-        Object pageDataObj = dataObj == null ? null : dataObj.get("pageData");
-        if (!(pageDataObj instanceof JSONObject)) {
+        if (!(dataObj != null && dataObj.get("pageData") instanceof JSONObject)) {
             pageData.put("rows", new ArrayList<>());
             pageData.put("pageNum", page);
             pageData.put("totalPages", 0);
             return;
         }
-        JSONObject pd = (JSONObject) pageDataObj;
+        JSONObject pd = (JSONObject) dataObj.get("pageData");
         Object rows = pd.get("rows");
-        pageData.put("rows", rows == null ? new ArrayList<>() : rows);
+        pageData.put("rows", decorateRows(rows, host, model));
         Object pageNum = pd.get("pageNum");
         try {
             pageData.put("pageNum", pageNum == null ? page : Integer.parseInt(pageNum.toString()));
@@ -664,6 +877,64 @@ public class RockwillKnowledgeService {
         } catch (NumberFormatException e) {
             pageData.put("totalPages", 0);
         }
+    }
+
+    /**
+     * 为行数据补充展示与跳转字段：
+     * <ul>
+     * <li>typeLabel：行 type（SearchScope.code）经 {@link SearchScope#fromCode} 归一化后取
+     * 英文默认文案（如 Products/Products/Documents 口径由模板大写渲染）；type 缺失或未知时置空</li>
+     * <li>detailUrlPrefix：按行 type 对应的站点页面类型从菜单页解析详情链接前缀——
+     * 产品/资料为 {菜单页pageName}/detail/，解决方案/成功案例/blog 为 {菜单页pageName}/；
+     * 菜单缺失时回退 ''，由模板侧兜底</li>
+     * </ul>
+     *
+     * @param rows 远程接口返回的行数据数组（可为 null）
+     * @param host 当前请求归一化域名
+     * @return 补充字段后的行数据列表；入参非数组时返回空列表
+     */
+    private List<Object> decorateRows(Object rows, String host, Map<String, Object> model) {
+        List<Object> decorated = new ArrayList<>();
+        if (!(rows instanceof JSONArray)) {
+            return decorated;
+        }
+        for (Object item : (JSONArray) rows) {
+            if (item instanceof JSONObject) {
+                JSONObject row = (JSONObject) item;
+                SearchScope scope = SearchScope.fromCode(row.getString("type"));
+                // typeLabel 与类型 Tab 同源：该语种菜单页 i18nName（缓存 topNavPages 优先），缺失回退英文文案
+                row.put("typeLabel", SearchScope.isAll(scope)
+                        ? "" : resolveMenuI18nLabel(scope, host, model, scope.getDefaultLabel()));
+                row.put("detailUrlPrefix", resolveDetailUrlPrefix(scope, host, model));
+            }
+            decorated.add(item);
+        }
+        return decorated;
+    }
+
+    /**
+     * 解析行数据的详情链接前缀：scope 经 pageType 映射匹配菜单页取 pageName
+     * （空格折叠为连字符，与列表模板链接口径一致）。产品(PRODUCTS)与资料(DOCUMENTS)
+     * 前缀含 /detail/ 段，解决方案/成功案例/blog 直接为菜单页路径段。
+     * 菜单页数据源与语种名称解析同源（缓存 topNavPages 优先，回退本地菜单）。
+     *
+     * @param scope 行内容类型
+     * @param host 当前请求归一化域名（回退本地菜单时使用）
+     * @param model 页面模型（读取合并后的 topNavPages）
+     * @return 形如 /{pageName}/ 或 /{pageName}/detail/ 的前缀；菜单页缺失时返回 /
+     */
+    private String resolveDetailUrlPrefix(SearchScope scope, String host, Map<String, Object> model) {
+        if (scope.getPageType() != null) {
+            for (SitePage menuPage : topNavPagesForScope(model, host)) {
+                if (scope.getPageType().equals(menuPage.getPageType())
+                        && StringUtils.isNotBlank(menuPage.getPageName())) {
+                    String seg = "/" + StringUtils.replace(StringUtils.trim(menuPage.getPageName()), " ", "-") + "/";
+                    boolean withDetail = SearchScope.PROD == scope || SearchScope.DOCUMENT == scope;
+                    return withDetail ? seg + "detail/" : seg;
+                }
+            }
+        }
+        return "/";
     }
 
     private Map<String, Object> emptyPageData(int page) {
@@ -1130,7 +1401,7 @@ public class RockwillKnowledgeService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.add("Deploy-Domain", domain);
         HttpEntity<String> requestEntity = new HttpEntity<>(formBody.toString(), headers);
-        return restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class);
+        return callWithWcmApiPermit(() -> restTemplate.exchange(wcmApi + targetUrl, HttpMethod.POST, requestEntity, String.class));
     }
 
     /**
@@ -1160,12 +1431,12 @@ public class RockwillKnowledgeService {
             HttpHeaders headers = new HttpHeaders();
             headers.add("Deploy-Domain", domain);
             HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-            ResponseEntity<AjaxResult<JSONObject>> response = restTemplate.exchange(
+            ResponseEntity<AjaxResult<JSONObject>> response = callWithWcmApiPermit(() -> restTemplate.exchange(
                     wcmApi + "publish/todayUpdatedIds",
                     HttpMethod.GET,
                     requestEntity,
                     typeReference
-            );
+            ));
             AjaxResult<JSONObject> ajaxResult = response.getBody();
             if (ajaxResult == null || ajaxResult.getCode() != 200 || ajaxResult.getData() == null) {
                 log.warn("request todayUpdatedIds failed, domain:{}, resp:{}", domain, ajaxResult);

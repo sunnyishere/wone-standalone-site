@@ -1,12 +1,15 @@
 <!-- 分页组件片段 -->
-<div th:fragment="pagination(totalPages, currentPage, requestUrl)"
+<!-- 路径模式（默认）：链接形如 {requestUrl} / {requestUrl}-{pageNum}，页 1 不带页码段 -->
+<!-- 参数模式（pageParam 非空）：链接形如 {requestUrl}&{pageParam}={pageNum}，requestUrl 须以 ? 或 & 结尾可直接追加；page=1 也显式携带，保证 URL 可被路由识别 -->
+<div th:fragment="pagination(totalPages, currentPage, requestUrl, pageParam)"
+     th:with="pageParamMode=${pageParam} ?: ''"
      th:if="${totalPages > 1}">
     <div class="phone-clear-margin" style="margin: 40px 30px 30px 15px;">
         <ul class="am-pagination">
             <!-- 上一页 -->
             <li th:class="${currentPage == 1} ? 'disabled' : ''">
                 <a th:if="${currentPage > 1}" aria-label="Previous Page"
-                   th:href="${currentPage == 2} ? ${requestUrl} : @{${requestUrl} + ${'-'} + ${currentPage - 1}}"
+                   th:href="${pageParamMode != ''} ? (${requestUrl} + ${pageParamMode} + '=' + ${currentPage - 1}) : (${currentPage == 2} ? ${requestUrl} : @{${requestUrl} + ${'-'} + ${currentPage - 1}})"
                 class="tn-icon-left"><span style="display:none;">Previous</span></a>
                 <a th:unless="${currentPage > 1}" aria-label="Previous Page"
                    class="tn-icon-left disabled"><span style="display:none;">Previous</span></a>
@@ -20,10 +23,12 @@
                     <a href="#" class="disabled">···</a>
                 </li>
 
-                <!-- 页码按钮（核心：短横线拼接页码） -->
+                <!-- 页码按钮（路径模式短横线拼接页码；参数模式追加 pageParam=页码） -->
                 <li th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
                     th:class="${pageNum == currentPage} ? 'am-active' : ''">
-                    <a th:href="${pageNum == 1} ? ${requestUrl} : @{${requestUrl} + ${'-'} + ${pageNum}}"
+                    <a th:href="${pageParamMode != ''} ?
+                        (${requestUrl} + ${pageParamMode} + '=' + ${pageNum}) :
+                        (${pageNum == 1} ? ${requestUrl} : @{${requestUrl} + ${'-'} + ${pageNum}})"
                     th:text="${pageNum}"></a>
                 </li>
 
@@ -36,7 +41,7 @@
             <!-- 下一页 -->
             <li th:class="${currentPage == totalPages} ? 'disabled' : ''">
                 <a th:if="${currentPage < totalPages}" aria-label="Next Page"
-                   th:href="@{${requestUrl} + ${'-'} + ${currentPage + 1}}"
+                   th:href="${pageParamMode != ''} ? (${requestUrl} + ${pageParamMode} + '=' + ${currentPage + 1}) : @{${requestUrl} + ${'-'} + ${currentPage + 1}}"
                 class="tn-icon-right"><span style="display:none;">Next</span></a>
                 <a th:unless="${currentPage < totalPages}" aria-label="Next Page"
                    class="tn-icon-right disabled">   <span style="display:none;">Next</span></a>

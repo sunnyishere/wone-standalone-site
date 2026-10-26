@@ -7,6 +7,7 @@ import com.rockwill.deploy.vo.SitePage;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.util.ObjectUtils;
 
@@ -24,9 +25,9 @@ public class PathMatchUtils {
 
     // 初始化正则表达式模式，对应nginx的location规则
     static {
-        // 搜索规则: /search/categoryName-searchKey-categoryId-pageNum
+        // 搜索规则（新）: /search?keyword=xxx&cid=123&page=2，query 不参与路径匹配
         patterns.add(new PathPattern(
-                Pattern.compile("^/search/(?<categoryName>.+?)-(?<searchKey>[^-]+)-(?<categoryId>\\d+)-(?<pageNum>\\d+)$"),
+                Pattern.compile("^/search$"),
                 PathPatternType.SEARCH
         ));
 
@@ -116,14 +117,12 @@ public class PathMatchUtils {
             return matchResult;
         }
         //搜索时直接转发请求
-        if (normalizedPath.startsWith("/search-")) {
-            matchResult.setPatternType(PathPatternType.MENU_WITHOUT_PAGE);
-            String target = PathPatternType.MENU_WITHOUT_PAGE.getForwardTarget() + "?name=" + normalizedPath.substring(1);
-            if (!ObjectUtils.isEmpty(lang)) {
-                // 透传站点短码，全码由 searchSiteContent 内基于 BrandConfig.mapLang 解析
-                target += "&lang=" + lang;
-            }
-            matchResult.setForwardTarget(target);
+        if (normalizedPath.startsWith("/search-") || normalizedPath.startsWith("/search/")) {
+            // 旧搜索 URL（/search-关键词、/search/分类-关键词-分类ID-页码）已改为
+            // /search?keyword=&cid=&page= 查询参数形态，此处 301 到新形态保住已收录链接
+            matchResult.setPatternType(PathPatternType.SEARCH);
+            matchResult.setRedirect(true);
+            matchResult.setForwardTarget(buildSearchRedirect(normalizedPath.substring(1), lang));
             return matchResult;
         }
         for (PathPattern pattern : patterns) {
@@ -170,6 +169,62 @@ public class PathMatchUtils {
         return matchResult;
     }
 
+    /**
+     * 将旧搜索 URL 重构为查询参数形态的 301 目标。
+     * 兼容两种旧形态：
+     * <ul>
+     *   <li>{@code search-关键词}（普通搜索，整段为关键词，页码固定第 1 页）</li>
+     *   <li>{@code search/分类名-关键词-分类ID-页码}（分类搜索，与旧路由正则同口径切分：
+     *       末两段为纯数字的 ID 与页码，紧邻 ID 的短横线段为关键词 {@code [^-]+}，
+     *       其余前缀为分类名丢弃）</li>
+     * </ul>
+     *
+     * @param oldPath 去掉语言前缀后的旧搜索路径（如 search-abc、search/cat-abc-12-2）
+     * @param lang 站点语言短码（空为英语，目标链接不带前缀）
+     * @return 形如 /search?keyword=abc&cid=12&page=2 的重定向目标；page=1 时省略 page 参数
+     */
+    private static String buildSearchRedirect(String oldPath, String lang) {
+        String body = oldPath.startsWith("search-")
+                ? oldPath.substring("search-".length())
+                : oldPath.substring("search/".length());
+        String keyword = body;
+        String cid = null;
+        String page = null;
+        if (oldPath.startsWith("search-")) {
+            // 普通搜索旧形态无页码（页码固定第 1 页）
+            page = "1";
+        } else {
+            // 分类搜索：按旧正则口径切分 search/分类名-关键词-分类ID-页码
+            java.util.regex.Matcher m =
+                    Pattern.compile("^(.+)-([^-]+)-(\\d+)-(\\d+)$").matcher(body);
+            if (m.matches()) {
+                keyword = m.group(2);
+                cid = m.group(3);
+                page = m.group(4);
+            }
+        }
+        StringBuilder target = new StringBuilder(ObjectUtils.isEmpty(lang) ? "/search" : "/" + lang + "/search");
+        target.append("?keyword=").append(urlEncodeUtf8(keyword));
+        if (cid != null) {
+            target.append("&cid=").append(cid);
+        }
+        if (page != null && !"1".equals(page)) {
+            target.append("&page=").append(page);
+        }
+        return target.toString();
+    }
+
+    /**
+     * UTF-8 百分号编码（空值安全），供重定向目标拼接查询参数
+     */
+    private static String urlEncodeUtf8(String value) {
+        try {
+            return java.net.URLEncoder.encode(StringUtils.defaultString(value), "UTF-8");
+        } catch (Exception e) {
+            return StringUtils.defaultString(value);
+        }
+    }
+
     private static String buildGetParams(Map<String, String> params) {
         return params.entrySet()
                 .stream()
@@ -203,6 +258,12 @@ public class PathMatchUtils {
         PathPatternType patternType;
         String forwardTarget;
         Boolean illegal=false;
+        /**
+         * true 时 forwardTarget 不是后端转发目标而是 301 目标地址
+         * （旧 URL 兼容迁移，如旧搜索路径 → /search?keyword=...），
+         * 拦截器识别后直接重定向，不再进入 Controller
+         */
+        boolean redirect;
 
     }
 }

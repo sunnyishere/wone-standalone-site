@@ -24,11 +24,18 @@
         .iee-btn:hover{border-color:#0DCB67;color:#07934A}
         .iee-btn-primary{background:#0DCB67;border-color:#0DCB67;color:#fff;font-weight:600}
         .iee-btn-primary:hover{background:#0AB75D;color:#fff}
-        .am-panel>a{display:block;padding:10px 15px;color:#333;text-decoration:none}
-        .admin-sidebar-sub li a{display:block;padding:8px 15px 8px 25px;color:#666;text-decoration:none}
-        .am-icon-angle-right,.am-icon-angle-down{float:right;margin-right:16px}
-        .admin-sidebar-sub li:has(a:hover),.admin-sidebar-sub li:has(a:focus){background-color:var(--theme-wone)}
-        .admin-sidebar-sub li:has(a:hover) a,.admin-sidebar-sub li:has(a:focus) a{color:#fff}
+        .tabs-new .category ul li{font-size:16px}
+        .tabs-new .category ul li a{display:block;color:inherit;text-decoration:none}
+        @media (min-width:641px){
+            #searchScopeTabs .category .tab-prev,#searchScopeTabs .category .tab-next{display:none !important}
+        }
+        #searchScopeTabs .category .tab-prev{display:none;position:absolute;top:0;width:50px;height:50px;border:1px solid #e1e3e6;border-radius:1000px;background:#fff;text-align:center;font-size:0;left:0}
+        #searchScopeTabs .category .tab-prev span{display:inline-block;vertical-align:middle;width:9px;height:14px;background-repeat:no-repeat;background-image:url(../images/arrow.svg);background-position:96.77% 25%}
+        #searchScopeTabs .category .tab-next span{display:inline-block;vertical-align:middle;width:9px;height:14px;background-repeat:no-repeat;background-image:url(../images/arrow.svg);background-position:61.29% 25%}
+        #searchScopeTabs .category .tab-next{position:absolute;top:0;width:50px;height:50px;border:1px solid #e1e3e6;border-radius:1000px;background:#fff;text-align:center;font-size:0;right:0;border-left:1px solid #e1e3e6;z-index:3}
+        /* 与首页一致：箭头白底圆形悬浮于 Tab 之上（z-index 高于滑动内容），
+           Tab 滑过箭头下方时被白底遮住，无需让位裁剪 */
+        .search-card-type{margin-top:8px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--theme-wone);line-height:1.2}
         .product-card-description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden;overflow-wrap:anywhere;font-size:13px;line-height:1.5;height:6em;max-height:6em;color:#666;margin:6px 0 0}
 @media (max-width:640px){
 .product-card-description{font-size:12px}
@@ -50,88 +57,45 @@
         <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
             <li><a href="/"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
             <li th:text="${searchNav}"></li>
-            <li class="am-active" th:if="${not #strings.isEmpty(category1)}">
-
-                <a th:title="${category1.name}" aria-hidden="false" th:aria-label="${category1.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
-                   '/' :
-                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#normalizer.normalizeString(category1.name)} + '-' +
-                   ${category1.id}"
-                   th:text="${category1.name}">
-                </a>
-            </li>
-            <li class="am-active" th:if="${not #strings.isEmpty(category2)}">
-                <a th:title="${category2.name}" aria-hidden="false" th:aria-label="${category2.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
-                   '/' :
-                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#normalizer.normalizeString(category2.name)} + '-' +
-                   ${category2.id}"
-                   th:text="${category2.name}"></a>
-            </li>
         </ol>
     </div>
 </nav>
 <div class="" style="">
 
     <div class="am-container phone-clear-padding am-margin-top-sm">
-        <div class="am-u-md-3 am-u-sm-12"
-             th:if="${association != null and #lists.size(association) > 0}">
-            <!-- 分类数据存在时显示 -->
-            <div class="am-list admin-sidebar-list"
-                    style="background-color: #FFFFFF; border-radius: 8px; ">
-
-                <div class="am-padding am-text-lg am-text-bold">Product Category</div>
-                <li class="am-panel am-padding-left"
-                    th:each="cate, stat : ${association}"
-                    th:with="hasSelectedChild=${#lists.contains(cate.children.![name], selectValue)}">
-
-                    <a th:title="${cate.name}" aria-hidden="false" th:aria-label="${cate.name}" class="am-text-bold"
-                       th:attr="'data-am-collapse' = '{parent: &quot;#collapase-nav-1&quot;, target: &quot;#a_' + ${stat.index} + '&quot;}'">
-                        <span th:text="${cate.name}"></span>
-                        <i class="am-fr am-margin-right"
-                           th:if="${cate.children != null and not cate.children.empty}"
-                           th:class="${hasSelectedChild} ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
-                    </a>
-
-                    <ul th:if="${cate.children != null and not cate.children.empty}"
-                        class="am-list admin-sidebar-sub am-collapse am-in"
-                        th:id="|a_${stat.index}|"
-                        th:classappend="${hasSelectedChild} ? 'am-in' : ''" >
-                        <li th:each="subCategory : ${cate.children}"
-                            th:style="${category2 != null and category2.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''">
-                            <a th:title="${subCategory.name}" aria-hidden="false" th:aria-label="${subCategory.name}" th:style="${category != null and category.id == subCategory.id} ? 'background-color: var(--theme-wone);color: #FFFFFF;' : ''"
-                               th:href="@{|${currentPathLang}/search/${#normalizer.normalizeString(subCategory.name)}-${selectValue}-${subCategory.id}-${pageData.pageNum}|}"
-                               th:text="${subCategory.name}"></a>
-                        </li>
-                    </ul>
-            </div>
-
-        </div>
-
-        <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
-             th:classappend="${association != null and not association.isEmpty()} ? ' am-u-md-9' : ' am-u-md-12'"
+        <div class="am-u-sm-12 am-u-md-12 am-margin-bottom-xl phone-clear-margin"
              style="background:#FFFFFF;min-height: 660px;">
             <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
+                <div class="tabs-new" id="searchScopeTabs" th:if="${scopeTabs != null and not #lists.isEmpty(scopeTabs)}">
+                    <div class="category">
+                        <div>
+                            <ul>
+                                <li th:each="tab : ${scopeTabs}" th:classappend="${tab.active} == 'true' ? 'pc-active'">
+                                    <a th:href="${tab.href}" th:title="${tab.label}" aria-hidden="false"
+                                       th:aria-label="${tab.label}" th:text="${tab.label}"></a>
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="javascript:;" class="tab-prev" aria-label="Previous tabs"><span></span></a>
+                        <a href="javascript:;" class="tab-next" aria-label="Next tabs"><span></span></a>
+                    </div>
+                </div>
                 <!-- 产品列表存在时显示 -->
                 <div th:if="${pageData != null and pageData.rows != null and not #lists.isEmpty(pageData.rows)}">
                     <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
                         style="margin: 0 0;">
                         <li class="equal-height-card-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
                             th:each="index : ${pageData.rows}">
-                            <a class="equal-height-card-link" th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}" th:href="(${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
-                   '/' :
-                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                    'detail/'+
+                            <a class="equal-height-card-link" th:title="${index.name}" aria-hidden="false" th:aria-label="${index.name}"
+                               th:href="${currentPathLang} + ${index.detailUrlPrefix} +
                    ${#normalizer.resolveSlugUrl(index.slugUrl, index.enName)} +
                    '-'+${index.id}">
                                 <div class="equal-height-card" style="background-color: #F9F9F9; padding: 15px; border-radius: 12px;">
                                     <div class="image-box">
                                         <img th:src="${index.url}" th:alt="${index.name}" class="image-square">
                                     </div>
-                                    <div class="dd-clamp-text-2 am-text-lg">
-                                        <span class="p-icon-a-087 am-padding-right-xs" style="color: #FFB400; font-size: 14px;"></span>
-                                        <span class="am-text-bold" style="color: #07C160; font-size: 14px">Whole life care manager</span>
-                                    </div>
+                                    <div class="search-card-type" th:if="${not #strings.isEmpty(index.typeLabel)}"
+                                         th:text="${index.typeLabel}"></div>
                                     <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
                                           th:text="${index.name}"></span>
                                     <p class="product-card-description" th:text="${index.description ?: ''}"></p>
@@ -147,7 +111,7 @@
                     <div class="iee-empty-icon tn-icon-empty-search" aria-hidden="true">
                         <span class="tn-icon-search"></span>
                     </div>
-                    <p style="font-size: 20px;color:#000000;font-weight: bold;" th:text="${noResults} +${selectValue}"></p>
+                    <p style="font-size: 20px;color:#000000;font-weight: bold;" th:text="${noResults}+' &quot;'+${selectValue}+'&quot;'"></p>
                     <p th:text="${keptQuery}"></p>
                     <div class="iee-empty-actions">
                         <button class="iee-btn" type="button" data-trigger="modal-1"
@@ -161,10 +125,12 @@
             <div class="am-container phone-clear-margin" style="margin: 0px 15px 15px 15px; padding-top: 30px;">
                 <!-- 分页组件 -->
                 <th:block th:if="${pageData != null}">
+                    <!-- 参数模式分页：requestUrl 形如 /search?keyword=xx&cid=1&（searchQueryBase 为空时无问号段），pageParam='page' -->
                     <th:block th:replace="pagination :: pagination(
             totalPages=${pageData.totalPages},
             currentPage=${pageData.pageNum},
-            requestUrl='search-'+${selectLabel})">
+            requestUrl=${currentPathLang} + '/search' + (${searchQueryBase} != '' ? '?' + ${searchQueryBase} + '&amp;' : '?'),
+            pageParam='page')">
                     </th:block>
                 </th:block>
             </div>
@@ -180,6 +146,92 @@
 <th:block th:replace="inquiry :: inquiry"></th:block>
 <th:block th:replace="right-menu :: right-menu(param1='serach_'+${selectLabel})"></th:block>
 <th:block th:replace="footer :: footer"></th:block>
+<th:block th:with="basePath=${cdnEnabled} ? ${cdnPrefix} +'/standalone' : ''">
+    <script th:src="@{${basePath + '/js/jquery.min.js?v=' + version}}"></script>
+</th:block>
+
+<script th:inline="javascript">
+    (function() {
+        function init() {
+            if (!window.jQuery) {
+                return;
+            }
+            var $ = window.jQuery;
+            var $wrap = $('#searchScopeTabs');
+            if (!$wrap.length) {
+                return;
+            }
+            var $list = $wrap.find('.category ul').first();
+            var $prev = $wrap.find('.category .tab-prev');
+            var $next = $wrap.find('.category .tab-next');
+
+            $list.find('li').off('click');
+
+            function maxOffset() {
+                return Math.max(0, $list[0].scrollWidth - $list.parent().width());
+            }
+
+            $next.on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var max = maxOffset();
+                if (max <= 0) {
+                    $next.hide();
+                    return;
+                }
+                $list.stop(true).animate({'margin-left': -max + 'px'}, 500, function() {
+                    $prev.show();
+                    $next.hide();
+                });
+            });
+
+            $prev.on('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $list.stop(true).animate({'margin-left': '0px'}, 500, function() {
+                    $prev.hide();
+                    $next.show();
+                });
+            });
+
+            $(window).on('resize.sscope', function() {
+                if (maxOffset() <= 0) {
+                    $list.css('margin-left', '0px');
+                    $prev.hide();
+                    $next.hide();
+                }
+            });
+
+            // 初始态：带 scope 进入时选中 Tab 可能在可视区外（移动端），自动滚到可见位置；
+            // 箭头状态按滚动后的实际位置设置（无溢出时两个箭头都不展示）
+            var $active = $list.find('li.pc-active').first();
+            var max = maxOffset();
+            var initialOffset = 0;
+            if ($active.length && max > 0) {
+                // 内容坐标下选中项的左右缘；目标位移需同时满足：左缘不越出左边界、右缘不越出右边界
+                var liLeft = $active[0].offsetLeft;
+                var liRight = liLeft + $active[0].offsetWidth;
+                var holderW = $list.parent().width();
+                initialOffset = Math.max(0, Math.min(Math.min(liLeft, liRight - holderW), max));
+                if (initialOffset > 0) {
+                    $list.css('margin-left', -initialOffset + 'px');
+                }
+            }
+            $prev.toggle(initialOffset > 0);
+            $next.toggle(initialOffset < max);
+        }
+
+        // main.js 的绑定同样发生在 DOMContentLoaded（$(document).ready），需等它绑完再摘除，
+        // 故 ready 后再推迟一个宏任务初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(init, 0);
+            });
+        } else {
+            setTimeout(init, 0);
+        }
+    })();
+</script>
 </body>
 
 </html>

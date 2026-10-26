@@ -33,7 +33,7 @@ public class SiteCommonContextCache {
     private static final List<String> WHITELIST = Arrays.asList(
             "prodBrand", "brandName", "siteMenuWidget", "bottomNavItems", "langList", "advanced",
             "currentLang", "currentPathLang", "langName", "pageName", "websitePath", "suffix",
-            "fontColor", "headColor", "headFontColor", "otherHeadFontColor", "langEName");
+            "fontColor", "headColor", "headFontColor", "otherHeadFontColor", "langEName", "topNavPages");
 
     private final ConcurrentHashMap<String, Map<String, Object>> cache = new ConcurrentHashMap<>();
 
