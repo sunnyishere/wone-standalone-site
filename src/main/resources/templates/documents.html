@@ -3,15 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title th:if="selectLabel == pageName"  th:text="${pageTitle}"></title>
-    <title th:if="selectLabel != pageName"  th:text="${selectLabel} +' | ' +${prodBrand.eName}+ ' Factory Document Library'"></title>
-    <meta th:if="selectLabel == pageName" name="description" th:content="${description} ?: ''"/>
-    <meta th:if="selectLabel != pageName" name="description" th:content="'Official '+${selectLabel} +' from '+ ${prodBrand.eName} +', Download from our factory technical document library—no agents, full engineering transparency'"/>
+    <title th:text="${pageTitle}"></title>
+    <meta name="description" th:content="${pageContent} ?: ''"/>
 
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
 
-    <meta property="og:title" th:content="${title}" />
-    <meta property="og:description" th:content="${description}"/>
+    <meta property="og:title" th:content="${pageTitle}" />
+    <meta property="og:description" th:content="${pageContent}"/>
     <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName +  (selectLabel == pageName?'':'/' + selectLabel)},basePath =${websitePath +pageName +(selectLabel == pageName?'':'/' + selectLabel)}">
         <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}" />
         <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
@@ -26,8 +24,8 @@
     <meta property="og:locale" th:content="${currentLang} ?: 'en'" />
     <meta property="og:site_name"  th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
 
-    <meta name="twitter:title" th:content="${title}"/>
-    <meta name="twitter:description" th:content="${description}"/>
+    <meta name="twitter:title" th:content="${pageTitle}"/>
+    <meta name="twitter:description" th:content="${pageContent}"/>
     <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
@@ -47,7 +45,7 @@
     </script>
 </head>
 
-<body class="body-bg">
+<body class="body-bg scroll-sidebar-page">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
 
     <th:block th:replace="pc-en :: section(param1='Documents')"></th:block>
@@ -84,7 +82,7 @@
     </div>
     <div class="am-container phone-clear-padding">
 
-        <div class="am-u-md-3 am-u-sm-12" th:if="${selectLabel == pageName}">
+        <div class="am-u-md-3 am-u-sm-12 scroll-sidebar" th:if="${selectLabel == pageName}">
             <ul class="am-list admin-sidebar-list" id="collapase-nav-1" style="background-color: #FFFFFF;">
                 <div class="am-padding am-text-lg am-text-bold" ><span class="inline-header" th:text="${advanced['filters']}">Filters</span></div>
                 <!-- Document king 面板 -->

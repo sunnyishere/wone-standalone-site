@@ -1,0 +1,53 @@
+<!-- t2 restores the full-width image layout without changing the page data contract. -->
+<style th:fragment="bannerStyle">
+.t2-page-banner{position:relative;overflow:hidden;background:#f3f3f3;height:auto;min-height:300px;padding:32px 0;box-sizing:border-box}
+.t2-banner-picture{position:absolute;inset:0;display:block;line-height:0}
+.t2-banner-picture img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.t2-page-banner .page-banner-inner{position:relative;z-index:1;width:100%;color:#fff}
+.t2-page-banner .page-banner-title{overflow-wrap:anywhere}
+.t2-page-banner .t2-banner-description{margin:10px auto 0;max-width:900px;font-size:22px;font-weight:400;line-height:1.45;white-space:pre-line;overflow-wrap:anywhere;color:inherit;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.t2-banner-button{display:inline-block;max-width:100%;box-sizing:border-box;margin-top:18px;border:1px solid currentColor;border-radius:28px;padding:9px 24px;color:inherit;line-height:1.4;overflow-wrap:anywhere}
+.t2-banner-button:hover,.t2-banner-button:focus{color:inherit;text-decoration:underline}
+.t2-page-banner--text-only .page-banner-inner,.t2-page-banner--text-only .page-banner-title{color:#060606;text-shadow:none}
+.t2-page-banner--text-only .t2-banner-description{text-shadow:none}
+.t2-hero-copy{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;box-sizing:border-box;width:100%;max-width:1200px;height:100%;margin:0 auto;padding:40px 30px}
+.t2-hero-copy--center{align-items:center;text-align:center}
+.t2-hero-copy h1,.t2-hero-copy .t2-hero-title{width:100%;margin:0 0 16px;font-size:60px;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.t2-hero-copy .t2-hero-description{max-width:75%;margin:0;font-size:25px;font-weight:700;line-height:1.5;white-space:pre-line;overflow-wrap:anywhere}
+.t2-hero-button{display:inline-block;max-width:100%;box-sizing:border-box;margin-top:24px;padding:10px 24px;border:1px solid currentColor;border-radius:40px;color:inherit;line-height:1.4;overflow-wrap:anywhere}
+.t2-hero-button:hover,.t2-hero-button:focus{color:inherit;text-decoration:underline}
+@media(max-width:768px){
+ .t2-hero-copy{padding:20px}
+ .t2-hero-copy h1,.t2-hero-copy .t2-hero-title{font-size:20px;margin-bottom:10px}
+ .t2-hero-copy .t2-hero-description{max-width:100%;font-size:15px}
+ .t2-hero-button{margin-top:16px;padding:8px 16px}
+}
+@media(max-width:640px){
+ .t2-page-banner{display:flex;min-height:150px;padding:24px 0}
+ .t2-page-banner .page-banner-inner{position:relative;top:auto;left:auto;transform:none}
+ .t2-page-banner .t2-banner-description{font-size:16px}
+}
+</style>
+
+<th:block th:fragment="pageBannerPreload"
+          th:with="desktopImage=${!#strings.isEmpty(pageIcon) ? pageIcon : (!#strings.isEmpty(pageH5Icon) ? pageH5Icon : '/images/case-bg.jpg')},
+                   mobileImage=${!#strings.isEmpty(pageH5Icon) ? pageH5Icon : desktopImage}">
+    <link rel="preload" as="image" fetchpriority="high" media="(min-width: 641px)" th:href="${desktopImage}">
+    <link rel="preload" as="image" fetchpriority="high" media="(max-width: 640px)" th:href="${mobileImage}">
+</th:block>
+
+<div th:fragment="pageBanner" class="page-banner t2-page-banner"
+     th:with="desktopImage=${!#strings.isEmpty(pageIcon) ? pageIcon : (!#strings.isEmpty(pageH5Icon) ? pageH5Icon : '/images/case-bg.jpg')},
+              mobileImage=${!#strings.isEmpty(pageH5Icon) ? pageH5Icon : desktopImage},
+              bannerTitle=${!#strings.isEmpty(pageHeroTitle) ? pageHeroTitle : i18nName}">
+    <picture class="t2-banner-picture">
+        <source media="(max-width: 640px)" th:srcset="${mobileImage}">
+        <img th:src="${desktopImage}" th:alt="${bannerTitle}" width="1920" height="800" fetchpriority="high" loading="eager">
+    </picture>
+    <div class="page-banner-inner am-container wone-text">
+        <h1 class="page-banner-title" th:text="${bannerTitle}"></h1>
+        <h2 class="t2-banner-description" th:text="${pageHeroDescription != null ? pageHeroDescription : ''}"></h2>
+        <a th:if="${pageButtonVisible == true}" class="t2-banner-button"
+           th:href="${pageButtonLink}" th:text="${pageButtonTitle}"></a>
+    </div>
+</div>

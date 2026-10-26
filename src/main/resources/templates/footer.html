@@ -1,4 +1,5 @@
-<footer class="m-footer" th:fragment="footer">
+<footer class="m-footer" th:fragment="footer"
+        th:replace="${footerTemplate != null and footerTemplate != 'footer'} ? ~{${footerTemplate} :: footer} : _">
     <div class="site-footer-main" th:if="${isHomeFooter == true}">
         <div class="am-container footer-grid">
             <section class="footer-brand-column">

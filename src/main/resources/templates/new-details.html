@@ -43,7 +43,7 @@
     </script>
 </head>
 
-<body class="body-bg">
+<body class="body-bg scroll-sidebar-page">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
 
 
@@ -67,12 +67,6 @@
     </div>
 </nav>
 <div class="" style="">
-    <div class="am-container am-padding phone-clear-padding"
-         style="margin: 0px auto 20px !important;padding: 0 30px 0 15px !important;" th:if="${not #strings.isEmpty(pageDetailedText)}">
-        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 1px;border-radius: 12px;"
-             th:text="${pageDetailedText}">
-        </div>
-    </div>
     <div class="am-container phone-container-top am-margin-bottom am-margin-top-sm">
         <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
              style="background:#FFFFFF;">
@@ -111,9 +105,9 @@
 
         </div>
 
-        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin">
+        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin scroll-sidebar">
 
-            <div class="am-margin-bottom" style="background:#FFFFFF;">
+            <div class="am-padding-bottom" style="background:#FFFFFF;">
                 <div class="am-text-bold am-padding" >
                     <h2 class="inline-header" th:text="${advanced['recent.news']}"></h2>
                 </div>

@@ -1,0 +1,149 @@
+<footer class="m-footer m-footer-t2" th:fragment="footer" data-template-version="t2">
+    <style>
+        .m-footer-t2 .footer-contact-column{flex:1.1 1 220px;min-width:220px}
+        .m-footer-t2 .footer-contact-column .footer-contact-list{flex-direction:column;align-items:stretch;gap:16px;text-align:left}
+        .m-footer-t2 .footer-contact-column .footer-contact-list li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:11px;align-items:start;line-height:1.65}
+        .m-footer-t2 .footer-contact-column .footer-contact-list i{color:var(--theme-wone);font-size:16px;line-height:1.65}
+        .m-footer-t2 .footer-contact-column .footer-contact-list span,.m-footer-t2 .footer-contact-column .footer-contact-list a{white-space:pre-line;opacity:.82}
+        .m-footer-t2 .footer-copyright{padding-top:24px}
+        @media(max-width:1100px){.m-footer-t2 .footer-contact-column{flex:1 1 calc(50% - 12px);min-width:260px}}
+        @media(max-width:640px){.m-footer-t2 .footer-contact-column{width:100%;min-width:0;flex:0 0 auto}}
+    </style>
+    <div class="site-footer-main">
+        <div class="am-container footer-grid">
+            <section class="footer-brand-column">
+                <span class="footer-brand-name"
+                    th:text="${footerConfig != null and footerConfig.title != null and footerConfig.title != '' ? footerConfig.title : (prodBrand != null and prodBrand.eName != null and prodBrand.eName != '' ? prodBrand.eName : brandName)}"></span>
+                <p class="footer-brand-description"
+                   th:if="${footerConfig != null and footerConfig.description != null and footerConfig.description != ''}"
+                   th:text="${footerConfig.description}"></p>
+                <div class="footer-socials"
+                     th:if="${footerConfig != null and
+                        ((footerConfig['facebookUrl'] != null and footerConfig['facebookUrl'] != '') or
+                         (footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != '') or
+                         (footerConfig.youtubeUrl != null and footerConfig.youtubeUrl != '') or
+                         (footerConfig.whatsappUrl != null and footerConfig.whatsappUrl != ''))}">
+                    <a th:if="${footerConfig['facebookUrl'] != null and footerConfig['facebookUrl'] != ''}"
+                       th:href="${footerConfig['facebookUrl']}" target="_blank" rel="noopener noreferrer"
+                       title="Facebook" aria-label="Facebook"><i class="am-icon-facebook" aria-hidden="true"></i></a>
+                    <a th:if="${footerConfig.linkedinUrl != null and footerConfig.linkedinUrl != ''}"
+                       th:href="${footerConfig.linkedinUrl}" target="_blank" rel="noopener noreferrer"
+                       title="LinkedIn" aria-label="LinkedIn"><i class="am-icon-linkedin" aria-hidden="true"></i></a>
+                    <a th:if="${footerConfig.youtubeUrl != null and footerConfig.youtubeUrl != ''}"
+                       th:href="${footerConfig.youtubeUrl}" target="_blank" rel="noopener noreferrer"
+                       title="YouTube" aria-label="YouTube"><i class="am-icon-youtube-play" aria-hidden="true"></i></a>
+                    <a th:if="${footerConfig.whatsappUrl != null and footerConfig.whatsappUrl != ''}"
+                       th:href="${footerConfig.whatsappUrl}" target="_blank" rel="noopener noreferrer"
+                       title="WhatsApp" aria-label="WhatsApp"><i class="am-icon-whatsapp" aria-hidden="true"></i></a>
+                </div>
+            </section>
+
+            <section class="footer-nav-column"
+                     th:if="${bottomNavItems != null and not #lists.isEmpty(bottomNavItems)}"
+                     th:each="section : ${bottomNavItems}">
+                <span class="footer-column-title" th:text="${section.title}"></span>
+                <ul class="footer-link-list">
+                    <li th:each="item : ${section.items}">
+                        <a th:if="${item.containsKey('href')}"
+                           th:title="${item.text}" th:aria-label="${item.text}"
+                           th:href="${item.get('href')}" th:text="${item.text}"></a>
+                        <span th:unless="${item.containsKey('href')}" th:text="${item.text}"></span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="footer-contact-column"
+                     th:if="${footerContact != null and
+                        ((footerContact.headquartersFactory != null and footerContact.headquartersFactory != '') or
+                         (footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != '') or
+                         (footerContact.email != null and footerContact.email != ''))}">
+                <span class="footer-column-title" th:text="${advanced['contact']}"></span>
+                <ul class="footer-contact-list">
+                    <li th:if="${footerContact.headquartersFactory != null and footerContact.headquartersFactory != ''}">
+                        <i class="am-icon-map-marker" aria-hidden="true"></i>
+                        <span th:text="${footerContact.headquartersFactory}"></span>
+                    </li>
+                    <li th:if="${footerContact.phoneWhatsapp != null and footerContact.phoneWhatsapp != ''}">
+                        <i class="am-icon-phone" aria-hidden="true"></i>
+                        <a th:href="${'https://wa.me/' + footerContact.phoneWhatsapp.replaceAll('[^0-9]', '')}"
+                           target="_blank" rel="noopener noreferrer" th:text="${footerContact.phoneWhatsapp}"></a>
+                    </li>
+                    <li th:if="${footerContact.email != null and footerContact.email != ''}">
+                        <i class="am-icon-envelope-o" aria-hidden="true"></i>
+                        <a th:href="|mailto:${#strings.trim(footerContact.email)}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
+                           th:text="${footerContact.email}"></a>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <div class="m-footer-bottom">
+        <div class="am-container">
+
+            <div class="footer-copyright" style="padding-top: 12px">
+                <div>&copy; <span th:text="${year}"></span>
+                    <span th:text="${brandName}"></span>. All rights reserved.</div>
+                <div class="footer-legal">
+                    <a th:if="${footerConfig != null and footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != ''}"
+                       th:href="${footerConfig.privacyPolicyUrl}" target="_blank" rel="noopener noreferrer"
+                       th:text="${advanced['account.privacy.policy']}"></a>
+                    <span th:if="${footerConfig != null and
+                        footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != '' and
+                        footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''}"
+                          aria-hidden="true">&middot;</span>
+                    <a th:if="${footerConfig != null and footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''}"
+                       th:href="${footerConfig.termsOfUseUrl}" target="_blank" rel="noopener noreferrer"
+                       th:text="${advanced['terms.of.use']}"></a>
+                    <span th:if="${footerConfig != null and
+                        ((footerConfig.privacyPolicyUrl != null and footerConfig.privacyPolicyUrl != '') or
+                         (footerConfig.termsOfUseUrl != null and footerConfig.termsOfUseUrl != ''))}"
+                          aria-hidden="true">&middot;</span>
+                    <span th:text="${currentHost}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script async th:src="'https://www.googletagmanager.com/gtag/js?id=' + ${gaTrackingId}"></script>
+    <script th:inline="javascript">
+        if (typeof gtag !== 'function') {
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+        }
+        gtag('config', /*[[${gaTrackingId}]]*/ 'G-0HKGZJNMN6');
+        document.addEventListener('DOMContentLoaded', function () {
+            var languageList = document.getElementById('site-language-list');
+            var pcMenu = document.getElementById('pc-language-menu');
+            var mobileMenu = document.getElementById('mobile-language-menu');
+            if (!languageList || !pcMenu || !mobileMenu) {
+                return;
+            }
+
+            var mobileViewport = window.matchMedia('(max-width: 640px)');
+            function moveLanguageList() {
+                mobileMenu.classList.remove('active', 'am-active');
+                pcMenu.classList.remove('am-active');
+                languageList.classList.toggle('lang-list', mobileViewport.matches);
+                (mobileViewport.matches ? mobileMenu : pcMenu).appendChild(languageList);
+                if (!mobileViewport.matches && window.jQuery && window.jQuery.fn.offCanvas) {
+                    window.jQuery('#r-nav').offCanvas('close');
+                }
+            }
+            moveLanguageList();
+            if (mobileViewport.addEventListener) {
+                mobileViewport.addEventListener('change', moveLanguageList);
+            } else {
+                mobileViewport.addListener(moveLanguageList);
+            }
+        });
+    </script>
+</footer>
+
+<script>
+    echo.init({
+        offset: 500,
+        throttle: 250,
+        unload: false
+    });
+</script>

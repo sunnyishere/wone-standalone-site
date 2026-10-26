@@ -54,7 +54,7 @@
     </script>
 </head>
 
-<body class="body-bg">
+<body class="body-bg product-list-page">
 <header class="m-hd" style="background-color: var(--theme-header-bg);">
     <!-- 电脑-->
     <th:block th:replace="pc-en :: section(param1='Products')"></th:block>
@@ -109,7 +109,7 @@
              th:if="${!#strings.isEmpty(pageDetailedText)}" th:text="${pageDetailedText}"></div>
     </div>
     <div class="am-container phone-clear-padding am-margin-top-sm">
-        <div class="am-u-md-3 am-u-sm-12" th:if="${category == null}">
+        <div class="am-u-md-3 am-u-sm-12 product-category-sidebar" th:if="${category == null}">
             <!-- 数据存在时显示的色块（白色背景） -->
             <div
                     class="am-list admin-sidebar-list"
@@ -120,14 +120,20 @@
                     th:each="cate, stat : ${association}"
                     th:with="isExpanded=${(category != null and (cate.id == category.id or category.parentId == cate.id))}">
 
-                    <a th:title="${cate.name}" aria-hidden="false" th:aria-label="${cate.name}" class="am-text-bold"
-                       th:classappend="${!isExpanded} ? 'am-collapsed'"
-                       th:attr="'data-am-collapse' = '{parent: &quot;#collapase-nav-1&quot;, target: &quot;#a_' + ${stat.index} + '&quot;}'">
-                        <span class="inline-header"><span th:text="${cate.i18nName}"></span></span>
-                        <i class="am-fr am-margin-right"
-                           th:if="${cate.children != null and not cate.children.empty}"
-                           th:class="${isExpanded} ? 'am-icon-angle-down' : 'am-icon-angle-right'"></i>
-                    </a>
+                    <div class="product-category-heading">
+                        <a th:title="${cate.i18nName}" th:aria-label="${cate.i18nName}" class="am-text-bold"
+                           th:href="${currentPathLang + '/' + pageName + '/' + #normalizer.normalizeString(cate.name) + '-' + cate.id}">
+                            <span class="inline-header"><span th:text="${cate.i18nName}"></span></span>
+                        </a>
+                        <button type="button" class="product-category-toggle"
+                                th:if="${cate.children != null and not cate.children.empty}"
+                                th:classappend="${!isExpanded} ? 'am-collapsed'"
+                                th:aria-label="${cate.i18nName}"
+                                th:attr="aria-controls=|a_${stat.index}|,
+                                'data-am-collapse' = '{target: &quot;#a_' + ${stat.index} + '&quot;}'">
+                            <i class="am-icon-angle-right" aria-hidden="true"></i>
+                        </button>
+                    </div>
 
                     <ul th:if="${cate.children != null and not cate.children.empty}"
                         class="am-list admin-sidebar-sub am-collapse"
@@ -162,9 +168,17 @@
                 </div>
             </div>
         </div>
+        <div class="am-u-sm-12 am-u-md-12 am-margin-bottom-xl phone-clear-margin"
+             th:if="${categoryOverview == true}">
+            <th:block th:replace="product-category-cards :: cards"></th:block>
+            <div class="am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+                <div style="background:#FFFFFF;padding: 0 1.6rem">
+                    <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+                </div>
+            </div>
+        </div>
 
-
-
+        <th:block th:unless="${categoryOverview == true}">
         <div class="am-u-sm-12 am-margin-bottom-xl phone-clear-margin"
              th:classappend="${category == null ? 'am-u-md-9' : 'am-u-md-12'}"
              th:if="${not #lists.isEmpty(pageData.rows)}">
@@ -214,19 +228,14 @@
              th:classappend="${category == null ? 'am-u-md-9' : 'am-u-md-12'}"
              th:unless="${not #lists.isEmpty(pageData.rows)}">
 
-            <!-- 产品列表为空时显示的占位背景 -->
-            <div
-                    style="background-color: #afb4b7; border-radius: 12px; min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
-
-                <div class="am-text-center am-text-white">
-                    <i class="am-margin-bottom"></i>
-                    <div class="am-margin-bottom-sm"></div>
-                    <p class="am-text-sm"></p>
-                </div>
+            <!-- 产品列表为空时显示空数据图 -->
+            <div class="product-list-empty">
+                <img th:src="@{/img/27.png}" alt="No data" width="414" height="324">
             </div>
 
 
         </div>
+        </th:block>
     </div>
 </div>
 <!-- 搜索弹窗-->
@@ -245,14 +254,6 @@
 <th:block th:replace="footer :: footer"></th:block>
 
 <style>
-    /* 主分类链接样式 */
-    .am-panel > a {
-        display: block;
-        padding: 10px 15px;
-        color: #333;
-        text-decoration: none;
-    }
-
     /* 子分类链接样式 */
     .admin-sidebar-sub li a {
         display: block;

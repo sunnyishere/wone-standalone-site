@@ -1,0 +1,352 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='about'">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${pageTitle}"></title>
+    <meta name="description" th:content="${pageContent} ?: ''"/>
+    <meta name="keywords" th:content="${pageKeyword} ?: ''">
+
+    <link rel="canonical" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
+    <meta property="og:url" th:href="${websitePath} + (${currentLang !=  null && currentLang != 'en' ? currentLang + '/' : ''}) + ${pageName}" />
+    <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath} + ${pageName}"/>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${websitePath +  (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName}" />
+    </th:block>
+
+    <meta property="og:type" th:content="${pageName}"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="twitter:title" th:content="${pageTitle}"/>
+    <meta name="twitter:description" th:content="${pageContent}"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <th:block th:with="pageHeroes=${topNavPages.?[pageType == 6]}">
+        <th:block th:replace="t2/banner :: pageBannerPreload"></th:block>
+    </th:block>
+    <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="t2/banner :: bannerStyle"></th:block>
+<!--    <th:block th:replace="head :: faqStyle"></th:block>-->
+    <style>
+        .faq-header{font-size: 2.4rem;}
+        .section-title{font-size: 2.4rem;}
+        @media (max-width:768px){
+            .section-title{font-size: 1.8rem;}
+            .faq-header{font-size: 1.8rem;}
+        }
+        .hero-row{ display:flex; flex-wrap:wrap; align-items:stretch; }
+        .hero-row::before,
+        .hero-row::after{ display:none; }
+        .hero-row > [class*="am-u-"]{ float:none; }
+        .about-cta-col{ display:flex; flex-direction:column; }
+        .about-cta-col .device-aware-link{ margin-top:auto; }
+        @media (max-width:768px){
+            .about-cta-col .device-aware-link{ margin-top:36px; }
+        }
+    </style>
+    <script th:if="${schemaJson != null and schemaJson != '{}'}" type="application/ld+json" th:utext="${schemaJson}">
+    </script>
+    <script th:if="${faqPageSchemaJson != null and faqPageSchemaJson != '{}'}" type="application/ld+json" th:utext="${faqPageSchemaJson}">
+    </script>
+    <script th:if="${breadcrumbSchemaJson != null and breadcrumbSchemaJson != '{}'}" type="application/ld+json" th:utext="${breadcrumbSchemaJson}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+    <th:block th:replace="pc-en :: section(param1='about')"></th:block>
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height"></div>
+
+<th:block th:with="pageHeroes=${topNavPages.?[pageType == 6]}">
+    <th:block th:replace="t2/banner :: pageBanner"></th:block>
+</th:block>
+
+<nav class="m-cat-nav" id="page-list-content">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}" aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}" aria-hidden="false" th:aria-label="${i18nName}"></a></li>
+        </ol>
+    </div>
+</nav>
+
+<div class="am-container phone-container-top am-margin-bottom am-margin-top-sm hero-row" style="background-color: #FFFFFF;">
+    <div class="am-u-sm-12 am-u-md-7 am-u-lg-5 am-padding-xl am-margin-bottom-xl phone-container-all phone-clear-margin" style="background:#FFFFFF;">
+        <div class="" style="background-color: #FFFFFF;">
+            <div class="phone-container phone-banner" style="height: 300px;">
+                <div class="am-slider am-slider-default" data-am-flexslider="{playAfterPaused: 8000}" style="border-radius: 10px;overflow: hidden;position: relative;z-index: 0;">
+                    <ul class="am-slides">
+                        <li class="phone-banner-height" style="width: 100%;height: 340px;" th:if="${not #lists.isEmpty(pictures)}" th:each="pic : ${pictures}">
+                            <img th:alt="${prodBrand.eName}" th:src="${pic.pictures}" alt="" style="width: 100%;height: 100%;object-fit: cover;">
+                        </li>
+                        <li class="phone-banner-height" style="width: 100%;height: 340px;" th:if="${#lists.isEmpty(pictures)}" th:each="i : ${#numbers.sequence(1, 4)}">
+                            <img alt="No Data" src="https://oss.iee-business.com/standalone/images/swiper-3.jpg" style="width: 100%;height: 100%;object-fit: cover;">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="am-u-sm-12 am-u-md-5 am-u-lg-6 am-padding about-cta-col">
+        <div class="">
+            <div class="am-text-lg am-text-bold am-margin-top-sm" > <h3 class="inline-header"  th:text="${advanced['about.us']}"></h3>
+            </div>
+        </div>
+        <p th:text="${brand.profile}"/>
+        <a class="device-aware-link"
+           style="display: flex; width: 200px; height: 44px; align-items: center; justify-content: center; color: #fff !important; border-radius: 999px; background: var(--theme-wone); font-size: 16px; font-weight: 700;"
+           th:href="${brandUrl}"
+           th:title="${brandName}"
+           th:aria-label="${brandName}"
+           th:text="${advanced['learn.more']} ?: 'Learn more'">Learn more</a>
+    </div>
+</div>
+
+<div class="am-container phone-container-all phone-clear-padding am-margin-bottom am-padding-top"
+     style="background-color: #FFFFFF;">
+    <div class="am-container phone-title" style="padding: 20px 30px 20px 30px;">
+        <div class="am-text-center">
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['verified.profile']}"></h3></div>
+            </div>
+        </div>
+    </div>
+    <div class="am-padding-top">
+        <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
+            <div class="am-padding type-hover">
+                <div  th:text="${advanced['organization.name']}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.fullName}"></div>
+                <div  th:text="${advanced['main.categories']}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${brand.categories}"></div>
+                <div  th:text="${advanced['business.type']}"></div>
+                <div class="am-text-bold dd-clamp-text-1"
+                     th:with="
+                       input=${brand.compNat},
+                       step1=${#strings.replace(input, 'Design', advanced['design'])},
+                       step2=${#strings.replace(step1, 'Manufacture', advanced['manufacture'])},
+                       step3=${#strings.replace(step2, 'Sales', advanced['sales'])}
+                     "
+                     th:text="${step3}">
+                </div>
+            </div>
+        </div>
+        <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
+            <div class="am-padding type-hover">
+                <div th:text="${advanced['employees']}"></div>
+                <div class="am-text-bold" th:text="${brand.empCount != null ? brand.empCount + '  people' : '100-500  people'}"></div>
+                <div th:text="${advanced['workplace']}"></div>
+                <div class="am-text-bold" th:text="${brand.workplace+ 'm²'} "></div>
+                <div th:text="${advanced['registered.capital']}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${factory.entRegFeeType}+${factory.entRegFee}"></div>
+            </div>
+        </div>
+        <div class="am-u-sm-12 am-u-md-6 am-u-lg-4 am-margin-bottom-lg">
+            <div class="am-padding type-hover">
+                <div th:text="${advanced['highest.annual.export.usd']}"></div>
+                <div class="am-text-bold" th:text="${'$'+brand.maxAnnExp}"></div>
+                <div th:text="${advanced['professional.experience']}"></div>
+                <div class="am-text-bold" th:text="${brand.regYears + '  years'} "></div>
+                <div th:text="${advanced['office.address']}"></div>
+                <div class="am-text-bold dd-clamp-text-1" th:text="${factory.eOffAddr}"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="am-container phone-container phone-clear-padding am-margin-bottom"
+     style="padding: 0 30px 0 30px;background-color: #FFFFFF;">
+    <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+        <div class="am-text-center">
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['certifcations']}"></h3></div>
+            </div>
+        </div>
+    </div>
+    <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
+        <div style="padding-top: 2px;opacity: 0;">占位</div>
+        <div class="am-padding">
+            <div data-am-widget="slider" class="am-slider am-slider-default cert-slider"
+                 data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":300,"itemMargin":5}'>
+                <ul class="am-slides " style="padding-bottom: 36px">
+                    <li class="am-margin-right" th:if="${not #lists.isEmpty(certificate)}"
+                        th:each="pic : ${certificate}">
+                        <img th:alt="${pic.name}" th:src="${pic.url}" style="border: 1px solid #EFEFEF">
+                        <div class="dd-clamp-text-1 am-padding-xs am-text-center" style="height: 36px;position: absolute;bottom: -36px;background-color: #EFEFEF;z-index: 999 !important;width: 100%">
+                            <text th:text="${pic.name}"></text>
+                        </div>
+                    </li>
+                    <li class="am-margin-right" th:if="${#lists.isEmpty(certificate)}"
+                        th:each="i : ${#numbers.sequence(1, 5)}">
+                        <img src="" alt="No Data" style="background: #afb4b7">
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="am-container phone-container phone-clear-padding" style="padding: 0 30px 0 30px;background-color: #FFFFFF;">
+    <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+        <div class="am-text-center">
+            <div class="am-u-sm-12">
+                <div class="am-text-lg am-text-bold" ><h3 class="inline-header"  th:text="${advanced['members']}"></h3></div>
+            </div>
+        </div>
+    </div>
+    <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding">
+        <li class="dd-hover4" th:if="${not #lists.isEmpty(employee)}" th:each="pic : ${employee}">
+            <div class="am-padding am-margin-sm phone-clear-margin"
+                 style="background-color: #F9F9F9;border-radius: 12px;">
+                <div class="am-container">
+                    <a aria-hidden="false" th:aria-label="${pic.account}"
+                       th:title="${pic.account}"
+                       th:href="${not #strings.isEmpty(pic.profileUrl)} ? ${pic.profileUrl} : 'javascript:void(0);'">
+                        <div class="am-text-center am-text-xl" style="margin: 10px 0;">
+                            <div class="" style="width: 90px;height: 90px;margin: 0 auto">
+                                <img th:alt="${pic.account}" th:src="${pic.auHead}"
+                                     style="border: 1px solid #E6E6E6;width: 90px;height: 90px;border-radius: 50%;overflow: hidden;object-fit: cover;">
+                            </div>
+                            <div class="am-hide-sm-only">
+                                <span class="dd-clamp-text-1" th:text="${pic.account}"></span>
+                            </div>
+                            <div class="am-show-sm-only">
+                                <span class="dd-clamp-text-1 am-text-sm am-padding-top-xs" th:text="${pic.account}"></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="am-text-center dd-clamp-text-1" style="color: #6C6C6C">
+                    <p th:text="${pic.profile}"></p>
+                </div>
+                <div class="am-text-center am-padding-top-xs">
+                    <button type="button" class="am-btn am-round" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }"
+                            style="background-color: #FFFFFF;color: #FFFFFF;width: 80%;border: 1px solid var(--theme-wone);color: var(--theme-wone);height: 40px;"  th:text="${advanced['chat.now']}">
+                    </button>
+                </div>
+            </div>
+        </li>
+        <li class="dd-hover4" th:if="${#lists.isEmpty(employee)}"
+            th:each="i : ${#numbers.sequence(1, 1)}">
+            <div class="am-padding am-margin-sm phone-clear-margin"
+                 style="background-color: #F9F9F9;border-radius: 12px;">
+                <div class="am-container">
+                    <div class="am-text-center am-text-xl" style="margin: 10px 0;">
+                        <div class="" style="width: 90px;height: 90px;margin: 0 auto">
+                            <img alt="No Data" src="" style="border: 1px solid #E6E6E6;width: 90px;height: 90px;border-radius: 50%;overflow: hidden;object-fit: cover;background: #afb4b7;">
+                        </div>
+                        <span class=""></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+<div class="am-container am-margin-top phone-container-title am-margin-bottom phone-clear-padding"
+     style="background-color: #FFFFFF;">
+    <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+        <div class="am-text-center">
+            <div class="am-u-sm-12">
+                <div class="section-title am-text-bold" ><h3 class="inline-header"  th:text="${advanced['organization.structure']}"></h3></div>
+            </div>
+        </div>
+    </div>
+    <div class="am-container">
+        <table class="am-table am-padding-top am-padding-bottom-sm">
+            <tbody>
+            <tr>
+                <td class="am-text-center am-text-bold am-text-lg">
+                    <div class="am-margin-sm" th:text="${advanced['shareholder.names']}">
+                    </div>
+                </td>
+                <td class="am-text-center am-text-bold am-text-lg">
+                    <div class="am-margin-sm" th:text="${advanced['shareholding.percentage']}">
+                    </div>
+                </td>
+            </tr>
+            <tr th:each="pic : ${equity}">
+                <td>
+                    <a aria-hidden="false" th:aria-label="${pic.account}"
+                       th:title="${pic.account}"
+                       th:href="${not #strings.isEmpty(pic.profileUrl)} ? ${pic.profileUrl} : 'javascript:void(0);'">
+                        <div class="am-padding" style="display: inline-flex;">
+                            <div class="" style="min-width: 60px">
+                                <!-- 图片存在时显示 -->
+                                <div th:if="${pic?.auHead != null and !#strings.isEmpty(#strings.trim(pic.auHead))}" >
+                                    <img th:src="${pic.auHead}" th:alt="${pic.account}" class="am-img-responsive"
+                                         style="object-fit: cover;width: 60px;min-width: 60px;height: 60px;border-radius: 100px;">
+                                </div>
+                                <!-- 图片不存在时显示 -->
+                                <div th:unless="${pic?.auHead != null and !#strings.isEmpty(#strings.trim(pic.auHead))}">
+                                    <div style="width: 60px;min-width: 60px;height: 60px;border-radius: 100px; background: #afb4b7;"></div>
+                                </div>
+                            </div>
+                            <div class="am-padding-left" style="height: 60px;justify-content: center;align-items: center;display: flex;">
+                                <div>
+                                    <div class="dd-clamp-text-1 am-text-lg am-text-bold" th:text="${pic.account}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </td>
+                <td class="am-text-center">
+                    <div class="am-padding-top-xl am-text-bold" th:text="${pic.shareRatio} + ' %'"></div>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(equity)}">
+                <td>
+                    <div class="am-padding" style="display: inline-flex;">
+                        <div class="am-padding-right">
+                            <div class="" style="width: 60px;height: 60px;">
+                            </div>
+                        </div>
+                        <div class="" style="height: 60px;justify-content: center;align-items: center;display: flex;">
+                            <div>
+                                <div class="dd-clamp-text-1 am-text-lg am-text-bold"></div>
+                                <div class="dd-clamp-text-2" style="color: #6C6C6C"></div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="am-text-center">
+                    <div class="am-padding-top-xl am-text-bold">
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="am-container am-margin-top phone-container-title am-margin-bottom"
+     style="background-color: #FFFFFF;">
+    <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+</div>
+
+
+<th:block th:replace="search :: search"></th:block>
+<th:block th:replace="inquiry :: inquiry"></th:block>
+<th:block th:replace="right-menu :: right-menu(param1='about')"></th:block>
+<th:block th:replace="footer :: footer"></th:block>
+</body>
+
+</html>

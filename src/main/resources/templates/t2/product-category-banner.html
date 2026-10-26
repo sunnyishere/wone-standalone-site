@@ -1,0 +1,24 @@
+<th:block th:fragment="preload"
+          th:with="desktopImage=${!#strings.isEmpty(category.pcImgUrl) ? category.pcImgUrl : category.h5ImgUrl},
+                   mobileImage=${!#strings.isEmpty(category.h5ImgUrl) ? category.h5ImgUrl : desktopImage}">
+    <link th:if="${!#strings.isEmpty(desktopImage)}" rel="preload" as="image" fetchpriority="high" media="(min-width: 641px)" th:href="${desktopImage}">
+    <link th:if="${!#strings.isEmpty(mobileImage)}" rel="preload" as="image" fetchpriority="high" media="(max-width: 640px)" th:href="${mobileImage}">
+</th:block>
+
+<div th:fragment="banner" class="page-banner t2-page-banner product-category-banner"
+     th:with="categoryTitle=${!#strings.isEmpty(category.i18nName) ? category.i18nName : category.name},
+              desktopImage=${!#strings.isEmpty(category.pcImgUrl) ? category.pcImgUrl : category.h5ImgUrl},
+              mobileImage=${!#strings.isEmpty(category.h5ImgUrl) ? category.h5ImgUrl : desktopImage}"
+     th:classappend="${#strings.isEmpty(desktopImage)} ? 't2-page-banner--text-only'">
+    <picture class="t2-banner-picture" th:if="${!#strings.isEmpty(desktopImage)}">
+        <source media="(max-width: 640px)" th:srcset="${mobileImage}">
+        <img th:src="${desktopImage}" th:alt="${categoryTitle}" width="1920" height="800" fetchpriority="high" loading="eager">
+    </picture>
+    <div class="page-banner-inner am-container wone-text">
+        <h1 class="page-banner-title" th:text="${categoryTitle}"></h1>
+        <h2 class="t2-banner-description" th:if="${!#strings.isEmpty(category.shortDesc)}"
+            th:text="${category.shortDesc}"></h2>
+        <a th:if="${pageButtonVisible == true}" class="t2-banner-button"
+           th:href="${pageButtonLink}" th:text="${pageButtonTitle}"></a>
+    </div>
+</div>

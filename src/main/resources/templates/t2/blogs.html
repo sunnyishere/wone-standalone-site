@@ -1,0 +1,160 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='blog-list'">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${pageTitle}"></title>
+    <meta name="description" th:content="${pageContent} ?: ''"/>
+    <meta name="keywords" th:content="${pageKeyword} ?: ''">
+    <meta property="og:title" th:content="${title}"/>
+    <meta property="og:description" th:content="${description}"/>
+    <th:block th:with="pn=${pageData?.pageNum ?: 1},canonical=${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
+basePath =${websitePath +pageName}">
+        <link rel="canonical" th:href="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <meta property="og:url" th:content="${pn > 1 ? canonical + '-' + pn : canonical}"/>
+        <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default"
+              th:href="${pn > 1 ? basePath + '-' + pn : basePath}"/>
+    </th:block>
+    <th:block th:if="${not #lists.isEmpty(langList) and langList.size() > 1}"
+              th:each="transLang : ${langList}"
+              th:with="pn=${pageData?.pageNum ?: 1}">
+        <link rel="alternate" th:hreflang="${transLang.lang}"
+              th:href="${websitePath + (transLang.lang!= 'en'?transLang.lang + '/':'') + pageName + (pn > 1 ? '-' + pn : '')}"/>
+    </th:block>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="twitter:title" th:content="${title}"/>
+    <meta name="twitter:description" th:content="${description}"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <th:block th:with="pageHeroes=${topNavPages.?[pageType == 8]}">
+        <th:block th:replace="t2/banner :: pageBannerPreload"></th:block>
+    </th:block>
+<!--    <th:block th:replace="head :: critical-list"></th:block>-->
+    <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="list-infinite-scroll :: assets"></th:block>
+    <th:block th:replace="t2/banner :: bannerStyle"></th:block>
+<!--    <th:block th:replace="head :: faqStyle"></th:block>-->
+    <script type="application/ld+json" th:utext="${faqPageSchemaJson != null ? faqPageSchemaJson : '{}'}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+
+    <th:block th:replace="pc-en :: section(param1='Blogs')"></th:block>
+
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+<div class="header-height"></div>
+<th:block th:with="pageHeroes=${topNavPages.?[pageType == 8]}">
+    <th:block th:replace="t2/banner :: pageBanner"></th:block>
+</th:block>
+<nav class="m-cat-nav" id="page-list-content">
+    <div class="am-container">
+        <ol class="am-breadcrumb am-breadcrumb-slash am-padding-top-xl">
+            <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:title="${advanced['home.button']}"
+                   aria-hidden="false" th:aria-label="${advanced['home.button']}"> <span
+                    class="am-padding-right-xs" th:text="${advanced['home.button']}"></span></a></li>
+            <li><a th:text="${i18nName}" th:href="${currentPathLang} + '/' + ${pageName}" th:title="${i18nName}"
+                   aria-hidden="false" th:aria-label="${i18nName}"></a></li>
+        </ol>
+    </div>
+</nav>
+<div class="" style="">
+    <div class="am-container am-padding phone-clear-padding"
+         style="margin: 0px auto 0px !important;padding: 0 30px 0 30px !important;"
+         th:if="${not #strings.isEmpty(pageDetailedText)}">
+        <div class="am-text-lg" style="background-color: #FFFFFF;padding: 30px;margin: 0 1px;border-radius: 12px;"
+             th:text="${pageDetailedText}">
+        </div>
+    </div>
+
+    <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
+        <ul data-scroll-list th:attr="data-page=${pageData.pageNum},data-next-url=${pageData.totalPages != null and pageData.pageNum < pageData.totalPages ? currentPathLang + '/' + pageName + '-' + (pageData.pageNum + 1) : ''}" class="am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails phone-clear-padding phone-clear-margin"
+            style="margin: 0 0 20px 0;padding: 10px">
+            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                th:if="${not #lists.isEmpty(pageData.rows)}"
+                th:each="index : ${pageData.rows}">
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="inline-a-link" th:title="${index.i18nTitle}" aria-hidden="false" th:aria-label="${index.i18nTitle}"
+                   th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
+                   '/' :
+                   ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
+                   ${#normalizer.resolveSlugUrl(index.slugUrl, index.title)} + '-' +
+                   ${index.id}">
+                        <div class="image-box3">
+                            <img th:alt="${index.i18nTitle}" th:src="${index.iconUrl}" alt="" class="image-square">
+                        </div>
+                        <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                            <div><span class="inline-header" th:text="${index.i18nTitle}"></span></div>
+                        </div>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm" style="height:12.6rem" th:text="${index.content}"></span>
+                    </a>
+                    <div class="am-padding-top-xs am-cf am-text-sm">
+                        <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                            <span class="am-icon-user"></span>
+                            <a class="device-aware-link" aria-hidden="false" th:aria-label="${index.author}" th:title="${index.author}"
+                               th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 6])} ?
+                               '/' :
+                               ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 6][0].pageName), ' ', '-')}))" style="border: none">
+                                <span th:text="${index.author}"></span>
+                            </a>
+                        </div>
+                        <div class="am-fr" style="color:#999999">
+                                    <span th:if="${index.created != null}"
+                                          th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                th:if="${#lists.isEmpty(pageData.rows)}"
+                th:each="i : ${#numbers.sequence(1, 6)}">
+                <div style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <div class="image-box3">
+                        <img alt="No Data" src="" class="image-square" style="background: #afb4b7">
+                    </div>
+                    <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                        <div></div>
+                    </div>
+                    <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"></span>
+                    <div class="am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                        <span></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <th:block th:replace="list-infinite-scroll :: controls(totalPages=${pageData.totalPages}, currentPage=${pageData.pageNum}, listPath=${currentPathLang + '/' + pageName})"></th:block>
+        <div class="am-container am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+            <div style="background:#FFFFFF;padding: 0 1.6rem">
+                <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 搜索弹窗-->
+<th:block th:replace="search :: search"></th:block>
+
+<th:block th:replace="inquiry :: inquiry"></th:block>
+<th:block th:replace="right-menu :: right-menu(param1='Blogs')"></th:block>
+<th:block th:replace="footer :: footer"></th:block>
+</body>
+
+</html>

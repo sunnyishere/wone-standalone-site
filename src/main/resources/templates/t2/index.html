@@ -1,0 +1,903 @@
+<!doctype html>
+<html class="no-js" th:lang="${currentLang != null? currentLang:'en'}" th:with="templateType='home'">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${title}"></title>
+    <meta name="description" th:content="${description} ?: ${prodBrand.eName ?: 'DefaultBrand'} +' Home'"/>
+    <meta name="keywords" th:content="${keywords} ?: ''">
+
+
+    <meta property="og:title" th:content="${title}"/>
+    <meta property="og:description" th:content="${description} ?: ${prodBrand.eName ?: 'DefaultBrand'} +' Home'"/>
+    <meta property="og:url"
+          th:content="${currentLang !=  null && currentLang != 'en' ? websitePath+currentLang : indexPath}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
+    <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <meta name="twitter:title" th:content="${title}"/>
+    <meta name="twitter:description" th:content="${description} ?: ${prodBrand.eName ?: 'DefaultBrand'} +' Home'"/>
+    <meta name="twitter:site" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:creator" th:content="'@'+${prodBrand.eName ?: 'DefaultBrand'}"/>
+
+    <link rel="canonical"
+          th:href="${currentLang !=  null && currentLang != 'en' ? websitePath+currentLang : indexPath}"/>
+    <link th:if="${langList != null and langList.size() > 1}" rel="alternate" hreflang="x-default"
+          th:href="${indexPath}"/>
+    <th:block th:if="${langList != null and langList.size() > 1 }" th:each="transLang : ${langList}">
+        <link rel="alternate" th:hreflang="${transLang.lang}" th:href="${transLang.lang!= 'en'?websitePath+transLang.lang:indexPath}"/>
+    </th:block>
+    <link th:if="${not #lists.isEmpty(banner)}" rel="preload" as="image" fetchpriority="high"
+          media="(min-width: 641px)" th:href="${banner.get(0).imgUrl}">
+    <link th:if="${not #lists.isEmpty(banner)}" rel="preload" as="image" fetchpriority="high"
+          media="(max-width: 640px)" th:href="${#strings.isEmpty(banner.get(0)['h5ImgUrl']) ? banner.get(0).imgUrl : banner.get(0)['h5ImgUrl']}">
+    <link rel="preconnect" href="https://oss.iee-business.com" crossorigin>
+    <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <th:block th:replace="head :: commonHead"></th:block>
+    <th:block th:replace="t2/banner :: bannerStyle"></th:block>
+    <script th:if="${schemaJson != null and schemaJson != '{}'}" type="application/ld+json" th:utext="${schemaJson}">
+    </script>
+    <script th:if="${faqPageSchemaJson != null and faqPageSchemaJson != '{}'}" type="application/ld+json" th:utext="${faqPageSchemaJson}">
+    </script>
+</head>
+
+<body class="body-bg">
+<header class="m-hd" style="background-color: var(--theme-header-bg);">
+
+    <th:block th:replace="pc-en :: section(param1='Home')"></th:block>
+
+    <th:block th:replace="phone-en :: phone-header"></th:block>
+
+
+    <th:block th:replace="phone-en2 :: r-nav"></th:block>
+</header>
+
+<div class="header-height"></div>
+<!-- Banner -->
+<div class="hero-embla" id="heroEmbla">
+    <div class="hero-embla__viewport">
+        <div class="hero-embla__container">
+            <div th:if="${not #lists.isEmpty(banner)}" th:each="index, stat : ${banner}"
+                 class="hero-embla__slide">
+
+                    <div class="t2-hero-copy" th:classappend="${index.fontPosition == 'center'} ? 't2-hero-copy--center'" th:style="'color:' + ${index['displayFontColor'] ?: '#060606'}">
+                        <h1 th:if="${stat.first}" th:text="${index.title}"></h1>
+                        <div th:unless="${stat.first}" class="t2-hero-title" th:text="${index.title}"></div>
+                        <h2 th:if="${stat.first}" class="t2-hero-description" th:text="${index.description}"></h2>
+                        <div th:unless="${stat.first}" class="t2-hero-description" th:text="${index.description}"></div>
+                        <a th:if="${index['buttonVisible'] == true}" class="t2-hero-button"
+                           th:href="${index.jumpUrl}" th:text="${index['buttonTitle']}"
+                           target="_blank" rel="noopener noreferrer"></a>
+                    </div>
+                    <picture class="hero-embla__media">
+                        <source media="(max-width: 640px)" width="800" height="800"
+                                th:srcset="${#strings.isEmpty(index['h5ImgUrl']) ? index.imgUrl : index['h5ImgUrl']}">
+                        <img th:src="${index.imgUrl}" th:alt="${index.title}"
+                             width="1920" height="800"
+                             th:attr="fetchpriority=${stat.first ? 'high' : 'auto'},loading=${stat.first ? 'eager' : 'lazy'}">
+                    </picture>
+            </div>
+
+            <div th:unless="${not #lists.isEmpty(banner)}"
+                 th:each="i : ${#numbers.sequence(1, 3)}"
+                 class="hero-embla__slide">
+                <div class="hero-embla__media">
+                    <img th:if="${i == 1}"
+                         th:src="'/images/banner' + ${i} + '.jpg'"
+                         alt="Banner"
+                         width="1920"
+                         height="680"
+                         fetchpriority="high"
+                         loading="eager">
+                    <img th:unless="${i == 1}"
+                         th:src="'/images/banner' + ${i} + '.jpg'"
+                         alt="Banner"
+                         width="1920"
+                         height="680"
+                         loading="lazy">
+                </div>
+                <a title="No More" aria-hidden="false" aria-label="No More" th:href="@{/}" class="banner-link" style="position: absolute; inset: 0; z-index: 2;">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div>
+    <div class="am-container phone-title am-hide-sm-only home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
+            <div class="am-text-center">
+                <div class="am-u-sm-12">
+                    <h3 class="inline-header"><span class="am-text-xl am-text-bold"
+                                                    th:text="${homeConfig != null and homeConfig.products != null and homeConfig.products.title != null and homeConfig.products.title != '' ? homeConfig.products.title : prodBrand.eName + '   ' + advanced['products']}"></span>
+                    </h3>
+                    <p class="home-config-description"
+                       th:if="${homeConfig != null and homeConfig.products != null and homeConfig.products.description != null and homeConfig.products.description != ''}"
+                       th:text="${homeConfig.products.description}"></p>
+                </div>
+            </div>
+    </div>
+    <div class="am-container" style="padding: 10px 0 30px 0;background-color: #FFFFFF;">
+                <div class="tabs-new">
+                    <div class="category">
+                        <div>
+                            <ul th:if="${not #lists.isEmpty(categories)}">
+                                <li class="pc-active" th:text="${advanced['all']}">
+                                    All
+                                </li>
+                                <li th:each="category,stat : ${categories}"
+                                    th:data-tab-index="${stat.index + 1}">
+                                    <span th:text="${category.i18nName}"></span>
+                                </li>
+                            </ul>
+                            <ul>
+                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}"
+                                    th:text="${advanced['all']}">
+                                    All
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="javascript:;" class="prev"><span></span></a>
+                        <a href="javascript:;" class="next"><span></span></a>
+                    </div>
+                    <div class="cont pc-active">
+
+                        <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                            style="margin: 0 0;">
+                            <li class="equal-height-card-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                                th:if="${not #lists.isEmpty(featuredProducts)}"
+                                th:each="prod : ${featuredProducts}">
+
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <a
+                                       class="equal-height-card-link inline-a-link"
+                                       th:href="${currentPathLang} + (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+            'detail/'+
+           ${#normalizer.resolveSlugUrl(prod.slugUrl, prod.name)} +
+           '-'+${prod.id}">
+                                        <div class="image-box">
+                                            <img th:alt="${prod.i18nName}" th:data-echo="${prod.url}"
+                                                 th:src="${prod.url}"  class="image-square">
+                                        </div>
+                                        <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                              th:text="${prod?.i18nName ?: ''}"></span>
+                                    </a>
+                                </div>
+
+                            </li>
+                            <!-- 空状态处理 -->
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
+                                th:if="${#lists.isEmpty(featuredProducts)}"
+                                th:each="i : ${#numbers.sequence(1, 5)}"
+                                style="padding: 0 10px !important;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img class="image-square" style="background: #afb4b7">
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"></span>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <div th:if="${not #lists.isEmpty(featuredProducts)}"
+                             class="am-container am-text-center am-margin-bottom-xl am-margin-top">
+                            <a title="View All Products" aria-hidden="false" aria-label="View All Products"
+                               class="inline-a-link"
+                               th:href="
+                               ${currentPathLang} +
+                               (${ (#lists.isEmpty(topNavPages.?[pageType==2])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==2][0].pageName), ' ', '-')) })">
+                                <button type="button" class="am-btn am-round"
+                                        style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;"
+                                        th:text="${advanced['view.all']} + ' ' + ${advanced['products']}">
+
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="cont" th:each="category,stat : ${cateProd}" th:data-content-index="${stat.index + 1}">
+                        <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                            style="margin: 0 0;">
+                            <!-- 产品列表循环 -->
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
+                                th:if="${not #lists.isEmpty(cateProd)}" th:each="product : ${category.prod}"
+                                style="padding: 0 10px !important;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <a
+                                       class="equal-height-card-link inline-a-link"
+
+                                       th:href="${currentPathLang} +
+                                (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
+        '/' :
+        ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
+          'detail/'+
+        ${#normalizer.resolveSlugUrl(product.slugUrl, product.name)} +
+        '-' +
+        ${product.id}">
+                                        <div class="image-box">
+                                            <img th:data-echo="${product.url}" th:alt="${product.i18nName}"
+                                                 src="/img/space.png" class="image-square">
+                                        </div>
+                                        <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                              th:text="${product.i18nName ?: ''}"></span>
+                                    </a>
+                                </div>
+
+                            </li>
+
+                            <!-- 空状态处理 -->
+                            <li class="equal-height-card-item dd-hover4 am-margin-top"
+                                th:if="${#lists.isEmpty(category.prod)}"
+                                th:each="i : ${#numbers.sequence(1, 5)}"
+                                style="padding: 0 10px !important;">
+                                <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                                    <div class="image-box">
+                                        <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
+                                    </div>
+                                    <span class="dd-clamp-text-2 am-padding-top-sm am-text-sm"></span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div th:if="${not #lists.isEmpty(cateProd)}"
+                             class="am-container am-text-center am-margin-bottom-xl am-margin-top">
+                            <!-- 临时调试：输出分类ID和名称 -->
+                            <div class="view-all-btn am-btn am-round load-more-btn"
+                                 th:attr="data-cate-id=${category.cateId},
+                                     data-lang-url=${currentPathLang},
+                                     data-cate-name=${#strings.replace(#strings.trim(#strings.toLowerCase(category.cateName)), ' ', '-')}">
+                                <button type="button" class="am-btn am-round"
+                                        style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;"
+                                        th:text="${advanced['view.all']}  + ' ' + ${advanced['products']}">
+
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+
+        <!-- 首页四项数据 -->
+        <section class="home-stat-strip"
+                 th:if="${homeConfig != null and homeConfig.stats != null and
+                ((homeConfig.stats.expertise.value != null and homeConfig.stats.expertise.value != '') or
+                 (homeConfig.stats.countriesServed.value != null and homeConfig.stats.countriesServed.value != '') or
+                 (homeConfig.stats.manufacturingBases.value != null and homeConfig.stats.manufacturingBases.value != '') or
+                 (homeConfig.stats.maxVoltage.value != null and homeConfig.stats.maxVoltage.value != ''))}">
+            <div class="am-container">
+                <ul class="home-stat-list">
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.expertise.value != null and homeConfig.stats.expertise.value != ''}">
+                        <strong th:text="${homeConfig.stats.expertise.value}"></strong>
+                        <span th:text="${advanced['years.of.expertise']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.countriesServed.value != null and homeConfig.stats.countriesServed.value != ''}">
+                        <strong th:text="${homeConfig.stats.countriesServed.value}"></strong>
+                        <span th:text="${advanced['countries.served']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.manufacturingBases.value != null and homeConfig.stats.manufacturingBases.value != ''}">
+                        <strong th:text="${homeConfig.stats.manufacturingBases.value}"></strong>
+                        <span th:text="${advanced['manufacturing.bases']}"></span>
+                    </li>
+                    <li class="home-stat-item"
+                        th:if="${homeConfig.stats.maxVoltage.value != null and homeConfig.stats.maxVoltage.value != ''}">
+                        <strong th:text="${homeConfig.stats.maxVoltage.value}"></strong>
+                        <span th:text="${advanced['max.voltage.rating']}"></span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    
+        <th:block th:if="${homeConfig != null and homeConfig['manufacturingStrength'] != null}">
+            <th:block th:with="strength=${homeConfig['manufacturingStrength']}">
+                <section class="home-strength-section" th:if="${not #strings.isEmpty(strength['title']) and not #strings.isEmpty(strength['description']) and not #strings.isEmpty(strength['youtubeUrl'])}">
+                    <div class="am-container home-strength-layout" th:classappend="${!(not #strings.isEmpty(strength['youtubeUrl']) or (strength['dataCard1'] != null and (not #strings.isEmpty(strength['dataCard1']['value']) or not #strings.isEmpty(strength['dataCard1']['description']))) or (strength['dataCard2'] != null and (not #strings.isEmpty(strength['dataCard2']['value']) or not #strings.isEmpty(strength['dataCard2']['description']))))} ? 'home-strength-layout--copy-only' : ''">
+                        <div class="home-strength-visual" th:if="${not #strings.isEmpty(strength['youtubeUrl']) or (strength['dataCard1'] != null and (not #strings.isEmpty(strength['dataCard1']['value']) or not #strings.isEmpty(strength['dataCard1']['description']))) or (strength['dataCard2'] != null and (not #strings.isEmpty(strength['dataCard2']['value']) or not #strings.isEmpty(strength['dataCard2']['description'])))}">
+                            <div class="home-strength-video" th:if="${not #strings.isEmpty(strength['youtubeUrl'])}"
+                                 th:attr="data-strength-video=${strength['youtubeUrl']}">
+                                <img class="home-strength-cover" width="1280" height="720" decoding="async"
+                                     th:alt="${#strings.isEmpty(strength['title']) ? 'Manufacturing strength' : strength['title']}" hidden>
+                                <div class="home-strength-cover-placeholder" aria-hidden="true"></div>
+                                <a class="home-strength-play" th:href="${strength['youtubeUrl']}" target="_blank" rel="noopener noreferrer"
+                                   aria-label="Play video" data-strength-play>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z"/></svg>
+                                </a>
+                            </div>
+                            <div class="home-strength-cards">
+                                <th:block th:each="number : ${#numbers.sequence(1, 2)}">
+                                    <th:block th:with="card=${strength['dataCard' + number]}">
+                                        <div class="home-strength-card" th:classappend="${number == 1} ? 'home-strength-card--primary' : ''"
+                                             th:if="${card != null and (not #strings.isEmpty(card['value']) or not #strings.isEmpty(card['description']))}">
+                                            <strong th:if="${not #strings.isEmpty(card['value'])}" th:text="${card['value']}"></strong>
+                                            <span th:if="${not #strings.isEmpty(card['description'])}" th:text="${card['description']}"></span>
+                                        </div>
+                                    </th:block>
+                                </th:block>
+                            </div>
+                        </div>
+                        <div class="home-strength-copy">
+                            <div class="home-strength-eyebrow" th:text="${advanced['manufacturing.strength']}">MANUFACTURING STRENGTH</div>
+                            <h3 class="home-strength-title" th:if="${not #strings.isEmpty(strength['title'])}" th:text="${strength['title']}"></h3>
+                            <p class="home-strength-description" th:if="${not #strings.isEmpty(strength['description'])}" th:text="${strength['description']}"></p>
+                            <ul class="home-strength-features">
+                                <th:block th:with="item=${strength['strengthItem1']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V9l6-4v16M10 21V3l8 4v14M2 21h20M14 10v2m0 3v2m4-5h2v9"/></svg></span>
+                                        <div>
+                                            <div class="home-strength-feature-title" th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></div>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem2']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6l-9 9-4-4"/><path d="M21 12a9 9 0 1 1-6-8.5"/></svg></span>
+                                        <div>
+                                            <div class="home-strength-feature-title" th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></div>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem3']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6a5 5 0 0 0-6 6L3 17a3 3 0 0 0 4 4l5-5a5 5 0 0 0 6-6l-3 3-4-4 3-3Z"/></svg></span>
+                                        <div>
+                                            <div class="home-strength-feature-title" th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></div>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                                <th:block th:with="item=${strength['strengthItem4']}">
+                                    <li class="home-strength-feature" th:if="${item != null and (not #strings.isEmpty(item['title']) or not #strings.isEmpty(item['description']))}">
+                                        <span class="home-strength-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18M12 3c5 5 5 13 0 18"/></svg></span>
+                                        <div>
+                                            <div class="home-strength-feature-title" th:if="${not #strings.isEmpty(item['title'])}" th:text="${item['title']}"></div>
+                                            <p th:if="${not #strings.isEmpty(item['description'])}" th:text="${item['description']}"></p>
+                                        </div>
+                                    </li>
+                                </th:block>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="am-container home-strength-gallery" th:if="${strength['images'] != null and not #lists.isEmpty(strength['images'])}" data-strength-gallery>
+                        <div class="home-strength-gallery-track" tabindex="0" role="region" aria-label="Company gallery" data-gallery-track>
+                            <figure class="home-strength-gallery-item" th:each="image : ${strength['images']}">
+                                <img th:src="${image['imageUrl']}" th:alt="${strength['title']}"
+                                     width="800" height="600" loading="lazy" decoding="async">
+                            </figure>
+                        </div>
+                        <div class="home-strength-gallery-controls" data-gallery-controls hidden>
+                            <button class="home-strength-gallery-arrow" type="button" aria-label="Previous images" data-gallery-prev>
+                                <i class="am-icon-angle-left" aria-hidden="true"></i>
+                            </button>
+                            <div class="home-strength-gallery-dots" aria-label="Gallery pages" data-gallery-dots></div>
+                            <button class="home-strength-gallery-arrow" type="button" aria-label="Next images" data-gallery-next>
+                                <i class="am-icon-angle-right" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <dialog class="home-strength-dialog" aria-label="Manufacturing video" data-strength-dialog>
+                        <button class="home-strength-close" type="button" aria-label="Close video" data-strength-close>&times;</button>
+                        <div class="home-strength-player" data-strength-player></div>
+                    </dialog>
+                </section>
+            </th:block>
+        </th:block>
+
+        <!-- 首页证书资料：左侧展示文案和资料入口，右侧展示前两条关联资料及资料列表入口。 -->
+        <section class="home-certificate-section"
+                 th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+            <div class="am-container home-certificate-layout">
+                <div class="home-certificate-copy">
+                    <div class="home-certificate-eyebrow" th:text="${advanced['certificates.type.tests']}">CERTIFICATES &amp; TYPE TESTS</div>
+                    <h3 class="home-certificate-title"
+                        th:if="${homeConfig.certificates.title != null and homeConfig.certificates.title != ''}"
+                        th:text="${homeConfig.certificates.title}"></h3>
+                    <p class="home-certificate-description"
+                       th:if="${homeConfig.certificates.description != null and homeConfig.certificates.description != ''}"
+                       th:text="${homeConfig.certificates.description}"></p>
+                    <ul class="home-certificate-list"
+                        th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+                        <li th:each="library : ${certificateLibraries}">
+                            <a class="inline-a-link"
+                               th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(library.slugUrl, library.name)} + '-' + ${library.id}"
+                               th:title="${library.name}">
+                                <span class="home-certificate-list__icon">✓</span>
+                                <span class="dd-clamp-text-2" th:text="${library.name}"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="home-certificate-visual"
+                     th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
+                    <a class="inline-a-link home-certificate-card home-certificate-card--back"
+                       th:if="${#lists.size(certificateLibraries) > 1}"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(certificateLibraries[1].slugUrl, certificateLibraries[1].name)} + '-' + ${certificateLibraries[1].id}"
+                       th:title="${certificateLibraries[1].name}">
+                        <img class="home-certificate-card__image"
+                             th:if="${certificateLibraries[1].icon != null and certificateLibraries[1].icon != ''}"
+                             th:src="${certificateLibraries[1].icon}"
+                             th:alt="${certificateLibraries[1].name}" loading="lazy">
+                        <span class="home-certificate-card__shade"></span>
+                        <span class="home-certificate-card__name dd-clamp-text-2"
+                              th:text="${certificateLibraries[1].name}"></span>
+                    </a>
+
+                    <a class="inline-a-link home-certificate-card home-certificate-card--front"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(certificateLibraries[0].slugUrl, certificateLibraries[0].name)} + '-' + ${certificateLibraries[0].id}"
+                       th:title="${certificateLibraries[0].name}">
+                        <img class="home-certificate-card__image"
+                             th:if="${certificateLibraries[0].icon != null and certificateLibraries[0].icon != ''}"
+                             th:src="${certificateLibraries[0].icon}"
+                             th:alt="${certificateLibraries[0].name}" loading="lazy">
+                        <span class="home-certificate-card__shade"></span>
+                        <span class="home-certificate-card__name dd-clamp-text-2"
+                              th:text="${certificateLibraries[0].name}"></span>
+                    </a>
+
+                    <a class="inline-a-link home-certificate-card home-certificate-card--cta"
+                       th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')}"
+                       th:title="${advanced['full'] + ' ' + advanced['documents']}">
+                        <strong th:text="${advanced['full'] + ' ' + advanced['documents']}"></strong>
+                        <span th:text="${advanced['view.all.certificates.and.type.test.documents']}"></span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+            <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;">
+                    <div class="home-section-header__center">
+                    <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
+                        <h3 class="inline-header">
+                            <div class="dd-clamp-text-1"
+                                 th:text="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.title != null and homeConfig.successCases.title != '' ? homeConfig.successCases.title :
+                                    (#lists.isEmpty(topNavPages.?[pageType == 7]) ? '' : (topNavPages.?[pageType == 7][0].i18nName ?: ''))}"></div>
+                        </h3>
+                        <p class="home-config-description"
+                           th:if="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.description != null and homeConfig.successCases.description != ''}"
+                           th:text="${homeConfig.successCases.description}"></p>
+                    </div>
+                    </div>
+                    <div class="home-section-header__action am-padding-top-xs">
+                        <a
+                           th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==7])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==7][0].pageName), ' ', '-')) })">
+                            <span style="color: #000000;text-decoration: underline;"
+                                  th:text="${advanced['view.all']}"></span>
+                            <span class="p-icon-a-067  am-padding-left-sm"></span>
+                        </a>
+                    </div>
+            </div>
+            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-sm">
+                <ul class="equal-height-card-list am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-padding-sm  ">
+                    <li class="equal-height-card-item dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                        th:if="${not #lists.isEmpty(successCases)}" th:each="success : ${successCases}">
+                        <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                            <a
+                               class="equal-height-card-link inline-a-link"
+                               th:href="
+                            ${currentPathLang} +
+                            (${#lists.isEmpty(topNavPages.?[pageType == 7])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 7][0].pageName), ' ', '-')} + '/') ) +
+           ${#normalizer.resolveSlugUrl(success.slugUrl, (success.seoTitle != null and !#strings.isEmpty(success.seoTitle)) ? success.seoTitle : success.title)} + '-' +
+           ${success.id}">
+                                <div class="image-box2">
+                                    <img th:data-echo="${success.iconUrl}" th:alt="${success.title}"
+                                         src="https://oss.iee-business.com/landing/img/space.png" class="image-square">
+                                </div>
+                                <div class="am-margin-top-sm dd-clamp-text-2 am-text-bold">
+                                    <div th:text="${success?.i18nTitle ?: ''}"></div>
+                                </div>
+                                <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm"
+                                      th:text="${success?.content ?: ''}"></span>
+                            </a>
+                        </div>
+
+                    </li>
+
+                    <li class="equal-height-card-item dd-hover4 am-margin-bottom-sm" style="padding: 0 10px !important;"
+                        th:if="${#lists.isEmpty(successCases)}"
+                        th:each="i : ${#numbers.sequence(1, 4)}">
+                        <div class="equal-height-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                            <div class="image-box2">
+                                <img alt="No Data" src="" class="image-square" style="background: #afb4b7">
+                            </div>
+                            <div class="am-margin-top-sm dd-clamp-text-2 am-text-bold"></div>
+                            <span class="dd-clamp-text-3 am-padding-top-sm am-text-sm"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+    <!--Rockwill Solutions -->
+    <div class="" style="background-color: #FFFFFF;">
+
+        <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
+                <div class="home-section-header__center">
+                <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
+                    <h3 class="inline-header">
+                        <div class="dd-clamp-text-1"
+                             th:text="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.title != null and homeConfig.solutions.title != '' ? homeConfig.solutions.title :
+                                (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '' : (topNavPages.?[pageType == 3][0].i18nName ?: ''))}"></div>
+                    </h3>
+                    <p class="home-config-description"
+                       th:if="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.description != null and homeConfig.solutions.description != ''}"
+                       th:text="${homeConfig.solutions.description}"></p>
+                </div>
+                </div>
+                <div class="home-section-header__action am-padding-top-xs">
+
+                    <a
+                       th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==3])) ?
+                 '/' :
+                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==3][0].pageName), ' ', '-')) })">
+                        <span style="color: #000000;text-decoration: underline;"
+                              th:text="${advanced['view.all']}"></span>
+                        <span class="p-icon-a-067  am-padding-left-sm"></span>
+                    </a>
+                </div>
+
+        </div>
+
+        <div class="am-container phone-container-all am-margin-top am-padding-bottom">
+            <div style="margin: 0 10px;">
+
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                     th:if="${not #lists.isEmpty(solutions)}" th:each="article : ${solutions}">
+                    <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                        <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                            <div>
+
+                                    <div class="am-fl am-margin-right">
+                                        <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                            <img th:data-echo="${article.iconUrl}" th:alt="${article.title}"
+                                                 src="https://oss.iee-business.com/landing/img/space.png"  class="am-img-responsive"
+                                                 style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;">
+                                        </div>
+                                    </div>
+                                    <div class="" style="height: 100px;">
+                                        <a
+                                           class="inline-a-link"
+                                           th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 3])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 3][0].pageName), ' ', '-')} + '/') ) +
+           ${#normalizer.resolveSlugUrl(article.slugUrl, article.title)} + '-' +
+           ${article.id}">
+                                        <span class="dd-clamp-text-1 am-text-bold" th:text="${article.i18nTitle}"></span>
+                                        <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
+                                             th:text="${article.content}"></div>
+                                        </a>
+                                        <div class="am-padding-top-xs am-cf am-text-sm">
+                                            <div class="am-fl dd-clamp-text-1" style="width: 40%;color: #5C779F;">
+                                                <span class="am-icon-user"></span>
+                                                <a class="device-aware-link"
+                                                   th:href="${currentPathLang} + (${ (#lists.isEmpty(topNavPages.?[pageType==6])) ?
+                                                 '/' :
+                                                 ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==6][0].pageName), ' ', '-')) })" style="border: none">
+                                                    <span th:text="${article.author}"></span>
+                                                </a>
+                                            </div>
+                                            <div class="am-fr" style="color:#999999">
+                                                <span th:if="${article.created != null}"
+                                                      th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="am-u-sm-12 am-u-md-12 am-u-lg-4 am-padding-left am-padding-right phone-clear-padding am-margin-bottom"
+                     th:if="${#lists.isEmpty(solutions)}"
+                     th:each="i : ${#numbers.sequence(1, 6)}">
+                    <div class="" style="background-color: #F9F9F9;border-radius: 12px;">
+                        <div class="am-g dd-hover4 am-padding" style="width: 100%;">
+                            <div>
+                                <div class="am-fl am-margin-right">
+                                    <div class="phone-bottom" style="width: 100px;height: 100px;">
+                                        <img src="" alt="No Data" class="am-img-responsive"
+                                             style="object-fit: cover;width: 100px;height: 100px;border-radius: 12px;background: #afb4b7">
+                                    </div>
+                                </div>
+                                <div class="" style="height: 100px;">
+                                    <div class="dd-clamp-text-1 am-text-bold"></div>
+                                    <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"></div>
+                                    <div class="am-padding-top-xs am-cf am-text-sm">
+                                        <div class="am-fl dd-clamp-text-1" style="width: 30%;color: #5C779F;">
+                                        </div>
+                                        <div class="am-fr" style="color:#999999">
+                                            <span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支持的厂商：按独立站原型使用左对齐浅灰卡片布局。 -->
+    <section class="home-manufacturer-section"
+             th:if="${homeConfig != null and homeConfig.supportedManufacturers != null and
+                ((homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != '') or
+                 (homeConfig.supportedManufacturers.description != null and homeConfig.supportedManufacturers.description != '') or
+                 (homeConfig.manufacturers != null and not #lists.isEmpty(homeConfig.manufacturers)))}">
+        <div class="am-container phone-title home-section-header">
+            <div class="home-section-header__center">
+                <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
+                    <h3 class="inline-header"
+                        th:if="${homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != ''}"
+                        th:text="${homeConfig.supportedManufacturers.title}"></h3>
+                    <p class="home-manufacturer-description"
+                       th:if="${homeConfig.supportedManufacturers.description != null and homeConfig.supportedManufacturers.description != ''}"
+                       th:text="${homeConfig.supportedManufacturers.description}"></p>
+                </div>
+            </div>
+        </div>
+        <ul class="home-manufacturer-list"
+            th:if="${homeConfig.manufacturers != null and not #lists.isEmpty(homeConfig.manufacturers)}">
+            <li class="home-manufacturer-item" th:each="manufacturer : ${homeConfig.manufacturers}">
+                <strong th:text="${manufacturer.abbreviation}"></strong>
+                <span th:text="${manufacturer.fullName}"></span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- News and blog: share one section and switch between the original card lists. -->
+    <section class="home-news-blog-section">
+        <div class="home-news-blog-heading home-config-heading">
+            <h3 th:text="${homeConfig != null and homeConfig.newsBlog != null and
+                    homeConfig.newsBlog.title != null and homeConfig.newsBlog.title != ''
+                    ? homeConfig.newsBlog.title
+                    : ((#lists.isEmpty(topNavPages.?[pageType == 5]) ? 'News' : (topNavPages.?[pageType == 5][0].i18nName ?: 'News'))
+                       + ' &amp; '
+                       + (#lists.isEmpty(topNavPages.?[pageType == 8]) ? 'Blog' : (topNavPages.?[pageType == 8][0].i18nName ?: 'Blog')))}"></h3>
+            <p class="home-config-description"
+               th:if="${homeConfig != null and homeConfig.newsBlog != null and
+                    homeConfig.newsBlog.description != null and homeConfig.newsBlog.description != ''}"
+               th:text="${homeConfig.newsBlog.description}"></p>
+        </div>
+        <div class="home-news-blog-toolbar">
+            <div aria-hidden="true"></div>
+            <div class="home-news-blog-tabs" role="tablist" aria-label="News and blog">
+                <button type="button" class="home-news-blog-tab is-active" role="tab"
+                        aria-selected="true" data-news-blog-tab="news"
+                        th:text="${advanced['news']}"></button>
+                <button type="button" class="home-news-blog-tab" role="tab"
+                        aria-selected="false" data-news-blog-tab="blog"
+                        th:text="${advanced['blogs']}"></button>
+            </div>
+            <div class="home-news-blog-actions">
+                <a class="home-news-blog-view-all" role="link" data-news-blog-action="news"
+                   th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==5])) ?
+                     '/' :
+                     ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==5][0].pageName), ' ', '-')) })">
+                    <span style="color: #000000;text-decoration: underline;"
+                          th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067 am-padding-left-sm"></span>
+                </a>
+                <a class="home-news-blog-view-all" role="link" data-news-blog-action="blog" hidden
+                   th:href="${currentPathLang} +  (${ (#lists.isEmpty(topNavPages.?[pageType==8])) ?
+                     '/' :
+                     ('/' + #strings.replace(#strings.trim(topNavPages.?[pageType==8][0].pageName), ' ', '-')) })">
+                    <span style="color: #000000;text-decoration: underline;"
+                          th:text="${advanced['view.all']}"></span>
+                    <span class="p-icon-a-067 am-padding-left-sm"></span>
+                </a>
+            </div>
+        </div>
+
+        <div class="home-news-blog-panel is-active" role="tabpanel" data-news-blog-panel="news">
+            <div class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+            <ul class="home-news-blog-list am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+                style="margin: 0 0 20px 0;">
+                <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                    th:if="${not #lists.isEmpty(news)}" th:each="index : ${news}">
+
+                    <div class="home-news-blog-card" style="background-color: #f9f9f9;padding: 15px;border-radius: 12px;">
+                        <a
+                           class="home-news-blog-card__link inline-a-link" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 5])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 5][0].pageName), ' ', '-')} + '/') ) +
+           ${#normalizer.resolveSlugUrl(index.slugUrl, index.title)} + '-' +
+           ${index.id}">
+                            <div class="image-box3">
+                                <img th:data-echo="${index.iconUrl}" th:alt="${index.title}" src="https://oss.iee-business.com/landing/img/space.png"
+                                      alt="" class="image-square">
+                            </div>
+                            <span class="am-margin-top-sm dd-clamp-text-1 am-text-bold" th:text="${index.i18nTitle}">
+                            </span>
+                            <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
+                                  th:text="${index.content}"></span>
+                            <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                           <span th:if="${index.created != null}"
+                                 th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                            </div>
+                        </a>
+                    </div>
+
+                </li>
+
+                <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important; "
+                    th:if="${#lists.isEmpty(news)}"
+                    th:each="i : ${#numbers.sequence(1, 6)}">
+                    <div class="home-news-blog-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                        <div class="image-box3">
+                            <img src="" alt="No Data" class="image-square" style="background: #afb4b7">
+                        </div>
+                        <div class="am-margin-top-sm dd-clamp-text-1 am-text-bold">
+                            <div></div>
+                        </div>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"></span>
+                        <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                            <span></span>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+            </div>
+        </div>
+
+        <div class="home-news-blog-panel" role="tabpanel" data-news-blog-panel="blog" hidden>
+            <div th:if="${not #lists.isEmpty(blogs)}" class="am-container phone-container-all phone-clear-padding am-margin-bottom-xl">
+        <ul class="home-news-blog-list am-avg-sm-1 am-avg-md-3 am-avg-lg-3 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
+            style="margin: 0 0 20px 0;">
+            <li class="home-news-blog-item dd-hover4 am-margin-top" style="padding: 0 10px !important;"
+                 th:each="index : ${blogs}">
+                <div class="home-news-blog-card" style="background-color: #FFFFFF;padding: 15px;border-radius: 12px;">
+                    <a class="home-news-blog-card__link inline-a-link" th:href="
+                        ${currentPathLang} +
+                        (${#lists.isEmpty(topNavPages.?[pageType == 8])} ?
+           '/' :
+           ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 8][0].pageName), ' ', '-')} + '/') ) +
+           ${#normalizer.resolveSlugUrl(index.slugUrl, index.title)} + '-' +
+           ${index.id}">
+                        <div class="image-box3">
+                            <img th:data-echo="${index.iconUrl}" th:alt="${index.title}"
+                                 src="https://oss.iee-business.com/landing/img/space.png"
+                                 alt="" class="image-square">
+                        </div>
+                        <span class="am-margin-top-sm dd-clamp-text-1 am-text-bold" th:text="${index.i18nTitle}">
+                            </span>
+                        <span class="dd-clamp-text-5 am-padding-top-sm am-text-sm"
+                              th:text="${index.content}"></span>
+                        <div class="home-news-blog-card__meta am-padding-top-xs am-text-sm am-text-right" style="color:#999999">
+                           <span th:if="${index.created != null}"
+                                 th:text="${#dates.format(index.created, 'MM/dd/yyyy')}"></span>
+                        </div>
+                    </a>
+                </div>
+            </li>
+        </ul>
+            </div>
+        </div>
+    </section>
+    <div class="am-container am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
+        <div style="background:#FFFFFF;padding: 0 1.6rem">
+            <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+        </div>
+    </div>
+
+    <!-- 首页联系方式：复用首页管理中的联系方式配置。 -->
+    <section class="home-contact-panel"
+             th:if="${homeConfig != null and homeConfig.contact != null and
+                ((homeConfig.contact.email != null and homeConfig.contact.email != '') or
+                 (homeConfig.contact.title != null and homeConfig.contact.title != '') or
+                 (homeConfig.contact.description != null and homeConfig.contact.description != '') or
+                 (homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != '') or
+                 (homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''))}">
+        <div class="home-contact-layout">
+            <div class="home-contact-copy">
+                <h3 class="home-contact-title"
+                    th:if="${homeConfig.contact.title != null and homeConfig.contact.title != ''}"
+                    th:text="${homeConfig.contact.title}"></h3>
+                <p class="home-contact-description"
+                   th:if="${homeConfig.contact.description != null and homeConfig.contact.description != ''}"
+                   th:text="${homeConfig.contact.description}"></p>
+                <ul class="home-contact-list">
+            <li th:if="${homeConfig.contact.email != null and homeConfig.contact.email != ''}">
+                <span class="home-contact-icon"><i class="am-icon-envelope-o"></i></span>
+                <strong th:text="${advanced['your.email']}"></strong>
+                <span class="home-contact-value"><a th:href="|mailto:${#strings.trim(homeConfig.contact.email)}?subject=Inquiry&body=Please describe in detail your needs and the products you are inquiring about.|"
+                         th:text="${homeConfig.contact.email}"></a></span>
+            </li>
+            <li th:if="${homeConfig.contact.phoneWhatsapp != null and homeConfig.contact.phoneWhatsapp != ''}">
+                <span class="home-contact-icon"><i class="am-icon-phone"></i></span>
+                <strong th:text="${advanced['phone'] + ' / WhatsApp'}"></strong>
+                <span class="home-contact-value"><a th:href="${'https://wa.me/' + homeConfig.contact.phoneWhatsapp.replaceAll('[^0-9]', '')}"
+                         target="_blank" rel="noopener noreferrer" th:text="${homeConfig.contact.phoneWhatsapp}"></a></span>
+            </li>
+            <li th:if="${homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''}">
+                <span class="home-contact-icon"><i class="am-icon-globe"></i></span>
+                <strong th:text="${advanced['global.support']}"></strong>
+                <span class="home-contact-value" th:text="${homeConfig.contact.globalSupport}"></span>
+            </li>
+                </ul>
+            </div>
+            <div class="home-contact-rfq">
+                <th:block th:replace="home-inquiry :: homeInquiry"></th:block>
+            </div>
+        </div>
+    </section>
+
+    <input type="hidden" id="topNavPageName"
+           th:value="${#lists.isEmpty(topNavPages.?[pageType == 2]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')}">
+</div>
+
+
+<th:block th:replace="search :: search"></th:block>
+<th:block th:replace="inquiry :: inquiry"></th:block>
+<th:block th:replace="right-menu :: right-menu(param1='Home')"></th:block>
+<th:block th:with="isHomeFooter=${true}">
+    <th:block th:replace="footer :: footer"></th:block>
+</th:block>
+<script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js" defer></script>
+<script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js" defer></script>
+<script>
+    (function () {
+        function initHeroEmbla() {
+            var heroEmblaRoot = document.getElementById('heroEmbla');
+            if (!heroEmblaRoot || typeof EmblaCarousel === 'undefined') {
+                return;
+            }
+
+            var viewportNode = heroEmblaRoot.querySelector('.hero-embla__viewport');
+            var plugins = [];
+            if (typeof EmblaCarouselAutoplay !== 'undefined') {
+                plugins.push(EmblaCarouselAutoplay({
+                    delay: 5000
+                }));
+            }
+
+            var emblaApi = EmblaCarousel(viewportNode, {
+                loop: true,
+                align: 'start'
+            }, plugins);
+
+            var autoplay = emblaApi.plugins().autoplay;
+            if (autoplay && typeof autoplay.play === 'function') {
+                autoplay.play();
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initHeroEmbla);
+            return;
+        }
+
+        initHeroEmbla();
+    })();
+</script>
+<script th:src="@{${'/js/home.js?v=' + version}}" defer></script>
+
+</body>
+
+</html>

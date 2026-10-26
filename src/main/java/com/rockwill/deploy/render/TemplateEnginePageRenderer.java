@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 
@@ -63,13 +66,46 @@ public class TemplateEnginePageRenderer {
         if (templateName == null || templateName.trim().isEmpty()) {
             throw new IllegalArgumentException("Template name cannot be empty");
         }
-        WebContext context = getWebContext(variables);
-        String htmlContent = templateEngine.process(templateName, context);
+        String resolvedTemplateName = resolveTemplateName(templateName, variables);
+        Map<String, Object> contextVariables = new HashMap<>(variables);
+        // 公共片段按自己的配置选择，不能继承主页面的 templateVersion。
+        contextVariables.put("footerTemplate", resolveTemplateName("footer",
+                Collections.singletonMap("templateVersions", variables.get("templateVersions") instanceof Map
+                        ? variables.get("templateVersions") : Collections.emptyMap())));
+        WebContext context = getWebContext(contextVariables);
+        String htmlContent = templateEngine.process(resolvedTemplateName, context);
         if (htmlContent.contains("http://oss.iwone.cn")) {
             htmlContent = htmlContent.replaceAll("http://oss.iwone.cn", "https://oss.iee-business.com");
         }
-        log.info("Template rendering completed: {}, size: {}KB", templateName, htmlContent.length() / 1024);
+        log.info("Template rendering completed: {}, size: {}KB", resolvedTemplateName, htmlContent.length() / 1024);
         return htmlContent;
+    }
+
+    /**
+     * 仅切换页面入口；片段仍由模板中的显式名称解析，可直接共享根目录片段。
+     * 未提供版本、非法版本或该版本尚无对应页面时，沿用原模板。
+     */
+    String resolveTemplateName(String templateName, Map<String, Object> variables) {
+        Object configuredVersion = variables == null ? null : variables.get("templateVersion");
+        Object templateVersions = variables == null ? null : variables.get("templateVersions");
+        if (templateVersions instanceof Map) {
+            // 本地搜索页、404 页可能复用其他页面的模型，必须按实际模板名选择。
+            configuredVersion = ((Map<?, ?>) templateVersions).get(templateName);
+        }
+        if (configuredVersion == null) {
+            return templateName;
+        }
+        String version = configuredVersion.toString().trim();
+        if ("t1".equals(version) || version.isEmpty()) {
+            return templateName;
+        }
+        if (!version.matches("t[1-9][0-9]*")) {
+            log.warn("Invalid template version: {}, using default template", version);
+            return templateName;
+        }
+        String candidate = version + "/" + templateName;
+        return new ClassPathResource("templates/" + candidate + ".html").exists()
+                ? candidate : templateName;
     }
 
     private WebContext getWebContext(Map<String, Object> variables) {

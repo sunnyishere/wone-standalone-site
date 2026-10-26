@@ -110,7 +110,7 @@
         }
     </style>
 </head>
-<body class="body-bg">
+<body class="body-bg scroll-sidebar-page">
 <header class="m-hd" style="background-color:var(--theme-header-bg);">
     <th:block th:replace="pc-en :: section(param1='documents-'+${library.id})"></th:block>
     <th:block th:replace="phone-en :: phone-header"></th:block>
@@ -222,7 +222,7 @@
             </section>
         </div>
 
-        <aside>
+        <aside class="scroll-sidebar">
             <th:block th:replace="section-publisher-about :: publisherAbout"></th:block>
             <section class="library-detail-panel" th:if="${relatedLibraries != null and not relatedLibraries.isEmpty()}">
                 <h2 class="library-detail-heading" th:text="${(advanced['related'] ?: 'Related') + ' ' + (advanced['documents'] ?: 'Documents')}">Related Documents</h2>

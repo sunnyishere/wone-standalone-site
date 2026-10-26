@@ -1,0 +1,34 @@
+<th:block th:fragment="cards">
+    <div class="product-list-no-pagination category-card-list" th:if="${not #lists.isEmpty(childCategoryCards)}">
+        <div class="am-container phone-container-all phone-clear-padding am-margin-bottom">
+            <ul class="product-list-grid am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin">
+                <li class="dd-hover4 am-margin-top" th:each="child : ${childCategoryCards}"
+                    th:with="title=${!#strings.isEmpty(child.i18nName) ? child.i18nName : child.name}">
+                    <a th:href="${currentPathLang + '/' + pageName + '/' + #normalizer.normalizeString(child.name) + '-' + child.id}"
+                       th:title="${title}" th:aria-label="${title}">
+                        <div class="product-card category-card">
+                            <div class="image-box">
+                                <img th:if="${!#strings.isEmpty(child.imageUrl)}"
+                                     th:src="${child.imageUrl}" th:alt="${title}" class="image-square" loading="lazy" style="object-fit: contain">
+                                <div th:if="${#strings.isEmpty(child.imageUrl) and not #lists.isEmpty(child.imageUrls)}"
+                                     class="category-card-mosaic" th:classappend="|category-card-mosaic--${#lists.size(child.imageUrls)}|">
+                                    <img th:each="imageUrl : ${child.imageUrls}" th:src="${imageUrl}" alt="" loading="lazy">
+                                </div>
+                                <div th:if="${#strings.isEmpty(child.imageUrl) and #lists.isEmpty(child.imageUrls)}"
+                                     class="category-card-placeholder" role="img" th:aria-label="${title}">
+                                    <i class="am-icon-picture-o" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <span class="product-card-name dd-clamp-text-2 am-padding-top-sm am-text-sm"
+                                  th:text="${title}"></span>
+                            <p class="product-card-description" th:text="${child.shortDesc ?: ''}"></p>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div th:if="${#lists.isEmpty(childCategoryCards)}" class="category-card-empty" role="status">
+        <i class="am-icon-folder-open-o" aria-hidden="true"></i>
+    </div>
+</th:block>

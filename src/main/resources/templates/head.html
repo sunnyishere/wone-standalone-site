@@ -30,6 +30,20 @@
         <link rel="shortcut icon" th:href="${prodBrand?.icon} ?: ''">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            /* Keep horizontal clipping from becoming a sticky scroll container. */
+            .scroll-sidebar-page { overflow-x: clip; }
+            @media (min-width: 641px) {
+                .scroll-sidebar-page .scroll-sidebar {
+                    position: sticky;
+                    top: var(--sidebar-sticky-top, 130px);
+                    align-self: start;
+                }
+            }
+            @media (max-width: 900px) {
+                .scroll-sidebar-page .library-detail-grid > .scroll-sidebar {
+                    position: static;
+                }
+            }
             .solution-google-tooltip {
                 display: none;
                 opacity: 0;
@@ -40,6 +54,28 @@
                 opacity: 1  !important;
             }
         </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var sidebars = document.querySelectorAll('.scroll-sidebar-page .scroll-sidebar, .product-list-page .product-category-sidebar');
+                if (!sidebars.length) return;
+
+                function updateSidebarOffsets() {
+                    Array.prototype.forEach.call(sidebars, function (sidebar) {
+                        var top = Math.min(130, window.innerHeight - sidebar.offsetHeight - 20);
+                        sidebar.style.setProperty('--sidebar-sticky-top', top + 'px');
+                    });
+                }
+
+                updateSidebarOffsets();
+                window.addEventListener('resize', updateSidebarOffsets);
+                if (window.ResizeObserver) {
+                    var observer = new ResizeObserver(updateSidebarOffsets);
+                    Array.prototype.forEach.call(sidebars, function (sidebar) {
+                        observer.observe(sidebar);
+                    });
+                }
+            });
+        </script>
         <script>
             window.i18n = window.i18n || {};
         </script>
