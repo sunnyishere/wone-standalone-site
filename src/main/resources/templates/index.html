@@ -256,7 +256,7 @@
                             <div class="view-all-btn am-btn am-round load-more-btn"
                                  th:attr="data-cate-id=${category.cateId},
                                      data-lang-url=${currentPathLang},
-                                     data-cate-name=${#strings.replace(#strings.trim(#strings.toLowerCase(category.cateName)), ' ', '-')}">
+                                     data-cate-name=${#normalizer.resolveCategorySlugUrl(category.slugUrl, category.cateName)}">
                                 <button type="button" class="am-btn am-round"
                                         style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;"
                                         th:text="${advanced['view.all']}  + ' ' + ${advanced['products']}">

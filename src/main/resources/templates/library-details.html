@@ -124,7 +124,7 @@
             <li><a th:href="${currentPathLang!=''? currentPathLang:'/'} " th:text="${advanced['home.button']}" th:title="${advanced['home.button']}"></a></li>
             <li><a th:href="${currentPathLang} + '/' + ${pageName}" th:text="${i18nName ?: 'Documents'}" th:title="${i18nName ?: 'Documents'}"></a></li>
             <li class="am-active" th:if="${library.eName != null and library.eName != ''}">
-                <a th:href="${currentPathLang} + '/' + ${pageName} + '/' + ${#strings.toLowerCase(#strings.replace(#strings.trim(library.faAssoc.name), ' ', '-'))} + '-' + ${library.fid}"
+                <a th:href="${currentPathLang} + '/' + ${pageName} + '/' + ${#normalizer.resolveSlugUrl(library.faAssoc.slugUrl, library.faAssoc.name)} + '-' + ${library.fid}"
                    th:text="${library.eName}" th:title="${library.eName}"></a>
             </li>
         </ol>

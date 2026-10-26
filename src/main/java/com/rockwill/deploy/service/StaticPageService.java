@@ -373,9 +373,10 @@ public class StaticPageService {
         // 分类
         if (domainHtmlVo.getModelMap() != null) {
             List<LinkedHashMap<String, Object>> categories = (List<LinkedHashMap<String, Object>>) domainHtmlVo.getModelMap().get("association");
+            int pageType = sitePage.getPageType() == null ? 0 : sitePage.getPageType().intValue();
             for (LinkedHashMap<String, Object> category : categories) {
                 SitePage cate = new SitePage();
-                cate.setPageName(category.get("name").toString().toLowerCase().trim());
+                cate.setPageName(resolveMenuCategoryPageSegment(pageType, category));
                 cate.setId(Long.parseLong(category.get("id").toString()));
                 processSubCategory(sitePage, cate, lang, domain);
                 if (category.containsKey("children")) {
@@ -383,7 +384,7 @@ public class StaticPageService {
                     if (!childs.isEmpty()) {
                         for (LinkedHashMap<String, Object> child : childs) {
                             SitePage sub = new SitePage();
-                            sub.setPageName(child.get("name").toString().toLowerCase().trim().replaceAll("/", "-"));
+                            sub.setPageName(resolveMenuCategoryPageSegment(pageType, child));
                             sub.setId(Long.parseLong(child.get("id").toString()));
                             processSubCategory(sitePage, sub, lang, domain);
                         }
@@ -409,6 +410,25 @@ public class StaticPageService {
             }
         }
         log.info("End of generating menu category html files,menu: {}", sitePage.getPageName());
+    }
+
+    /**
+     * 菜单分类静态化路径段：库 slugUrl 优先。
+     * Products → 空则 normalizeString（对齐 resolveCategorySlugUrl）；
+     * Documents → 空则 generateSmartSlug（对齐 resolveSlugUrl / 资料分类 04）。
+     */
+    private String resolveMenuCategoryPageSegment(int pageType, Map<String, Object> category) {
+        if (category == null) {
+            return "";
+        }
+        Object slugUrl = category.get("slugUrl");
+        Object name = category.get("name");
+        String slugStr = slugUrl == null ? null : slugUrl.toString();
+        String nameStr = name == null ? null : name.toString();
+        if (pageType == SitePage.SitePageType.DOCUMENTS) {
+            return ThymeleafUtils.resolveSlugUrl(slugStr, nameStr);
+        }
+        return ThymeleafUtils.resolveCategorySlugUrl(slugStr, nameStr);
     }
 
     private List<CompletableFuture<Void>>  processSubCategory(SitePage menu, SitePage sitePage, String lang, String domain) {

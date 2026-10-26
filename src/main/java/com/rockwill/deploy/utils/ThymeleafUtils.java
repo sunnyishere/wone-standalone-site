@@ -73,6 +73,18 @@ public class ThymeleafUtils {
     }
 
     /**
+     * 拼分类 URL slug 段：库值非空则原样 trim；空则 {@link #normalizeString}(name)。
+     * 勿与详情 {@link #resolveSlugUrl}（smartSlug 兜底）混用。
+     */
+    public static String resolveCategorySlugUrl(String slugFromDb, String name) {
+        if (slugFromDb != null && !slugFromDb.trim().isEmpty()) {
+            return slugFromDb.trim();
+        }
+        String slug = normalizeString(name);
+        return slug == null ? "" : slug;
+    }
+
+    /**
      * 拼详情 URL slug 段：库值非空则原样 trim（禁止再 normalize）；空则 generateSmartSlug(title)。
      * 语义对齐 knowledge StringUtils.resolveSlugUrl。
      */

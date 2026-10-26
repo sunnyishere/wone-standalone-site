@@ -79,7 +79,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #normalizer.normalizeString(category1.name) +
+                    #normalizer.resolveCategorySlugUrl(category1.slugUrl, category1.name) +
                     '-' + category1.id}"
                    th:text="${category1.i18nName}">Sub Category</a>
             </li>
@@ -90,7 +90,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
                     '/' +
-                    #normalizer.normalizeString(category2.name) +
+                    #normalizer.resolveCategorySlugUrl(category2.slugUrl, category2.name) +
                     '-' + category2.id}"
                    th:text="${category2.i18nName}">Sub Category</a>
             </li>

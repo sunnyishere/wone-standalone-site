@@ -9,7 +9,7 @@
     <meta name="keywords" th:content="${pageKeyword} ?: ''">
     <th:block th:with="pn=${pageData?.pageNum ?: 1},
     base = ${websitePath + (currentLang !=  null && currentLang != 'en' ? currentLang + '/' : '') + pageName},
-    slug = ${category != null ? #normalizer.normalizeString(category.name) + '-' + category.id : ''},
+    slug = ${category != null ? #normalizer.resolveCategorySlugUrl(category.slugUrl, category.name) + '-' + category.id : ''},
     canonical = ${base + (slug != '' ? '/' + slug : '')},
     canonicalUrl = ${pn > 1 ? canonical + '-' + pn : canonical}
     ">
@@ -82,7 +82,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#normalizer.normalizeString(item.name)} + '-' +
+                   ${#normalizer.resolveCategorySlugUrl(item.slugUrl, item.name)} + '-' +
                    ${item.id}"
                    th:text="${item.i18nName}">
                 </a>
@@ -93,7 +93,7 @@
                 (${#lists.isEmpty(topNavPages.?[pageType == 2])} ?
                    '/' :
                    ('/' + ${#strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-')} + '/') ) +
-                   ${#normalizer.normalizeString(category.name)} + '-' +
+                   ${#normalizer.resolveCategorySlugUrl(category.slugUrl, category.name)} + '-' +
                    ${category.id}"
                    th:text="${category.i18nName}"></a>
             </li>
@@ -149,7 +149,7 @@
            '/' +
            #strings.replace(#strings.trim(topNavPages.?[pageType == 2][0].pageName), ' ', '-') +
            '/' +
-           #normalizer.normalizeString(subCategory.name) +
+           #normalizer.resolveCategorySlugUrl(subCategory.slugUrl, subCategory.name) +
            '-' + subCategory.id}">
                                 <span th:text="${subCategory.i18nName}"></span>
                             </a>
@@ -185,7 +185,7 @@
             <div style="background:#FFFFFF;" class="product-list-no-pagination">
                 <div class="am-container phone-container-all phone-clear-padding am-margin-bottom" >
                     <ul class="product-list-grid am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin"
-                        style="margin: 0 0;" data-scroll-list th:attr="data-page=${pageData.pageNum},data-next-url=${pageData.totalPages != null and pageData.pageNum < pageData.totalPages ? currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.normalizeString(category.name) + '-' + category.id : '') + '-' + (pageData.pageNum + 1) : ''}">
+                        style="margin: 0 0;" data-scroll-list th:attr="data-page=${pageData.pageNum},data-next-url=${pageData.totalPages != null and pageData.pageNum < pageData.totalPages ? currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.resolveCategorySlugUrl(category.slugUrl, category.name) + '-' + category.id : '') + '-' + (pageData.pageNum + 1) : ''}">
                         <li class="dd-hover4 am-margin-top"
                             th:each="index : ${pageData.rows}">
                             <a th:title="${index.pName}" aria-hidden="false" th:aria-label="${index.pName}"
@@ -214,7 +214,7 @@
                         </li>
                     </ul>
                 </div>
-                <th:block th:replace="list-infinite-scroll :: controls(totalPages=${pageData.totalPages}, currentPage=${pageData.pageNum}, listPath=${currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.normalizeString(category.name) + '-' + category.id : '')})"></th:block>
+                <th:block th:replace="list-infinite-scroll :: controls(totalPages=${pageData.totalPages}, currentPage=${pageData.pageNum}, listPath=${currentPathLang + '/' + pageName + (category != null ? '/' + #normalizer.resolveCategorySlugUrl(category.slugUrl, category.name) + '-' + category.id : '')})"></th:block>
             </div>
             <div class="am-margin-top am-margin-bottom" th:if="${pageFaqList != null and !#lists.isEmpty(pageFaqList)}">
                 <div style="background:#FFFFFF;padding: 0 1.6rem">
