@@ -176,7 +176,7 @@
                                 </div>
 
                             </li>
-                            <!-- 空状态处理 -->
+                            <!-- 空状态处�?-->
                             <li class="equal-height-card-item dd-hover4 am-margin-top"
                                 th:if="${#lists.isEmpty(featuredProducts)}"
                                 th:each="i : ${#numbers.sequence(1, 5)}"
@@ -237,7 +237,7 @@
 
                             </li>
 
-                            <!-- 空状态处理 -->
+                            <!-- 空状态处�?-->
                             <li class="equal-height-card-item dd-hover4 am-margin-top"
                                 th:if="${#lists.isEmpty(category.prod)}"
                                 th:each="i : ${#numbers.sequence(1, 5)}"
@@ -252,11 +252,11 @@
                         </ul>
                         <div th:if="${not #lists.isEmpty(cateProd)}"
                              class="am-container am-text-center am-margin-bottom-xl am-margin-top">
-                            <!-- 临时调试：输出分类ID和名称 -->
+                            <!-- 临时调试：输出分类ID和名�?-->
                             <div class="view-all-btn am-btn am-round load-more-btn"
                                  th:attr="data-cate-id=${category.cateId},
                                      data-lang-url=${currentPathLang},
-                                     data-cate-name=${#normalizer.resolveCategorySlugUrl(category.slugUrl, category.cateName)}">
+                                     data-cate-name=${#normalizer.resolveCategorySlugUrl(category, category.cateName)}">
                                 <button type="button" class="am-btn am-round"
                                         style="background-color: #FFFFFF;color: black;width: 300px;border: 1px solid var(--theme-wone);height: 40px;"
                                         th:text="${advanced['view.all']}  + ' ' + ${advanced['products']}">
@@ -398,7 +398,7 @@
             </th:block>
         </th:block>
 
-        <!-- 首页证书资料：左侧展示文案和资料入口，右侧展示前两条关联资料及资料列表入口。 -->
+        <!-- 首页证书资料：左侧展示文案和资料入口，右侧展示前两条关联资料及资料列表入口�?-->
         <section class="home-certificate-section"
                  th:if="${certificateLibraries != null and not #lists.isEmpty(certificateLibraries)}">
             <div class="am-container home-certificate-layout">
@@ -416,7 +416,7 @@
                             <a class="inline-a-link"
                                th:href="${currentPathLang} + '/' + ${#lists.isEmpty(topNavPages.?[pageType == 4]) ? 'Documents' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')} + '/detail/' + ${#normalizer.resolveSlugUrl(library.slugUrl, library.name)} + '-' + ${library.id}"
                                th:title="${library.name}">
-                                <span class="home-certificate-list__icon">✓</span>
+                                <span class="home-certificate-list__icon">�?/span>
                                 <span class="dd-clamp-text-2" th:text="${library.name}"></span>
                             </a>
                         </li>
@@ -642,7 +642,7 @@
         </div>
     </div>
 
-    <!-- 支持的厂商：按独立站原型使用左对齐浅灰卡片布局。 -->
+    <!-- 支持的厂商：按独立站原型使用左对齐浅灰卡片布局�?-->
     <section class="home-manufacturer-section"
              th:if="${homeConfig != null and homeConfig.supportedManufacturers != null and
                 ((homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != '') or
@@ -807,7 +807,7 @@
         </div>
     </div>
 
-    <!-- 首页联系方式：复用首页管理中的联系方式配置。 -->
+    <!-- 首页联系方式：复用首页管理中的联系方式配置�?-->
     <section class="home-contact-panel"
              th:if="${homeConfig != null and homeConfig.contact != null and
                 ((homeConfig.contact.email != null and homeConfig.contact.email != '') or

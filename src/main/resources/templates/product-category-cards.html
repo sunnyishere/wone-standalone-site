@@ -4,7 +4,7 @@
             <ul class="product-list-grid am-avg-sm-2 am-avg-md-3 am-avg-lg-4 am-thumbnails am-padding-sm phone-clear-padding phone-clear-margin">
                 <li class="dd-hover4 am-margin-top" th:each="child : ${childCategoryCards}"
                     th:with="title=${!#strings.isEmpty(child.i18nName) ? child.i18nName : child.name}">
-                    <a th:href="${currentPathLang + '/' + pageName + '/' + #normalizer.normalizeString(child.name) + '-' + child.id}"
+                    <a th:href="${currentPathLang + '/' + pageName + '/' + #normalizer.resolveCategorySlugUrl(child, child['name']) + '-' + child.id}"
                        th:title="${title}" th:aria-label="${title}">
                         <div class="product-card category-card">
                             <div class="image-box">

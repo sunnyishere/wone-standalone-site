@@ -280,6 +280,7 @@ public class RockwillKnowledgeService {
                         String templateName = model.get("templateName").toString();
                         DomainHtmlVo domainHtmlVo = new DomainHtmlVo();
                         if (StringUtils.isNotEmpty(templateName)) {
+                            ThymeleafUtils.fillChildCategoryCardSlugUrls(model);
                             String content = templateEnginePageRenderer.renderPage(templateName, model);
                             domainHtmlVo.setHtmlContent(content);
                             domainHtmlVo.setModelMap(model);

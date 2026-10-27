@@ -111,7 +111,7 @@
                     '/' +
                     #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-') +
                     '/' +
-                    #strings.toLowerCase(#strings.replace(#strings.trim(index.name), ' ', '-')) +
+                    #normalizer.resolveSlugUrl(index.slugUrl, index.name) +
                     '-' +
                     index.id}">
                             </a>
