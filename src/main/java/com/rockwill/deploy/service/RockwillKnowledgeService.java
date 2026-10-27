@@ -282,6 +282,9 @@ public class RockwillKnowledgeService {
                         if (StringUtils.isNotEmpty(templateName)) {
                             ThymeleafUtils.fillChildCategoryCardSlugUrls(model);
                             String content = templateEnginePageRenderer.renderPage(templateName, model);
+                            if ("products-details".equals(templateName) && content != null) {
+                                content = content.replace("&amp;", "&");
+                            }
                             domainHtmlVo.setHtmlContent(content);
                             domainHtmlVo.setModelMap(model);
                             if (model.containsKey("pageData")) {
