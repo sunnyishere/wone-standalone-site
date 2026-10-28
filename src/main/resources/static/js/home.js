@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var remove = document.createElement('button');
             remove.type = 'button';
             remove.className = 'home-rfq-upload-delete';
-            remove.textContent = '¡Á';
+            remove.textContent = 'Ã—';
             remove.title = 'Remove file';
             remove.setAttribute('aria-label', 'Remove ' + file.name);
             remove.addEventListener('click', function () {

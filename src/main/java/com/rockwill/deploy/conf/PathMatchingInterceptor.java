@@ -38,6 +38,12 @@ public class PathMatchingInterceptor implements HandlerInterceptor {
             response.sendRedirect("/");
             return false;
         }
+        //旧 URL 兼容迁移（如旧搜索路径 → /search?keyword=...）：直接 301 到新地址，不进 Controller
+        if (matchResult.isRedirect()) {
+            response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            response.setHeader("Location", matchResult.getForwardTarget());
+            return false;
+        }
         request.setAttribute("patternType", matchResult.getPatternType().name());
         request.setAttribute("forwardTarget", matchResult.getForwardTarget());
         //处理非法请求

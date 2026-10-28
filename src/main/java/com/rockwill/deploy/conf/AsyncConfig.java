@@ -5,18 +5,21 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import javax.annotation.Resource;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 @EnableAsync
 public class AsyncConfig {
 
+    @Resource
+    BrandConfig brandConfig;
+
     @Bean(name = "rockwillTaskExecutor")
     public ThreadPoolTaskExecutor rockwillTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        int cpuCores = Runtime.getRuntime().availableProcessors();
-        executor.setCorePoolSize(Math.max(5, cpuCores * 5));
-        executor.setMaxPoolSize(Math.max(25, cpuCores * 12));
+        executor.setCorePoolSize(brandConfig.resolveStaticPoolCore());
+        executor.setMaxPoolSize(brandConfig.resolveStaticPoolMax());
         executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("rockwill-");
         executor.setWaitForTasksToCompleteOnShutdown(true);

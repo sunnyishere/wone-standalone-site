@@ -1,5 +1,7 @@
 <!doctype html>
-<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='documents-list'">
+<html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }"
+      th:with="templateType='documents-list',
+      langSwitchPath=${(selectLabel == pageName ? '' : '/' + selectLabel) + ((pageData?.pageNum != null and pageData.pageNum > 1) ? '-' + pageData.pageNum : '')}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

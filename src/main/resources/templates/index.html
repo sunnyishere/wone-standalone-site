@@ -860,8 +860,8 @@
 <th:block th:with="isHomeFooter=${true}">
     <th:block th:replace="footer :: footer"></th:block>
 </th:block>
-<script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js" defer></script>
-<script src="https://unpkg.com/embla-carousel-autoplay/embla-carousel-autoplay.umd.js" defer></script>
+<script th:src="@{${'/js/embla-carousel.umd.js?v=' + version}}" defer></script>
+<script th:src="@{${'/js/embla-carousel-autoplay.umd.js?v=' + version}}" defer></script>
 <script>
     (function () {
         function initHeroEmbla() {
@@ -884,7 +884,8 @@
             }, plugins);
 
             var autoplay = emblaApi.plugins().autoplay;
-            if (autoplay && typeof autoplay.play === 'function') {
+            // 单张 banner 时 autoplay 插件 init 提前返回，play() 内部会因 delay 列表未初始化而报错
+            if (emblaApi.scrollSnapList().length > 1 && autoplay && typeof autoplay.play === 'function') {
                 autoplay.play();
             }
         }

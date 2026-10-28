@@ -16,15 +16,16 @@
 
                                         <nav class="" style="width: 100%;height: auto; max-height: 200px;overflow-y: scroll;">
                                             <ul class="am-menu-nav am-avg-sm-1" style="background-color: var(--theme-header-bg)">
-                                                <li class="am-parent" th:each="item : ${langList}">
-                                                    <a th:if="${suffix != null}"
+                                                <li class="am-parent" th:each="item : ${langList}"
+                                                    th:with="langPath=${langSwitchPath ?: suffix}">
+                                                    <a th:if="${langPath != null}"
                                                        th:href="${item.lang == 'en'} ?
-                                                        ('/' + ${pageName} + ${suffix}) :
-                                                        ('/' + ${item.lang} + '/' + ${pageName} + ${suffix})"
+                                                        ('/' + ${pageName} + ${langPath}) :
+                                                        ('/' + ${item.lang} + '/' + ${pageName} + ${langPath})"
                                                        th:text="${item.langName}"
                                                         th:classappend="${currentLang == item.lang} ? 'am-active' : ''">
                                                     </a>
-                                                    <a th:unless="${suffix != null}"
+                                                    <a th:unless="${langPath != null}"
                                                        th:href="${item.lang == 'en'} ?
                                                         ( ${pageName!='Home'?'/'+pageName:'/'}) :
                                                         ('/' + ${item.lang}  + ( ${pageName!='Home'?'/'+pageName:''}))"

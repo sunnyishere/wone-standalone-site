@@ -1,6 +1,5 @@
 package com.rockwill.deploy.controller;
 
-import com.rockwill.deploy.conf.BrandConfig;
 import com.rockwill.deploy.service.RockwillKnowledgeService;
 import com.rockwill.deploy.service.StaticPageService;
 import com.rockwill.deploy.utils.PathPatternType;
@@ -44,9 +43,6 @@ public class UnifiedRouterController {
     @Autowired
     StaticPageService staticPageService;
 
-    @Autowired
-    BrandConfig brandConfig;
-
     @RequestMapping(value = "/page/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> routeRequest(HttpServletRequest request) throws IOException {
         String realUri = "";
@@ -79,37 +75,27 @@ public class UnifiedRouterController {
                     domainHtmlVo = rockwillKnowledgeService.getHome(realTimeRestTemplate, host);
                     break;
                 }
-                if (isSearchPrefixRequest(forwardTarget.toString())) {
-                    // /search-xxx 形态：关键词本地搜索；lang 优先取 URL 透传值，
-                    // 旧缓存页面（无语种隐藏域、旧 JS）不带语种时从 Referer 来源页解析兜底
-                    String keyword = extractParam(forwardTarget.toString(), "name");
-                    keyword = keyword != null && keyword.startsWith("search-")
-                            ? keyword.substring("search-".length()) : "";
-                    String lang = extractParam(forwardTarget.toString(), "lang");
-                    if (ObjectUtils.isEmpty(lang)) {
-                        lang = resolveLangFromReferer(request);
-                    }
-                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(keyword, null, "1", lang, host, null);
-                    break;
-                }
             case DETAIL:
             case CATEGORY_PAGINATION:
             case MULTI_LEVEL:
             case CATEGORY_WITH_ID:
             case MENU_WITH_PAGE:
             case SEARCH:
-                if (pathPatternType == PathPatternType.SEARCH) {
-                    // /search/xxx-xxx-id-page 形态：分类+关键词本地搜索；categoryName 透传用于语种切换链接重构
-                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(
-                            extractParam(forwardTarget.toString(), "searchKey"),
-                            extractParam(forwardTarget.toString(), "categoryId"),
-                            extractParam(forwardTarget.toString(), "pageNum"),
-                            extractParam(forwardTarget.toString(), "lang"),
-                            host,
-                            extractParam(forwardTarget.toString(), "categoryName"));
+                // /search?keyword=&cid=&scope=&page= 形态：业务参数（keyword/cid/scope/page）在浏览器查询串上，
+                // 从 request 原始参数取（scope 归一化在 Service 内完成）；lang 由 PathMatchUtils
+                // 按语种路径前缀剥离后写入 forwardTarget——URL 路径是语种的权威来源，
+                // 无前缀的 /search 即英语，禁止再从 Referer 兜底解析（右上角切英语时
+                // Referer 仍是旧语种页，兜底会导致英语 URL 渲染出旧语种结果）
+                if (isSearchQueryRequest(forwardTarget.toString())) {
+                    String keyword = request.getParameter("keyword");
+                    String cid = request.getParameter("cid");
+                    String scope = request.getParameter("scope");
+                    String page = request.getParameter("page");
+                    String lang = extractParam(forwardTarget.toString(), "lang");
+                    domainHtmlVo = rockwillKnowledgeService.searchSiteContent(keyword, cid, scope, page, lang, host);
                     break;
                 }
-                domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString(),host);
+                domainHtmlVo = rockwillKnowledgeService.getFromApi(realTimeRestTemplate, forwardTarget.toString(), host);
                 break;
             case DEFAULT:
             default:
@@ -143,39 +129,11 @@ public class UnifiedRouterController {
     }
 
     /**
-     * 判断 MENU_WITHOUT_PAGE 转发目标是否为 /search-xxx 搜索请求（PathMatchUtils 特判产出）
+     * 判断 SEARCH 转发目标是否为查询参数形态的搜索请求（forwardTarget 形如 /public/search?lang=...）。
+     * 旧短横线路径已在 PathMatchUtils 层 301 迁移，不会进入此分支。
      */
-    private boolean isSearchPrefixRequest(String forwardTarget) {
-        String name = extractParam(forwardTarget, "name");
-        return name != null && name.startsWith("search-");
-    }
-
-    /**
-     * 旧缓存页面（无语种隐藏域、旧 JS）发起搜索时请求不带 lang，
-     * 从 Referer 来源页路径首段解析语种短码（如 https://host/de/products → de）兜底。
-     * 首段必须是 brand.languages 中配置的语种才返回，否则返回 null（按英语处理）。
-     */
-    private String resolveLangFromReferer(HttpServletRequest request) {
-        try {
-            String referer = request.getHeader(HttpHeaders.REFERER);
-            if (ObjectUtils.isEmpty(referer)) {
-                return null;
-            }
-            String path = URI.create(referer).getPath();
-            if (path == null || !path.startsWith("/")) {
-                return null;
-            }
-            int secondSlash = path.indexOf('/', 1);
-            String firstSeg = secondSlash > 0 ? path.substring(1, secondSlash) : path.substring(1);
-            if (!ObjectUtils.isEmpty(firstSeg) && brandConfig.getLanguages() != null
-                    && brandConfig.getLanguages().contains(firstSeg)) {
-                log.info("search lang resolved from referer:{}", firstSeg);
-                return firstSeg;
-            }
-        } catch (Exception e) {
-            log.warn("resolve search lang from referer failed", e);
-        }
-        return null;
+    private boolean isSearchQueryRequest(String forwardTarget) {
+        return forwardTarget != null && forwardTarget.startsWith(PathPatternType.SEARCH.getForwardTarget());
     }
 
     /**
