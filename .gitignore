@@ -17,3 +17,11 @@ local-test.yml
 # 部署配置含服务器账号密码/密钥路径（勿入库）
 .agents/skills/deploy-wone-site/deploy-config.json
 .agents/skills/deploy-wone-site/deploy.ps1
+test-reports
+.claude
+src/test
+static-output
+.agents
+.work
+.zcode
+work
