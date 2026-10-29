@@ -61,7 +61,7 @@ brand:
 cdn:
   enabled: true
   prefix: "https://oss.iee-business.com"
-  version: 1.1.10
+  version: 1.1.15
 
 google-tag:
   id: G-0HKGZJNMN6

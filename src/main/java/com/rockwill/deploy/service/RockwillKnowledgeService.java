@@ -618,19 +618,19 @@ public class RockwillKnowledgeService {
             // 传入短码，resolveApiLang 基于 BrandConfig.mapLang 解析为完整语种 code（de → de_DE）后再查询
             String query = buildSiteContentQuery(lang, keyword, channelCid, searchScope, page, host);
             if (query == null) {
-                return renderSearchPage(model, host);
+                return fallbackToBackendSearch(model, keyword, channelCid, page, lang, host);
             }
             String url = siteContentProperties.getBaseUrl() + "/api/siteContent/search?" + query;
             log.info("request siteContent list, host:{}, pageNum:{}, lang:{}", host, page, lang);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 log.error("siteContent list request failed, status:{}", response.getStatusCodeValue());
-                return renderSearchPage(model, host);
+                return fallbackToBackendSearch(model, keyword, channelCid, page, lang, host);
             }
             JSONObject body = JSON.parseObject(response.getBody());
             if (body == null || "fail".equalsIgnoreCase(body.getString("state"))) {
                 log.error("siteContent list request rejected, msg:{}", body == null ? "empty body" : body.getString("msg"));
-                return renderSearchPage(model, host);
+                return fallbackToBackendSearch(model, keyword, channelCid, page, lang, host);
             }
             mapToPageData(body, pageData, page, host, model);
             model.put("pageData", pageData);
@@ -643,8 +643,137 @@ public class RockwillKnowledgeService {
             mapIfPresent(dataObject(body), "sourcingRequest", model);
         } catch (Exception e) {
             log.error("siteContent list request exception, pageNum:{}, lang:{}", page, lang, e);
+            return fallbackToBackendSearch(model, keyword, channelCid, page, lang, host);
         }
         return renderSearchPage(model, host);
+    }
+
+    /**
+     * siteContent 搜索接口不可用（鉴权未配置/请求异常/非 2xx/state=fail）时的兜底：
+     * 回退后端 CMS 旧搜索接口取数——
+     * 分类搜索（带 cid）走 /public/search（catePaging，必传 searchKey/categoryId/pageNum），
+     * 全站搜索走 /public/url（publicUrl，menuName=search&docName=search，paging 以 id 收关键词；
+     * docName 缺失时后端搜索分支会 NPE，必传）。
+     * 后端返回模型是旧模板口径（行数据缺 detailUrlPrefix/slugUrl，模型缺 searchQueryBase），
+     * 直接渲染会 SpEL 缺键报错，故只取其 pageData 行数据，补齐新模板必需字段后并入本地模型渲染。
+     * 旧接口无 scope 维度，类型 Tab 移除（模板 th:if 隐藏）；
+     * 旧链路也失败（空数据/异常）时同样移除 scopeTabs 后渲染本地空结果页。
+     *
+     * @param model 已组装的搜索页本地模型（含 searchQueryBase/currentPathLang 等渲染脚手架）
+     * @param keyword 搜索关键词原始值
+     * @param channelCid 分类 ID（非空走分类搜索旧链路，空走全站搜索旧链路）
+     * @param page 页码（空或非法按 1 处理）
+     * @param lang 站点语言短码（与 URL 语种前缀一致）
+     * @param host 当前请求归一化域名
+     */
+    private DomainHtmlVo fallbackToBackendSearch(Map<String, Object> model, String keyword, String channelCid,
+                                                 int page, String lang, String host) {
+        StringBuilder path = new StringBuilder();
+        if (StringUtils.isNotBlank(channelCid)) {
+            path.append("/public/search?searchKey=").append(urlEncode(StringUtils.defaultString(keyword)))
+                    .append("&categoryId=").append(urlEncode(channelCid))
+                    .append("&pageNum=").append(Math.max(1, page));
+        } else {
+            path.append("/public/url?menuName=search&docName=search")
+                    .append("&id=").append(urlEncode(StringUtils.defaultString(keyword)))
+                    .append("&pageNum=").append(Math.max(1, page));
+        }
+        if (StringUtils.isNotBlank(lang)) {
+            path.append("&lang=").append(urlEncode(lang));
+        }
+        try {
+            Map<String, Object> pageData = fetchLegacySearchPageData(path.toString(), host, page, model);
+            if (pageData != null) {
+                model.put("pageData", pageData);
+                model.put("selectValue", keyword);
+                // 旧搜索接口不返回空结果文案（新接口随响应下发），固定英文兜底，避免模板渲染出 null
+                model.putIfAbsent("noResults", "No results for");
+                model.putIfAbsent("keptQuery", "We kept your original query. Try a related keyword, browse a broader "
+                        + "category, remove filters or publish a sourcing request.");
+                model.putIfAbsent("sourcingRequest", "Post a sourcing request");
+                model.remove("scopeTabs");
+                log.info("siteContent search unavailable, fallback to backend search succeeded, host:{}, lang:{}", host, lang);
+                return renderSearchPage(model, host);
+            }
+            log.error("backend search fallback returned empty, host:{}, lang:{}", host, lang);
+        } catch (Exception e) {
+            log.error("backend search fallback exception, host:{}, lang:{}", host, lang, e);
+        }
+        model.remove("scopeTabs");
+        return renderSearchPage(model, host);
+    }
+
+    /**
+     * 请求后端旧搜索接口并转换为本地 pageData。后端行数据为原始 Prod 结构（id/name/url），
+     * 缺新模板必需键（SpEL 对 Map 缺键会抛 EL1008E），渲染前补齐：
+     * type 统一按 products（旧搜索接口仅检索产品）、slugUrl 缺失按 name 生成 smart slug、
+     * description/enName 空值兜底，再经 {@link #decorateRows} 补 typeLabel 与 detailUrlPrefix。
+     *
+     * @param path 后端搜索接口路径（getFromApi 同源拼接口径，wcmApi + path）
+     * @param host 当前请求归一化域名
+     * @param page 页码（后端未回显时的兜底值）
+     * @param model 页面模型（decorateRows 解析菜单级 typeLabel/detailUrlPrefix 使用）
+     * @return pageData（rows/pageNum/totalPages）；接口失败、非 2xx 或 data 缺失时返回 null
+     */
+    private Map<String, Object> fetchLegacySearchPageData(String path, String host, int page, Map<String, Object> model) {
+        String apiPath = path.startsWith("/") ? path.substring(1) : path;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Deploy-Domain", host);
+        ResponseEntity<String> response = restTemplate.exchange(wcmApi + apiPath, HttpMethod.GET,
+                new HttpEntity<>(null, headers), String.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("legacy search request failed, path:{}, status:{}", apiPath, response.getStatusCodeValue());
+            return null;
+        }
+        JSONObject body = JSON.parseObject(response.getBody());
+        if (body == null || body.getInteger("code") == null || body.getInteger("code") != 200) {
+            log.error("legacy search request rejected, path:{}, msg:{}",
+                    apiPath, body == null ? "empty body" : body.getString("msg"));
+            return null;
+        }
+        JSONObject data = body.getJSONObject("data");
+        if (data == null) {
+            return null;
+        }
+        JSONObject pd = data.getJSONObject("pageData");
+        JSONArray rows = pd == null ? null : pd.getJSONArray("rows");
+        if (rows != null) {
+            for (Object item : rows) {
+                if (!(item instanceof JSONObject)) {
+                    continue;
+                }
+                JSONObject row = (JSONObject) item;
+                if (StringUtils.isBlank(row.getString("type"))) {
+                    row.put("type", "prod");
+                }
+                if (StringUtils.isBlank(row.getString("slugUrl"))) {
+                    row.put("slugUrl", ThymeleafUtils.resolveSlugUrl(null, row.getString("name")));
+                }
+                if (row.getString("description") == null) {
+                    row.put("description", "");
+                }
+                if (!row.containsKey("enName")) {
+                    row.put("enName", "");
+                }
+            }
+        }
+        Map<String, Object> pageData = new HashMap<>();
+        pageData.put("rows", decorateRows(rows, host, model));
+        int pageNum = page;
+        int totalPages = 0;
+        if (pd != null) {
+            try {
+                pageNum = Integer.parseInt(pd.getString("pageNum"));
+            } catch (NumberFormatException ignored) {
+            }
+            try {
+                totalPages = Integer.parseInt(pd.getString("totalPages"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        pageData.put("pageNum", pageNum);
+        pageData.put("totalPages", totalPages);
+        return pageData;
     }
 
     private JSONObject dataObject(JSONObject body) {
