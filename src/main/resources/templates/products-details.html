@@ -125,12 +125,12 @@
                 </span>
             </div>
 
-            <!--  ”∆µ+Õº∆¨ -->
+            <!-- ËßÜÈ¢ë+ÂõæÁâá -->
             <div class="m-partner">
                 <div data-am-widget="slider" class="am-slider am-slider-default-2"
                      data-am-slider='{"animation":"slide","controlNav":"thumbnails"}'>
                     <ul class="am-slides">
-                        <!-- Ãıº˛≈–∂œ£∫»Áπ˚ videoUrl ≤ªŒ™ø’‘Úœ‘ æ ”∆µ -->
+                        <!-- Êù°‰ª∂Âà§Êñ≠ÔºöÂ¶ÇÊûú videoUrl ‰∏ç‰∏∫Á©∫ÂàôÊòæÁ§∫ËßÜÈ¢ë -->
                         <th:block th:if="${videoUrl != null and videoUrl != ''}">
                             <li class="video-product" data-thumb="/images/play.png"
                                 style="border-radius: 0px;width: 100%;object-fit: contain;">
@@ -148,7 +148,7 @@
                             </li>
                         </th:block>
 
-                        <!-- —≠ª∑±È¿˙Õº∆¨¡–±Ì -->
+                        <!-- Âæ™ÁéØÈÅçÂéÜÂõæÁâáÂàóË°® -->
                         <th:block th:each="image : ${imageList}">
                             <li th:attr="data-thumb=${image}"
                                 style="border-radius: 0;max-height: 432px;width: 100%;object-fit: cover;">
@@ -160,7 +160,7 @@
                 </div>
             </div>
 
-            <!--∂®Œª -->
+            <!--ÂÆö‰Ωç -->
             <div class="am-hide-sm-only">
                 <div class="am-container am-margin-top-lg phone-container-title phone-clear-padding"
                      style="background-color: #FFFFFF;padding: 10px 0;">
@@ -181,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- ∂®Œª1 -->
+            <!-- ÂÆö‰Ωç1 -->
             <div id="target1" class="dd-clamp-text-1 am-text-bold am-text-lg am-margin-top-lg"
             >
                 <h2 class="inline-header prod-h2-bg" th:text="${advanced['key.attributes']}"></h2>
@@ -240,7 +240,7 @@
                           th:replace="section-related-cards :: relatedCards(${relatedBlogs}, ${advanced['related']} + ' ' + ${advanced['blogs']}, 'Blogs More', ${blogsPagePath})"></th:block>
             </div>
 
-            <!-- Œƒµµ◊ ‘¥ø‚ -->
+            <!-- ÊñáÊ°£ËµÑÊ∫êÂ∫ì -->
             <div th:if="${faLibraryList != null and #lists.size(faLibraryList) > 0}"
                  th:with="documentsPageName=${#lists.isEmpty(topNavPages.?[pageType == 4]) ? '' : #strings.replace(#strings.trim(topNavPages.?[pageType == 4][0].pageName), ' ', '-')}">
                 <div id="target4" class="am-g">
@@ -285,11 +285,11 @@
                                             <span th:text="${advanced['restricted']} + '.'">Restricted.</span>
                                         </div>
 
-                                        <div class="dd-clamp-text-2 am-text-lg" th:text="${item.name}">Œƒµµ√˚≥∆</div>
+                                        <div class="dd-clamp-text-2 am-text-lg" th:text="${item.name}">ÊñáÊ°£ÂêçÁß∞</div>
                                         <div style="display: flex;flex-wrap: wrap;">
                                             <div class="am-text-left am-padding-top-sm am-padding-right-lg"
                                                  style="color: #5C779F;">
-                                                <span th:text="${item.faAssoc?.name}">∑÷¿‡√˚≥∆</span>
+                                                <span th:text="${item.faAssoc?.name}">ÂàÜÁ±ªÂêçÁß∞</span>
                                             </div>
                                             <div th:if="${item.locale == 1}"
                                                  th:text="${advanced['language.chinese']} ?: 'Chinese'"
@@ -314,7 +314,7 @@
                                         </div>
                                     </div>
                                     <div class="PC-24 product-library-action">
-                                        <!-- π´ø™ + Œƒµµ -->
+                                        <!-- ÂÖ¨ÂºÄ + ÊñáÊ°£ -->
                                         <div class="am-show-lg-only" th:if="${item.isShow == 1 and item.type == 1}">
                                             <div th:if="${item.fileDatalis != null}">
                                                 <a aria-hidden="false"
@@ -332,14 +332,14 @@
                                                     </div>
                                                 </a>
                                             </div>
-                                            <!-- fileDatalis Œ™ null  ±œ‘ æ°∞ŒﬁŒƒº˛°± -->
+                                            <!-- fileDatalis ‰∏∫ null Êó∂ÊòæÁ§∫‚ÄúÊó†Êñá‰ª∂‚Äù -->
                                             <div th:unless="${item.fileDatalis != null}"
                                                  style="margin-top: 30px;color: #999;text-align: right;">
                                                 No file
                                             </div>
                                         </div>
 
-                                        <!-- π´ø™ +  ”∆µ -->
+                                        <!-- ÂÖ¨ÂºÄ + ËßÜÈ¢ë -->
                                         <div class="am-show-lg-only"
                                              th:if="${item.isShow == 1 and item.type == 2 and item.url != null}">
                                             <div class="am-text-center" style="display: flex;justify-content: right;">
@@ -352,7 +352,7 @@
                                             </div>
                                         </div>
 
-                                        <!--  ‹œﬁ£∫—ÿ”√◊…—ØµØ¥∞£¨’π æŒ™Œƒº˛¿‡–Õ∫Õœ¬‘ÿÕº±Í -->
+                                        <!-- ÂèóÈôêÔºöÊ≤øÁî®Âí®ËØ¢ÂºπÁ™óÔºåÂ±ïÁ§∫‰∏∫Êñá‰ª∂Á±ªÂûãÂíå‰∏ãËΩΩÂõæÊ†á -->
                                         <div class="am-show-lg-only" th:if="${item.isShow == 0}">
                                             <div class="am-text-center" style="display: flex;justify-content: right;">
                                                 <div
@@ -428,7 +428,7 @@
                     <div data-am-widget="slider" class="am-slider am-slider-default"
                          data-am-slider='{"controlNav":false,"animation":"slide","animationLoop":false,"itemWidth":180,"itemMargin":5}'>
                         <ul class="am-slides">
-                            <!-- –ﬁ∏¥£∫Ω´ th:if ∫œ≤¢µΩ li …œ -->
+                            <!-- ‰øÆÂ§çÔºöÂ∞Ü th:if ÂêàÂπ∂Âà∞ li ‰∏ä -->
                             <li class="dd-hover4"
                                 th:each="item : ${prCercateList}"
                                 th:if="${item.url != null}">
@@ -448,7 +448,7 @@
         </div>
         <div class="sticky-bar am-u-sm-12 am-u-md-5 am-u-lg-5 phone-clear-margin" style="padding: 0 15px;">
             <div style="background-color: #FFFFFF;margin-bottom:0;margin-top: 25px;border: 1px solid #E9E9E9;border-radius: 10px;padding: 20px;">
-                <!-- º€∏Ò«¯º‰’π æ -->
+                <!-- ‰ª∑Ê†ºÂå∫Èó¥Â±ïÁ§∫ -->
                 <div style="border-bottom: 1px solid #E6E6E6;padding-bottom: 15px;">
                     <div>
                         <span class="am-text-xl am-text-bold" style="color: #F75755;"></span>
@@ -456,7 +456,7 @@
                               th:text="${(userPrice != null && userPrice != '$Negotiable') ? userPrice : advanced['negotiable']}"></span>
                     </div>
                     <div class="am-padding-top-sm">
-                        <!-- Ãıº˛≈–∂œ£∫œ‘ æπ´ Ω√˚≥∆ªÚƒ¨»œŒƒ±æ -->
+                        <!-- Êù°‰ª∂Âà§Êñ≠ÔºöÊòæÁ§∫ÂÖ¨ÂºèÂêçÁß∞ÊàñÈªòËÆ§ÊñáÊú¨ -->
                         <th:block th:if="${formula != null}">
                             <a class="device-aware-link dd-clamp-text-1"
                                th:href="@{/electrical-calculator/{name}-{id}(name=${formula.name.replace(' ', '-')}, id=${formula.id})}"
@@ -476,7 +476,7 @@
                     </div>
                 </div>
 
-                <!-- –Õ∫≈¡–±Ì -->
+                <!-- ÂûãÂè∑ÂàóË°® -->
                 <th:block th:if="${modelList != null && modelList.size() > 0}">
                     <div class="am-hide-sm-only" style="padding: 20px 0;border-bottom: 1px solid #E6E6E6;">
                         <div class="am-g">
@@ -484,7 +484,7 @@
                                 <span th:text="${advanced['model']}">Model</span>
                             </div>
                             <div class="dd-scroll" style="max-height: 180px;overflow-y: auto;padding-right: 10px;">
-                                <!-- —≠ª∑±È¿˙–Õ∫≈¡–±Ì£∫µ„ª˜±æµÿ«–ªª–Õ∫≈–≈œ¢£¨≤ª‘ŸÃ¯◊™ -series ¡¥Ω” -->
+                                <!-- Âæ™ÁéØÈÅçÂéÜÂûãÂè∑ÂàóË°®ÔºöÁÇπÂáªÊú¨Âú∞ÂàáÊç¢ÂûãÂè∑‰ø°ÊÅØÔºå‰∏çÂÜçË∑≥ËΩ¨ -series ÈìæÊé• -->
                                 <th:block th:each="item, stat : ${modelList}">
                                     <th:block
                                             th:with="isActive = ${model?.id != null ? (item.id == model.id) : (stat.index == 0)}">
@@ -510,16 +510,16 @@
                     </div>
                 </th:block>
 
-                <!-- Œƒµµ/Œƒº˛¡–±Ì -->
+                <!-- ÊñáÊ°£/Êñá‰ª∂ÂàóË°® -->
                 <th:block th:if="${faLibraryList != null and faLibraryList != null and #lists.size(faLibraryList) > 0}">
                     <th:block th:each="item : ${faLibraryList}">
-                        <!-- ≈–∂œ item ≤ªŒ™ø’ + fileDatalis µ•∂‘œÛ≤ªŒ™ø’£®Œﬁ–Ë—≠ª∑£¨“Ú’˝≥£≤ø∑÷ «µ•∂‘œÛ£© -->
+                        <!-- Âà§Êñ≠ item ‰∏ç‰∏∫Á©∫ + fileDatalis ÂçïÂØπË±°‰∏ç‰∏∫Á©∫ÔºàÊó†ÈúÄÂæ™ÁéØÔºåÂõ†Ê≠£Â∏∏ÈÉ®ÂàÜÊòØÂçïÂØπË±°Ôºâ -->
                         <th:block th:if="${item != null and item.fileDatalis != null}">
-                            <!-- ÷±Ω”ªÒ»°µ•∂‘œÛµƒ url ∫Õ name£¨Œﬁ–Ë—≠ª∑ -->
+                            <!-- Áõ¥Êé•Ëé∑ÂèñÂçïÂØπË±°ÁöÑ url Âíå nameÔºåÊó†ÈúÄÂæ™ÁéØ -->
                             <th:block th:if="${item.fileDatalis != null}"
                                       th:with="url = ${item.fileDatalis.url}, fileName = ${item.fileDatalis.name}">
                                 <th:block th:if="${url != null}">
-                                    <!-- ¿‡–Õ1£∫ø…œ¬‘ÿŒƒº˛£®π´ø™£© -->
+                                    <!-- Á±ªÂûã1ÔºöÂèØ‰∏ãËΩΩÊñá‰ª∂ÔºàÂÖ¨ÂºÄÔºâ -->
                                     <th:block th:if="${item.isShow == 1 and item.type == 1}">
                                         <a aria-hidden="false"
                                            th:aria-label="${fileName}"
@@ -531,7 +531,7 @@
                                                  style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">
                                                 <div style="margin: 0 10px; border: 1px solid var(--theme-wone); background-color: #FFFFFF; border-radius: 100px; padding: 4px 8px; color: var(--theme-wone); min-width: 140px; text-align: center;">
                                                     <span class="p-icon-a-085 am-padding-right-xs"></span>
-                                                    <!-- ∑√Œ µ•∂‘œÛµƒ type£¨º”ƒ¨»œ÷µ±‹√‚ø’œ‘ æ -->
+                                                    <!-- ËÆøÈóÆÂçïÂØπË±°ÁöÑ typeÔºåÂä†ÈªòËÆ§ÂÄºÈÅøÂÖçÁ©∫ÊòæÁ§∫ -->
                                                     <span>[[${item.fileDatalis.type ?: 'UNKNOWN'}]]</span>
                                                 </div>
                                                 <div class="am-padding-left-sm am-text-bold dd-clamp-text-1">
@@ -541,7 +541,7 @@
                                         </a>
                                     </th:block>
 
-                                    <!-- ¿‡–Õ2£∫MP4 ”∆µ£®π´ø™£¨–Ë»∑»œ item.url ¥Ê‘⁄£© -->
+                                    <!-- Á±ªÂûã2ÔºöMP4ËßÜÈ¢ëÔºàÂÖ¨ÂºÄÔºåÈúÄÁ°ÆËÆ§ item.url Â≠òÂú®Ôºâ -->
                                     <th:block th:if="${item.isShow == 1 and item.type == 2 and item.url != null}">
                                         <div class="am-text-center"
                                              style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">
@@ -555,7 +555,7 @@
                                         </div>
                                     </th:block>
 
-                                    <!-- ¿‡–Õ3£∫ ‹œﬁ◊ ‘¥£®◊…—Ø∞¥≈•£© -->
+                                    <!-- Á±ªÂûã3ÔºöÂèóÈôêËµÑÊ∫êÔºàÂí®ËØ¢ÊåâÈíÆÔºâ -->
                                     <!--                                    <th:block th:if="${item.isShow == 0}">-->
                                     <!--                                        <div class="am-text-center"-->
                                     <!--                                             style="border-bottom: 1px solid #E6E6E6; display: flex; align-items: center; padding: 10px 0;">-->
@@ -575,7 +575,7 @@
                     </th:block>
                 </th:block>
 
-                <!-- ∞¥≈•«¯”Ú£®¥Û∆¡œ‘ æ£© -->
+                <!-- ÊåâÈíÆÂå∫ÂüüÔºàÂ§ßÂ±èÊòæÁ§∫Ôºâ -->
                 <div class="am-show-lg-only">
                     <div class="am-text-center am-padding-top">
                         <a aria-hidden="false"
@@ -605,7 +605,7 @@
                     </div>
                 </div>
 
-                <!-- ∞¥≈•«¯”Ú£®–°∆¡œ‘ æ£© -->
+                <!-- ÊåâÈíÆÂå∫ÂüüÔºàÂ∞èÂ±èÊòæÁ§∫Ôºâ -->
                 <div class="am-hide-lg-only">
                     <div class="am-text-center am-padding-top">
                         <a aria-hidden="false"
@@ -630,7 +630,7 @@
                     </div>
                 </div>
 
-                <!-- ±£–ﬁ–≈œ¢ -->
+                <!-- ‰øù‰øÆ‰ø°ÊÅØ -->
                 <div class="am-text-bold am-padding-top" style="color: #1D1D1F;">
                     <span th:text="${advanced['warranty.by']}">Warranty by</span>
                 </div>
@@ -645,7 +645,7 @@
                     consumption.
                 </div>
 
-                <!-- π©”¶…Ã»œ÷§–≈œ¢ -->
+                <!-- ‰æõÂ∫îÂïÜËÆ§ËØÅ‰ø°ÊÅØ -->
                 <div style="background-color: #F8F8F8;border-radius: 10px;padding: 15px 25px;color: #767676;margin-top: 15px;"
                      th:text="${advanced['prod.detail.company.overview.two']}">
                     The equipment supplier has passed platform qualification certification and technical evaluation,
@@ -808,14 +808,14 @@
         </div>
     </div>
 </div>
-<!--  ”∆µ≤•∑≈ƒ£Ã¨øÚ -->
+<!-- ËßÜÈ¢ëÊí≠ÊîæÊ®°ÊÄÅÊ°Ü -->
 <div class="video-modal" id="videoModal"
      style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 9999; align-items: center; justify-content: center; padding: 40px 20px;">
     <div class="video-container"
          style="width: 90%; max-width: 1200px; height: auto; max-height: 90vh; position: relative;">
         <div class="close-video" id="closeVideo"
              style="position: absolute; top: -40px; right: 0; color: #fff; font-size: 24px; cursor: pointer; width: 40px; height: 40px; text-align: center; line-height: 40px;">
-            °¡
+            √ó
         </div>
         <div style="position: relative; width: 100%; padding-top: 56.25%;">
             <div id="videoIframeContainer"
@@ -873,11 +873,11 @@
 
             var rows = tbody.querySelectorAll('tr');
             var html = '';
-            // ∆∑≈∆––£®µ⁄“ª––£©‘≠—˘±£¡Ù
+            // ÂìÅÁâåË°åÔºàÁ¨¨‰∏ÄË°åÔºâÂéüÊ†∑‰øùÁïô
             if (rows.length > 0) {
                 html += rows[0].outerHTML;
             }
-            // Model NO. ––
+            // Model NO. Ë°å
             var modelRow = document.getElementById('model-no-row');
             if (modelRow) {
                 var nameCell = modelRow.querySelector('td:first-child');
@@ -886,7 +886,7 @@
                     + '</td><td id="model-no-value" style="width: 55%;">'
                     + escapeHtml(data.modelNames[modelId] || '') + '</td></tr>';
             }
-            // πÊ∏Ò––
+            // ËßÑÊ†ºË°å
             for (var i = 0; i < specKeyOrder.length; i++) {
                 var specKeyId = specKeyOrder[i];
                 var specValueId = specMap[specKeyId];
@@ -895,7 +895,7 @@
                     + escapeHtml(specKeyNames[specKeyId] || '')
                     + '</td><td style="width: 55%;">' + escapeHtml(valueName) + '</td></tr>';
             }
-            // Series ––º∞◊‘∂®“Â Ù–‘––‘≠—˘±£¡Ù
+            // Series Ë°åÂèäËá™ÂÆö‰πâÂ±ûÊÄßË°åÂéüÊ†∑‰øùÁïô
             var specRowCount = 1 + (modelRow ? 1 : 0) + specKeyOrder.length;
             for (var j = specRowCount; j < rows.length; j++) {
                 html += rows[j].outerHTML;
@@ -976,7 +976,7 @@
         function handlePlayVideo(button) {
             let iframeCode = button.getAttribute('data-video-iframe');
             if (!iframeCode) {
-                alert('Œ¥ªÒ»°µΩ ”∆µ≤•∑≈¥˙¬Î£¨«Î¡™œµπ‹¿Ì‘±');
+                alert('Êú™Ëé∑ÂèñÂà∞ËßÜÈ¢ëÊí≠Êîæ‰ª£Á†ÅÔºåËØ∑ËÅîÁ≥ªÁÆ°ÁêÜÂëò');
                 return;
             }
 
@@ -989,8 +989,8 @@
                 .replace(/&nbsp;/g, ' ');
 
             if (!iframeCode.startsWith('<iframe') || !iframeCode.endsWith('</iframe>')) {
-                console.error('data-video-iframe ÷–µƒ÷µ≤ª «ÕÍ’˚µƒ iframe ¥˙¬Î£∫', iframeCode);
-                alert(' ”∆µ≤•∑≈¥˙¬Î∏Ò Ω¥ÌŒÛ');
+                console.error('data-video-iframe ‰∏≠ÁöÑÂÄº‰∏çÊòØÂÆåÊï¥ÁöÑ iframe ‰ª£Á†ÅÔºö', iframeCode);
+                alert('ËßÜÈ¢ëÊí≠Êîæ‰ª£Á†ÅÊ†ºÂºèÈîôËØØ');
                 return;
             }
 
