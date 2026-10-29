@@ -38,6 +38,7 @@ tbody.am-collapse.am-in{display:table-row-group}
 #editor ul,#editor ol{margin-top:1.6rem;margin-bottom:1.6rem;padding-left:2em}
 #editor table{width:100%;border-collapse:separate;border-spacing:0}
 #editor th,#editor td{padding:.7rem;line-height:1.6;vertical-align:top;border:1px solid #E6E6E6}
+#editor th,#editor td{word-break:break-word}
 .solution-detail-meta{display:flex}
 .detail-page-heading h1{margin:0}
 .detail-page-heading{margin-bottom:18px}
