@@ -111,18 +111,8 @@
                    th:if="${not #strings.isEmpty(prod.description)}"
                    th:text="${prod.description}"></p>
             </div>
-            <div class="solution-detail-meta am-margin-bottom">
-                <span class="solution-google-review-wrap">
-                    <a class="solution-google-review" href="https://www.google.com/preferences/source"
-                       th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
-                       target="_blank" rel="noopener noreferrer" th:aria-label="${advanced['add.us.on.google']}"
-                       aria-describedby="product-google-tooltip">
-                        <span class="am-icon-google" aria-hidden="true"></span>
-                        <span th:text="${advanced['add.us.on.google']}"></span>
-                    </a>
-                    <span id="product-google-tooltip" class="solution-google-tooltip" role="tooltip"
-                          th:text="${advanced['google.preferred.source.description']}"></span>
-                </span>
+            <div class="solution-detail-meta product-detail-toolbar am-margin-bottom">
+                <th:block th:replace="site-interaction :: toolbar"></th:block>
             </div>
 
             <!-- 视频+图片 -->
@@ -229,6 +219,8 @@
                 <div style="width: 100%;overflow-x: auto" th:utext="${prod.detail}">
                 </div>
             </div>
+            <th:block th:replace="site-interaction :: comments('product', ${prod.id}, ${prod.name})"></th:block>
+
 
             <div class="am-margin-top-xl"
                  th:if="${not #lists.isEmpty(relatedSolutions) or not #lists.isEmpty(relatedSuccessCases) or not #lists.isEmpty(relatedBlogs)}">

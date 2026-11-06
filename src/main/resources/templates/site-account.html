@@ -1,0 +1,40 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="assets">
+        <template id="site-account-template">
+            <dialog id="site-account-dialog" class="site-account-dialog" aria-labelledby="site-account-title"
+                    th:attr="data-login-label=${(advanced != null ? advanced['account.login'] : null) ?: 'Login'},
+                             data-rejected=${(advanced != null ? advanced['login.account.password.incorrect'] : null) ?: 'Incorrect account or password.'},
+                             data-network=${(advanced != null ? advanced['rule.network'] : null) ?: 'Network error, please try again.'}">
+                <button type="button" class="site-account-close" data-account-close aria-label="Close"
+                        th:aria-label="${(advanced != null ? advanced['close'] : null) ?: 'Close'}">×</button>
+                <h2 id="site-account-title" th:text="${(advanced != null ? advanced['account.login'] : null) ?: 'Login'}">Login</h2>
+                <form id="site-account-form">
+                    <label for="site-account-name" th:text="${(advanced != null ? advanced['email'] : null) ?: 'Email'}">Email</label>
+                    <input id="site-account-name" name="account" type="text" autocomplete="username" maxlength="254" required>
+                    <label for="site-account-password" th:text="${(advanced != null ? advanced['account.password'] : null) ?: 'Password'}">Password</label>
+                    <input id="site-account-password" name="password" type="password" autocomplete="current-password" maxlength="256" required>
+                    <button class="site-account-submit" type="submit" th:text="${(advanced != null ? advanced['account.login'] : null) ?: 'Login'}">Login</button>
+                </form>
+                <p class="site-account-status" role="status" aria-live="polite"></p>
+            </dialog>
+        </template>
+    </th:block>
+</head>
+<body>
+    <span th:fragment="entry" class="site-account-menu">
+    <button type="button" class="site-account-entry" data-account-entry
+            aria-haspopup="dialog" aria-controls="site-account-dialog"
+            th:title="${(advanced != null ? advanced['account.login'] : null) ?: 'Sign in'}"
+            th:aria-label="${(advanced != null ? advanced['account.login'] : null) ?: 'Sign in'}">
+        <i class="am-icon-user" aria-hidden="true"></i>
+        <span class="site-account-label" th:text="${(advanced != null ? advanced['account.login'] : null) ?: 'Sign in'}">Sign in</span>
+    </button>
+    <span class="site-account-dropdown" hidden>
+        <button type="button" data-account-logout
+                th:text="${(advanced != null ? advanced['account.logout'] : null) ?: 'Logout'}">Logout</button>
+    </span>
+    </span>
+</body>
+</html>

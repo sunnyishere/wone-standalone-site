@@ -64,6 +64,10 @@ public class UnifiedRouterController {
         DomainHtmlVo domainHtmlVo;
         PathPatternType pathPatternType = PathPatternType.fromString(patternType.toString());
         switch (pathPatternType) {
+            case COMMENTS:
+                return rockwillKnowledgeService.forwardCommentRequest(request, forwardTarget.toString());
+            case ACCOUNT:
+                return rockwillKnowledgeService.forwardAccountRequest(request, forwardTarget.toString());
             case LEAVE_MESSAGE:
             case UPLOAD:
                 ResponseEntity<String> response = rockwillKnowledgeService.forwardFormRequest(request, forwardTarget.toString());

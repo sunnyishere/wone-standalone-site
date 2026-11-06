@@ -38,7 +38,6 @@
         .library-detail-hero { display: grid; grid-template-columns: 220px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; grid-template-areas: "cover category google" "cover title title" "cover lead lead"; column-gap: 24px; align-items: start; }
         .library-detail-cover { grid-area: cover; }
         .library-detail-copy { display: contents; overflow-wrap: anywhere; }
-        .library-detail-google { grid-area: google; margin-left: 0; }
         .library-detail-cover { width: 220px; height: 220px; flex: 0 0 220px; object-fit: cover; border: 1px solid #e9e9e9; border-radius: 12px; background: #f8f8f8; }
         .library-detail-eyebrow { grid-area: category; min-width: 0; align-self: center; color: var(--theme-wone); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
         .library-detail-title { grid-area: title; min-width: 0; margin: 8px 0 10px; color: #1d1d1f; font-size: 30px; line-height: 1.25; }
@@ -145,18 +144,7 @@
                         <h1 class="library-detail-title" th:text="${library.name}"></h1>
                         <p class="library-detail-lead" th:if="${library.description != null and library.description != ''}" th:text="${library.description}"></p>
                     </div>
-                    <span class="solution-google-review-wrap library-detail-google">
-                        <a class="solution-google-review" href="https://www.google.com/preferences/source"
-                           th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
-                           target="_blank" rel="noopener noreferrer"
-                           th:aria-label="${advanced['add.us.on.google'] ?: 'Add us on Google'}"
-                           aria-describedby="library-google-tooltip">
-                            <span class="am-icon-google" aria-hidden="true"></span>
-                            <span th:text="${advanced['add.us.on.google'] ?: 'Add us on Google'}">Add us on Google</span>
-                        </a>
-                        <span id="library-google-tooltip" class="solution-google-tooltip" role="tooltip"
-                              th:text="${advanced['google.preferred.source.description'] ?: 'Add us as a Google Preferred Source to see more of our articles in your search results.'}"></span>
-                    </span>
+                    <th:block th:replace="site-interaction :: toolbar"></th:block>
                 </div>
 
                 <div class="library-detail-facts">
@@ -211,6 +199,9 @@
                 <h2 class="library-detail-heading" th:text="${advanced['document.description'] ?: 'Document description'}">Document description</h2>
                 <div id="editor" class="library-detail-content" th:utext="${library.content}"></div>
             </section>
+
+
+            <th:block th:replace="site-interaction :: comments('document', ${library.id}, ${library.name})"></th:block>
 
             <section class="library-detail-panel" th:if="${relatedProducts != null and not relatedProducts.isEmpty()}">
                 <th:block th:replace="section-related-cards :: relatedCards(${relatedProducts}, ${advanced['related.products'] ?: 'Related products'}, ${advanced['more'] ?: 'More'}, ${productsPagePath})"></th:block>

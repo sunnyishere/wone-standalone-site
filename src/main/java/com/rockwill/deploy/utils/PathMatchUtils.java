@@ -33,6 +33,8 @@ public class PathMatchUtils {
 
         // leaveMessage
         patterns.add(new PathPattern(Pattern.compile("/leaveMessage"), PathPatternType.LEAVE_MESSAGE));
+        patterns.add(new PathPattern(Pattern.compile("^/account/(login|logout)$"), PathPatternType.ACCOUNT));
+        patterns.add(new PathPattern(Pattern.compile("^/comments/(list|replies|add|like|states)$"), PathPatternType.COMMENTS));
 
         // 详情页 /menuName/detail/title-id
         patterns.add(new PathPattern(
@@ -129,6 +131,10 @@ public class PathMatchUtils {
             Matcher matcher = pattern.regex.matcher(normalizedPath);
             if (matcher.matches()) {
                 matchResult.setPatternType(pattern.type);
+                if (pattern.type == PathPatternType.ACCOUNT || pattern.type == PathPatternType.COMMENTS) {
+                    matchResult.setForwardTarget(normalizedPath);
+                    return matchResult;
+                }
                 Map<String, String> params = extractNamedGroups(matcher);
                 if (pattern.type == PathPatternType.CATEGORY_WITH_ID
                         || pattern.type == PathPatternType.CATEGORY_PAGINATION) {

@@ -102,17 +102,7 @@
                     <span th:title="${article.title}"  aria-hidden="false" th:aria-label="${article.title}"  class="am-padding-left" style="color:#999999;"
                        th:text="${#dates.format(article.created, 'MM/dd/yyyy')}"></span>
                 </div>
-                <span class="solution-google-review-wrap">
-                    <a class="solution-google-review" href="https://www.google.com/preferences/source"
-                       th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
-                       target="_blank" rel="noopener noreferrer" th:aria-label="${advanced['add.us.on.google']}"
-                       aria-describedby="solution-google-tooltip">
-                        <span class="am-icon-google" aria-hidden="true"></span>
-                        <span th:text="${advanced['add.us.on.google']}"></span>
-                    </a>
-                    <span id="solution-google-tooltip" class="solution-google-tooltip" role="tooltip"
-                          th:text="${advanced['google.preferred.source.description']}"></span>
-                </span>
+                <th:block th:replace="site-interaction :: toolbar"></th:block>
             </div>
             <br>
             <div class="am-padding-top am-padding-bottom-xl">
@@ -138,6 +128,8 @@
             </div>
 
             <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
+
+            <th:block th:replace="site-interaction :: comments('solution', ${article.id}, ${article.title})"></th:block>
 
 
         </div>

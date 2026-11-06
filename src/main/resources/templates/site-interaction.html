@@ -1,0 +1,85 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<div th:fragment="toolbar" class="site-detail-toolbar" th:with="d=${advanced}">
+    <span class="solution-google-review-wrap">
+        <a class="solution-google-review" th:href="${'https://www.google.com/preferences/source?q=https://' + currentHost}"
+           target="_blank" rel="noopener noreferrer" aria-describedby="site-google-tooltip">
+            <span class="am-icon-google" aria-hidden="true"></span>
+            <span th:text="${d['add.us.on.google'] ?: 'Add us on Google'}">Add us on Google</span>
+        </a>
+        <span id="site-google-tooltip" class="solution-google-tooltip" role="tooltip"
+              th:text="${d['google.preferred.source.description']}"></span>
+    </span>
+    <div class="site-share">
+        <button type="button" class="site-share-action" data-share-toggle aria-expanded="false" aria-controls="site-share-menu"
+                th:attr="aria-label=${d['share'] ?: 'Share'},title=${d['share'] ?: 'Share'}">
+            <i class="am-icon-share" aria-hidden="true"></i>
+        </button>
+        <div id="site-share-menu" class="site-share-menu" hidden>
+            <button type="button" class="site-share-action" data-share="copy"
+                    th:attr="aria-label=${d['copy.link'] ?: 'Copy link'},title=${d['copy.link'] ?: 'Copy link'}">
+                <i class="am-icon-link" aria-hidden="true"></i>
+            </button>
+            <a class="site-share-action" data-share="linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                <i class="am-icon-linkedin" aria-hidden="true"></i>
+            </a>
+            <a class="site-share-action" data-share="whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
+                <i class="am-icon-whatsapp" aria-hidden="true"></i>
+            </a>
+            <a class="site-share-action" data-share="facebook" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+                <i class="am-icon-facebook" aria-hidden="true"></i>
+            </a>
+            <a class="site-share-action" data-share="x" target="_blank" rel="noopener noreferrer" aria-label="X" title="X"><span aria-hidden="true">𝕏</span></a>
+            <a class="site-share-action" data-share="email" rel="noopener noreferrer"
+               th:attr="aria-label=${d['share.email'] ?: 'Email'},title=${d['share.email'] ?: 'Email'}">
+                <i class="am-icon-envelope" aria-hidden="true"></i>
+            </a>
+            <span class="site-share-status" role="status" aria-live="polite" hidden></span>
+        </div>
+    </div>
+    <a class="site-comments-link" href="#site-comments">
+        <span class="am-icon-comment-o" aria-hidden="true"></span>
+        <span th:text="${d['comment.comments'] ?: 'Comments'}">Comments</span> <span data-comment-total>…</span>
+    </a>
+</div>
+
+<section th:fragment="comments(type,id,title)" id="site-comments" class="site-comments" tabindex="-1"
+         th:attr="data-type=${type},data-id=${id},data-title=${title}">
+    <div class="site-comment-labels" hidden th:with="d=${advanced}"
+         th:attr="data-reply=${d['comment.reply'] ?: 'Reply'},
+                  data-failed=${d['comments.load.failed'] ?: 'Unable to load comments. Please try again.'},
+                  data-submit-failed=${d['comment.post.failed'] ?: 'Unable to post comment.'},
+                  data-loading=${d['loading'] ?: 'Loading…'},
+                  data-more=${d['list.load.more'] ?: 'Load more'},
+                  data-more-replies=${d['view.more.replies'] ?: 'View more replies'},
+                  data-ready=${d['list.scroll.more'] ?: 'Scroll for more'},
+                  data-retry=${d['list.load.retry'] ?: 'Retry'},
+                  data-end=${d['list.loaded.all'] ?: 'All items loaded'},
+                  data-expand=${d['show.more'] ?: 'Show more'},
+                  data-collapse=${d['show.less'] ?: 'Show less'},
+                  data-like=${d['comment.like'] ?: 'Like'},
+                  data-copied=${d['link.copied'] ?: 'Link copied'},
+                  data-copy-failed=${d['copy.link.failed'] ?: 'Copy this link:'}"></div>
+    <h2 th:text="${advanced['comment.comments'] ?: 'Comments'}">Comments</h2>
+    <form class="site-comment-form" data-comment-form>
+        <div class="site-comment-prompt" th:text="${advanced['share.question'] ?: 'Share your questions or thoughts'}">Share your questions or thoughts</div>
+        <label for="site-comment-text" class="site-comment-sr" th:text="${advanced['comment.placeholder'] ?: 'Write a comment'}">Write a comment</label>
+        <textarea id="site-comment-text" name="content" rows="3" maxlength="1000"></textarea>
+        <span class="site-comment-form-status" role="status" aria-live="polite"></span>
+        <div class="site-comment-submit-row">
+            <button type="submit" th:text="${advanced['post.comment'] ?: (advanced['comment.submit'] ?: 'Post comment')}">Post comment</button>
+        </div>
+    </form>
+    <div class="site-comment-list"></div>
+    <div class="site-comments-pagination" hidden>
+        <span class="site-comments-status" role="status" aria-live="polite"></span>
+        <button type="button" class="site-comments-retry" hidden></button>
+        <button type="button" class="site-comments-more" hidden></button>
+    </div>
+    <div class="site-comment-load-status" role="status" aria-live="polite"></div>
+</section>
+</body>
+</html>

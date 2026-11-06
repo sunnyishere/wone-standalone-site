@@ -40,6 +40,8 @@
                                 </ul>
                             </li>
 
+                            <li><th:block th:replace="site-account :: entry"></th:block></li>
+
                             <li>
                                 <button title="RFQ" aria-hidden="false" aria-label="RFQ" data-trigger="modal-1" style="background: none; border: none;color: var(--theme-menu-font-color) !important;" th:data-biz-id="'site-'+${param1}" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
                                     <span class="p-icon-a-019"></span>

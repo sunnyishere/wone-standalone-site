@@ -520,3 +520,43 @@ a:focus,a:active{outline:none;box-shadow:none}
 .faq-open .faq-question{color:var(--theme-wone)}
 .faq-open .faq-answer{grid-template-rows:1fr}
 .faq-open .faq-arrow{transform:rotate(180deg)}
+.site-account-entry{display:inline-flex;align-items:center;gap:6px;max-width:160px;padding:8px 10px;border:0;background:transparent;color:var(--theme-menu-font-color,#222);font:inherit;cursor:pointer;}
+.site-account-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.site-account-menu{position:relative;display:inline-block;vertical-align:middle;line-height:1.5;}
+.site-account-dropdown{position:absolute;top:100%;right:0;z-index:1100;min-width:104px;padding:6px 0;border-radius:3px;background:#fff;box-shadow:0 1px 7px #0002;text-align:left;}
+.site-account-dropdown[hidden]{display:none !important;}
+.site-account-dropdown button{display:block;width:100%;padding:7px 14px;border:0;background:transparent;color:#173b66;font:inherit;font-size:13px;line-height:1.5;text-align:left;cursor:pointer;}
+.site-account-dropdown button:hover,.site-account-dropdown button:focus-visible{background:#f5f7fa;}
+.site-account-dropdown button:disabled{opacity:.6;cursor:wait;}
+.site-account-dialog{width:420px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);margin:auto;padding:32px;border:0;border-radius:12px;background:#fff;color:#222;box-shadow:0 20px 70px #0003;overflow:auto;font-size:15px;line-height:1.6;}
+.site-account-dialog::backdrop{background:#0008;}
+.site-account-dialog [hidden]{display:none !important;}
+.site-account-dialog h2{margin:0 28px 16px 0;font-size:24px;}
+.site-account-close{position:absolute;top:12px;right:14px;border:0;background:transparent;font-size:28px;line-height:1;cursor:pointer;color:#555;}
+.site-account-dialog label{display:block;margin:12px 0 6px;font-weight:600;}
+.site-account-dialog input{box-sizing:border-box;display:block;width:100%;min-width:0;padding:10px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#222;font:inherit;}
+.site-account-dialog input:focus{outline:2px solid var(--theme-wone,#467d44);outline-offset:1px;}
+.site-account-submit{width:100%;margin-top:24px;padding:10px;border:0;border-radius:6px;background:var(--theme-wone,#467d44);color:#fff;font:inherit;font-weight:600;cursor:pointer;}
+.site-account-submit:disabled{opacity:.6;cursor:wait;}
+.site-account-status{margin:14px 0 0;color:#a33024;overflow-wrap:anywhere;}
+@media (max-width:640px){
+.am-header .site-account-entry{padding:0 10px;color:var(--theme-wone);vertical-align:middle;}
+.am-header .site-account-label{display:none;}
+.am-header .is-signed-in .site-account-label{display:inline;max-width:72px;}
+.site-account-dialog{padding:24px;}
+}
+@font-face{font-family:FontAwesome;src:url(/fonts/fontawesome-webfont.woff2?v=4.3.0) format("woff2"),url(/fonts/fontawesome-webfont.woff?v=4.3.0) format("woff");font-weight:400;font-style:normal;font-display:swap;}
+.site-account-entry .am-icon-user:before{display:inline-block;font:normal normal normal 1em/1 FontAwesome;content:"\f007";-webkit-font-smoothing:antialiased;}
+.am-header .am-header-right{display:flex;align-items:center;gap:16px;height:100%;}
+.am-header .site-account-menu{display:flex;align-items:center;height:100%;}
+.am-header .site-account-entry{padding:0;line-height:1;}
+/* Keep horizontal clipping from becoming a sticky scroll container. */
+.scroll-sidebar-page { overflow-x: clip; }
+@media (min-width: 641px) {
+    .scroll-sidebar-page .scroll-sidebar{position:sticky;top:var(--sidebar-sticky-top, 130px);align-self:start;}
+}
+@media (max-width: 900px) {
+    .scroll-sidebar-page .library-detail-grid > .scroll-sidebar{position:static;}
+}
+.solution-google-tooltip{display:none;opacity:0;visibility:hidden;pointer-events:none;}
+.m-hd .am-sticky{opacity:1!important;}

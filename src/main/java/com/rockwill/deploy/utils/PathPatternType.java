@@ -4,6 +4,8 @@ public enum PathPatternType {
     // 匹配的路径类型
     SEARCH("/public/search"),
     LEAVE_MESSAGE("/public/leaveMessage"),
+    ACCOUNT("/account"),
+    COMMENTS("/comments"),
     DETAIL("/public/detail"),
     MULTI_LEVEL("/public/url"),
 

@@ -31,6 +31,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1336,6 +1343,84 @@ public class RockwillKnowledgeService {
         }
     }
 
+
+    /** 仅转发账号白名单请求；不进入表单日志，不保留客户端 Cookie。 */
+    public ResponseEntity<String> forwardAccountRequest(HttpServletRequest request, String target) throws IOException {
+        if (!target.matches("/account/(login|logout)")) return interactionFailure(404, "NOT_FOUND");
+        return forwardInteractionRequest(request, target);
+    }
+
+    /** 评论复用账号的受控转发，正文与个人状态不写共享静态缓存。 */
+    public ResponseEntity<String> forwardCommentRequest(HttpServletRequest request, String target) throws IOException {
+        if (!target.matches("/comments/(list|replies|add|like|states)")) return interactionFailure(404, "NOT_FOUND");
+        Object host = request.getAttribute("resolvedHost");
+        if (host == null || !request.getServerName().equalsIgnoreCase(host.toString())) {
+            return interactionFailure(403, "INVALID_SITE");
+        }
+        return forwardInteractionRequest(request, target);
+    }
+
+    private ResponseEntity<String> forwardInteractionRequest(HttpServletRequest request, String target) throws IOException {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        responseHeaders.set(HttpHeaders.CACHE_CONTROL, "private, no-store");
+        if (!"POST".equals(request.getMethod())) {
+            responseHeaders.setAllow(Collections.singleton(HttpMethod.POST));
+            return ResponseEntity.status(405).headers(responseHeaders).body(interactionErrorBody(405, "METHOD_NOT_ALLOWED"));
+        }
+        String origin = request.getHeader("Origin");
+        String originHost = null;
+        if (origin != null) {
+            try { originHost = URI.create(origin).getHost(); }
+            catch (IllegalArgumentException ignored) { /* 非法来源按跨站请求拒绝。 */ }
+        }
+        if (!"1".equals(request.getHeader("X-Site-Request")) || (origin != null
+                && !request.getServerName().equalsIgnoreCase(originHost))) {
+            return ResponseEntity.status(403).headers(responseHeaders).body(interactionErrorBody(403, "SAME_ORIGIN_REQUIRED"));
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        Object domain = request.getAttribute("resolvedHost");
+        headers.set("Deploy-Domain", domain == null ? request.getServerName() : domain.toString());
+        for (String name : Arrays.asList(HttpHeaders.COOKIE, "X-Site-Request", "Sec-Fetch-Site", "X-Real-IP")) {
+            if (request.getHeader(name) != null) headers.set(name, request.getHeader(name));
+        }
+        if (!headers.containsKey("X-Real-IP")) headers.set("X-Real-IP", request.getRemoteAddr());
+        String backend = StringUtils.removeEnd(wcmApi, "/");
+        try (CloseableHttpClient client = HttpClients.custom().disableCookieManagement().disableRedirectHandling().build()) {
+            HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(client);
+            factory.setConnectTimeout(5000);
+            factory.setReadTimeout(10000);
+            RestTemplate forwarding = new RestTemplate(factory);
+            ResponseEntity<String> result;
+            try {
+                result = forwarding.exchange(backend + target, HttpMethod.POST,
+                        new HttpEntity<>(StreamUtils.copyToByteArray(request.getInputStream()), headers), String.class);
+            } catch (RestClientResponseException e) {
+                result = ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders()).body(e.getResponseBodyAsString());
+            }
+            if (result.getHeaders().containsKey(HttpHeaders.SET_COOKIE)) {
+                responseHeaders.put(HttpHeaders.SET_COOKIE, new ArrayList<>(result.getHeaders().get(HttpHeaders.SET_COOKIE)));
+            }
+            return ResponseEntity.status(result.getStatusCodeValue()).headers(responseHeaders).body(result.getBody());
+        } catch (RestClientException e) {
+            return ResponseEntity.status(502).headers(responseHeaders)
+                    .body(interactionErrorBody(502, "AUTH_UPSTREAM_UNAVAILABLE"));
+        }
+    }
+
+    private ResponseEntity<String> interactionFailure(int status, String message) {
+        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.CACHE_CONTROL, "private, no-store")
+                .body(interactionErrorBody(status, message));
+    }
+
+    private String interactionErrorBody(int status, String message) {
+        AjaxResult<Object> result = new AjaxResult<>();
+        result.setCode(status);
+        result.setMsg(message);
+        return JSON.toJSONString(result);
+    }
 
     @SneakyThrows
     public ResponseEntity<String> forwardFormRequest(HttpServletRequest originalRequest, String targetUrl) {
