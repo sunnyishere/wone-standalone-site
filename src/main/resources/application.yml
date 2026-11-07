@@ -58,10 +58,13 @@ brand:
   static-pool-core: 5 #静态化线程池核心线程数，静态化任务含本地渲染(CPU密集)，应与部署机器核数匹配(2核建议5~8)
   static-pool-max: 8 #静态化线程池最大线程数，不得小于 wcm-api-concurrency
 
+legacy-redirect:
+  enabled: true
+
 cdn:
   enabled: true
   prefix: "https://oss.iee-business.com"
-  version: 1.1.16
+  version: 1.1.17
 
 google-tag:
   id: G-0HKGZJNMN6

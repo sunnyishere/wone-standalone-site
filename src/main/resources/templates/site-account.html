@@ -9,7 +9,7 @@
                              data-network=${(advanced != null ? advanced['rule.network'] : null) ?: 'Network error, please try again.'}">
                 <button type="button" class="site-account-close" data-account-close aria-label="Close"
                         th:aria-label="${(advanced != null ? advanced['close'] : null) ?: 'Close'}">×</button>
-                <h2 id="site-account-title" th:text="${(advanced != null ? advanced['account.login'] : null) ?: 'Login'}">Login</h2>
+                <span id="site-account-title" th:text="${(advanced != null ? advanced['account.login'] : null) ?: 'Login'}">Login</span>
                 <form id="site-account-form">
                     <label for="site-account-name" th:text="${(advanced != null ? advanced['email'] : null) ?: 'Email'}">Email</label>
                     <input id="site-account-name" name="account" type="text" autocomplete="username" maxlength="254" required>

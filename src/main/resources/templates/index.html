@@ -117,9 +117,9 @@
     <div class="am-container phone-title am-hide-sm-only home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
             <div class="am-text-center">
                 <div class="am-u-sm-12">
-                    <h3 class="inline-header"><span class="am-text-xl am-text-bold"
+                    <h2 class="inline-header"><span class="am-text-xl am-text-bold"
                                                     th:text="${homeConfig != null and homeConfig.products != null and homeConfig.products.title != null and homeConfig.products.title != '' ? homeConfig.products.title : prodBrand.eName + '   ' + advanced['products']}"></span>
-                    </h3>
+                    </h2>
                     <p class="home-config-description"
                        th:if="${homeConfig != null and homeConfig.products != null and homeConfig.products.description != null and homeConfig.products.description != ''}"
                        th:text="${homeConfig.products.description}"></p>
@@ -131,18 +131,17 @@
                     <div class="category">
                         <div>
                             <ul th:if="${not #lists.isEmpty(categories)}">
-                                <li class="pc-active" th:text="${advanced['all']}">
-                                    All
+                                <li class="pc-active" >
+                                    <h3 class="inline-header" th:text="${advanced['all']}">All</h3>
                                 </li>
                                 <li th:each="category,stat : ${categories}"
                                     th:data-tab-index="${stat.index + 1}">
-                                    <span th:text="${category.i18nName}"></span>
+                                    <h3 class="inline-header" th:text="${category.i18nName}"></h3>
                                 </li>
                             </ul>
                             <ul>
-                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}"
-                                    th:text="${advanced['all']}">
-                                    All
+                                <li class="pc-active" th:unless="${not #lists.isEmpty(categories)}">
+                                    <h3 class="inline-header" th:text="${advanced['all']}">All</h3>
                                 </li>
                             </ul>
                         </div>
@@ -331,7 +330,7 @@
                         </div>
                         <div class="home-strength-copy">
                             <div class="home-strength-eyebrow" th:text="${advanced['manufacturing.strength']}">MANUFACTURING STRENGTH</div>
-                            <h3 class="home-strength-title" th:if="${not #strings.isEmpty(strength['title'])}" th:text="${strength['title']}"></h3>
+                            <h2 class="home-strength-title" th:if="${not #strings.isEmpty(strength['title'])}" th:text="${strength['title']}"></h2>
                             <p class="home-strength-description" th:if="${not #strings.isEmpty(strength['description'])}" th:text="${strength['description']}"></p>
                             <ul class="home-strength-features">
                                 <th:block th:with="item=${strength['strengthItem1']}">
@@ -404,9 +403,9 @@
             <div class="am-container home-certificate-layout">
                 <div class="home-certificate-copy">
                     <div class="home-certificate-eyebrow" th:text="${advanced['certificates.type.tests']}">CERTIFICATES &amp; TYPE TESTS</div>
-                    <h3 class="home-certificate-title"
+                    <h2 class="home-certificate-title"
                         th:if="${homeConfig.certificates.title != null and homeConfig.certificates.title != ''}"
-                        th:text="${homeConfig.certificates.title}"></h3>
+                        th:text="${homeConfig.certificates.title}"></h2>
                     <p class="home-certificate-description"
                        th:if="${homeConfig.certificates.description != null and homeConfig.certificates.description != ''}"
                        th:text="${homeConfig.certificates.description}"></p>
@@ -463,11 +462,11 @@
             <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;">
                     <div class="home-section-header__center">
                     <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
-                        <h3 class="inline-header">
+                        <h2 class="inline-header">
                             <div class="dd-clamp-text-1"
                                  th:text="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.title != null and homeConfig.successCases.title != '' ? homeConfig.successCases.title :
                                     (#lists.isEmpty(topNavPages.?[pageType == 7]) ? '' : (topNavPages.?[pageType == 7][0].i18nName ?: ''))}"></div>
-                        </h3>
+                        </h2>
                         <p class="home-config-description"
                            th:if="${homeConfig != null and homeConfig.successCases != null and homeConfig.successCases.description != null and homeConfig.successCases.description != ''}"
                            th:text="${homeConfig.successCases.description}"></p>
@@ -532,11 +531,11 @@
         <div class="am-container phone-title home-section-header home-config-heading" style="padding: 30px 30px 0 30px;background-color: #FFFFFF;">
                 <div class="home-section-header__center">
                 <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
-                    <h3 class="inline-header">
+                    <h2 class="inline-header">
                         <div class="dd-clamp-text-1"
                              th:text="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.title != null and homeConfig.solutions.title != '' ? homeConfig.solutions.title :
                                 (#lists.isEmpty(topNavPages.?[pageType == 3]) ? '' : (topNavPages.?[pageType == 3][0].i18nName ?: ''))}"></div>
-                    </h3>
+                    </h2>
                     <p class="home-config-description"
                        th:if="${homeConfig != null and homeConfig.solutions != null and homeConfig.solutions.description != null and homeConfig.solutions.description != ''}"
                        th:text="${homeConfig.solutions.description}"></p>
@@ -651,9 +650,9 @@
         <div class="am-container phone-title home-section-header">
             <div class="home-section-header__center">
                 <div class="home-section-header__title am-text-xl am-text-bold am-text-center">
-                    <h3 class="inline-header"
+                    <h2 class="inline-header"
                         th:if="${homeConfig.supportedManufacturers.title != null and homeConfig.supportedManufacturers.title != ''}"
-                        th:text="${homeConfig.supportedManufacturers.title}"></h3>
+                        th:text="${homeConfig.supportedManufacturers.title}"></h2>
                     <p class="home-manufacturer-description"
                        th:if="${homeConfig.supportedManufacturers.description != null and homeConfig.supportedManufacturers.description != ''}"
                        th:text="${homeConfig.supportedManufacturers.description}"></p>
@@ -672,12 +671,12 @@
     <!-- News and blog: share one section and switch between the original card lists. -->
     <section class="home-news-blog-section">
         <div class="home-news-blog-heading home-config-heading">
-            <h3 th:text="${homeConfig != null and homeConfig.newsBlog != null and
+            <h2 th:text="${homeConfig != null and homeConfig.newsBlog != null and
                     homeConfig.newsBlog.title != null and homeConfig.newsBlog.title != ''
                     ? homeConfig.newsBlog.title
                     : ((#lists.isEmpty(topNavPages.?[pageType == 5]) ? 'News' : (topNavPages.?[pageType == 5][0].i18nName ?: 'News'))
                        + ' &amp; '
-                       + (#lists.isEmpty(topNavPages.?[pageType == 8]) ? 'Blog' : (topNavPages.?[pageType == 8][0].i18nName ?: 'Blog')))}"></h3>
+                       + (#lists.isEmpty(topNavPages.?[pageType == 8]) ? 'Blog' : (topNavPages.?[pageType == 8][0].i18nName ?: 'Blog')))}"></h2>
             <p class="home-config-description"
                th:if="${homeConfig != null and homeConfig.newsBlog != null and
                     homeConfig.newsBlog.description != null and homeConfig.newsBlog.description != ''}"
@@ -817,9 +816,9 @@
                  (homeConfig.contact.globalSupport != null and homeConfig.contact.globalSupport != ''))}">
         <div class="home-contact-layout">
             <div class="home-contact-copy">
-                <h3 class="home-contact-title"
+                <h2 class="home-contact-title"
                     th:if="${homeConfig.contact.title != null and homeConfig.contact.title != ''}"
-                    th:text="${homeConfig.contact.title}"></h3>
+                    th:text="${homeConfig.contact.title}"></h2>
                 <p class="home-contact-description"
                    th:if="${homeConfig.contact.description != null and homeConfig.contact.description != ''}"
                    th:text="${homeConfig.contact.description}"></p>
