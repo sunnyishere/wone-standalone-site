@@ -620,11 +620,11 @@ a:focus,a:active{outline:none;box-shadow:none}
 .home-config-section{padding:0 0 12px;background:#fff}
 .home-manufacturer-section{padding:46px 0 44px;background:#f9f9f9;color:#000}
 .home-manufacturer-section .home-section-header{max-width:1576px;margin:0 auto;box-sizing:border-box}
-.home-manufacturer-section .home-section-header__title{text-align:left !important}
-.home-manufacturer-section .home-section-header__title,.home-manufacturer-section .home-section-header__title h3{color:#000;text-align:left}
+.home-manufacturer-section .home-section-header__title{text-align:center !important}
+.home-manufacturer-section .home-section-header__title,.home-manufacturer-section .home-section-header__title h3{color:#000;text-align:center}
 .home-manufacturer-section .home-section-header__title h3{font-size:24px;line-height:1.2;letter-spacing:.02em;text-transform:uppercase}
-.home-manufacturer-description{max-width:650px;margin:10px 0 0;color:#000;font-size:16px;font-weight:400;line-height:1.75;letter-spacing:.01em;text-align:left}
-.home-manufacturer-list{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:14px;max-width:1576px;margin:28px auto 0;padding:0 30px;list-style:none}
+.home-manufacturer-description{max-width:760px;margin:10px auto 0;color:#000;font-size:16px;font-weight:400;line-height:1.75;letter-spacing:.01em;text-align:center}
+.home-manufacturer-list{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;max-width:1576px;margin:28px auto 0;padding:0 30px;list-style:none}
 .home-manufacturer-item{display:flex;flex:0 0 253px;min-width:0;min-height:89px;padding:18px 18px 14px;box-sizing:border-box;flex-direction:column;justify-content:center;border:1px solid #e8edf3;border-radius:12px;background:#fff;text-align:center}
 .home-manufacturer-item strong,.home-manufacturer-item span{display:block}
 .home-manufacturer-item strong{color:#000;font-size:21px;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}

@@ -1,5 +1,6 @@
 package com.rockwill.deploy.controller;
 
+import com.rockwill.deploy.service.LegacyRedirectService;
 import com.rockwill.deploy.service.RockwillKnowledgeService;
 import com.rockwill.deploy.service.StaticPageService;
 import com.rockwill.deploy.utils.PathPatternType;
@@ -42,6 +43,9 @@ public class UnifiedRouterController {
 
     @Autowired
     StaticPageService staticPageService;
+
+    @Autowired
+    LegacyRedirectService legacyRedirectService;
 
     @RequestMapping(value = "/page/**", produces = {"text/html"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<?> routeRequest(HttpServletRequest request) throws IOException {
@@ -112,6 +116,15 @@ public class UnifiedRouterController {
         HttpStatus status = HttpStatus.OK;
         if (ObjectUtils.isEmpty(domainHtmlVo.getHtmlContent())) {
             if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
+                //空内容 404：同样尝试历史链接兜底，未命中返回空 404（原行为）
+                String redirect = legacyRedirectService.resolveRedirect(host, realUri);
+                if (redirect != null) {
+                    log.info("legacy-redirect 301: {} -> {}", realUri, redirect);
+                    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                            .location(URI.create(redirect))
+                            .headers(headers)
+                            .build();
+                }
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .headers(headers)
                         .build();
@@ -122,6 +135,15 @@ public class UnifiedRouterController {
                     .build();
         }
         if (domainHtmlVo.getHttpErrCode() == HttpStatus.NOT_FOUND.value()) {
+            //历史链接兜底：命中 301 目标则重定向；未命中保持 404 状态继续走原返回链
+            String redirect = legacyRedirectService.resolveRedirect(host, realUri);
+            if (redirect != null) {
+                log.info("legacy-redirect 301: {} -> {}", realUri, redirect);
+                return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                        .location(URI.create(redirect))
+                        .headers(headers)
+                        .build();
+            }
             status = HttpStatus.NOT_FOUND;
         }
         //静态化未存储，及时保存html文件（搜索页不做静态化，含语种前缀的搜索路径同样排除）
