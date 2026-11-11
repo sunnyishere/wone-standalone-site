@@ -129,7 +129,8 @@ public class StaticPageService {
                 generateMenuAndDetailPage(lang, domain, todayUpdatedIds);
             }
 
-            siteSitemapUtils.generateStaticSitemap(domain, webSitemapGroups.get(domain));
+            // sitemap 仅由定时全量 generateAllPages 重建：本方法（CMS 触发/增量）的 webSitemapGroups
+            // 只含本轮触碰的类型，重建会覆盖完整根索引导致业务分片丢失（2026-11-10 事故根因）
             webSitemapGroups.remove(domain);
             RobotsUtils.generateRobots(domain, isHttpsSupported(domain), domainPath);
             state = 2;

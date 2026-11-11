@@ -50,19 +50,19 @@ public class StaticizeTriggerController {
         if (JSON.isValid(request.getData().toString())) {
             JSONObject object = JSON.parseObject(request.getData().toString());
             domain = object.getString("domain");
-            if (object.containsKey("prodIds")) {
+            if (StringUtils.hasText(object.getString("prodIds"))) {
                 resultMap.put(SitePage.SitePageType.PRODUCTS, Arrays.stream(object.getString("prodIds")
                         .split(",")).filter(StringUtils::hasText).map(Long::parseLong).collect(Collectors.toSet()));
             }
-            if (object.containsKey("articleIds")) {
+            if (StringUtils.hasText(object.getString("articleIds"))) {
                 resultMap.put(SitePage.SitePageType.SOLUTIONS, Arrays.stream(object.getString("articleIds")
                         .split(",")).filter(StringUtils::hasText).map(Long::parseLong).collect(Collectors.toSet()));
             }
-            if (object.containsKey("caseIds")) {
+            if (StringUtils.hasText(object.getString("caseIds"))) {
                 resultMap.put(SitePage.SitePageType.SUCCESS_REFERENCE, Arrays.stream(object.getString("caseIds")
                         .split(",")).filter(StringUtils::hasText).map(Long::parseLong).collect(Collectors.toSet()));
             }
-            if (object.containsKey("newsIds")) {
+            if (StringUtils.hasText(object.getString("newsIds"))) {
                 resultMap.put(SitePage.SitePageType.NEWS, Arrays.stream(object.getString("newsIds")
                         .split(",")).filter(StringUtils::hasText).map(Long::parseLong).collect(Collectors.toSet()));
             }

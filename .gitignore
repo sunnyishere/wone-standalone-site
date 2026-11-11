@@ -25,3 +25,5 @@ static-output
 .work
 .zcode
 work
+tools
+.tmp-purge-work
