@@ -232,7 +232,10 @@
                         </div>
                     </a>
                 </div>
-                <div class="am-text-center dd-clamp-text-1" style="color: #6C6C6C">
+                <div class="am-text-center dd-clamp-text-1 am-text-sm"
+                     th:if="${not #strings.isEmpty(pic['positions'])}"
+                     th:text="${pic['positions']}"></div>
+                <div class="am-text-center dd-clamp-text-1" style="color: #6C6C6C" th:if="${not #strings.isEmpty(pic['profile'])}">
                     <p th:text="${pic.profile}"></p>
                 </div>
                 <div class="am-text-center am-padding-top-xs">

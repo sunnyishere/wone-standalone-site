@@ -1,15 +1,18 @@
 <!doctype html>
 <html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='blog-detail'">
 
-<head>
+<head th:with="seoPageTitle=${#strings.isEmpty(blog.seoTitle) ? blog.title : blog.seoTitle}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title th:text="${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
+    <title th:text="${seoPageTitle} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}"></title>
     <meta name="description" th:content="${blog.description} ?: ''" />
+    <meta name="keywords"
+          th:if="${not #strings.isEmpty(blog.keywords)}"
+          th:content="${#strings.replace(blog.keywords, '#', ',')}"/>
 
     <link rel="canonical" th:href="${websiteUrl}" />
-    <meta property="og:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta property="og:title" th:attr="content=${seoPageTitle} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta property="og:description" th:content="${blog.description} ?: ''" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
     <link th:if="${not #lists.isEmpty(langList) and langList.size() > 1}" rel="alternate" hreflang="x-default" th:href="${websitePath  + pageName + suffix}"/>
@@ -22,7 +25,7 @@
     <meta property="og:image" th:attr="content=${blog.iconUrl}" />
     <meta property="og:site_name" th:content="${prodBrand.eName ?: 'DefaultBrand'}" />
 
-    <meta name="twitter:title" th:attr="content=${blog.title} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
+    <meta name="twitter:title" th:attr="content=${seoPageTitle} + '-' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta name="twitter:description" th:content="${blog.description} ?: ''" />
     <meta name="twitter:site" th:attr="content='@' + ${prodBrand.eName ?: 'DefaultBrand'}" />
     <meta name="twitter:card" content="summary_large_image" />

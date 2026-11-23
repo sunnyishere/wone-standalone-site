@@ -1,4 +1,6 @@
 <th:block th:fragment="blogAuthor(blog)">
+    <script th:if="${authorSchemaJson != null and authorSchemaJson != '{}'}" type="application/ld+json" th:utext="${authorSchemaJson}">
+    </script>
     <section class="blog-author-card"
              th:if="${blog != null and blog.authorId != null and not #strings.isEmpty(blog.author)}"
              aria-labelledby="blog-author-heading">
@@ -10,8 +12,11 @@
                   th:text="${#strings.substring(blog.author, 0, 1)}"></span>
         </div>
         <div class="blog-author-copy">
-            <h2 id="blog-author-heading">About the Author</h2>
+            <h2 id="blog-author-heading" th:text="${advanced['about.the.author']}">About the Author</h2>
             <div class="blog-author-name" th:text="${blog.author}"></div>
+            <div class="am-text-sm am-margin-bottom-xs"
+                 th:if="${not #strings.isEmpty(blog['authorPosition'])}"
+                 th:text="${blog['authorPosition']}"></div>
             <p class="blog-author-profile"
                th:if="${not #strings.isEmpty(blog.authorProfile)}"
                th:text="${blog.authorProfile}"></p>

@@ -355,18 +355,21 @@ function replaceCountrySelectWithIcon(selectEl, themeColor) {
 
 $(document).ready(function () {
     'use strict';
-    $(document).on('click', 'a[data-trigger="modal-1"], div[data-trigger="modal-1"]', function (e) {
+    function prepareRfq(bizId) {
         $('.form-control').each(function() {
             clearError($(this));
         });
-        e.preventDefault();
-        const bizId = $(this).data('biz-id');
         $('#input-biz-id').val(bizId);
         $('#param-value').text(bizId);
         resetUploadUI();
 
         // 只在打开模态框时调用IP查询
         setCountryByIP();
+    }
+
+    $(document).on('click', 'a[data-trigger="modal-1"], div[data-trigger="modal-1"]', function (e) {
+        e.preventDefault();
+        prepareRfq($(this).data('biz-id'));
     });
 
     const showError = ($input, errorMsg) => {
@@ -1324,6 +1327,22 @@ $(document).ready(function () {
         initCountrySelect();
         initFileUpload();
 
+        document.querySelectorAll('[data-header-rfq]').forEach(function (slot) {
+            if (!slot.querySelector('button')) {
+                slot.insertAdjacentHTML('beforeend', `
+            <button type="button" title="RFQ" aria-controls="doc-modal-1"
+                    style="background: none; border: none; color: var(--theme-menu-font-color) !important;"
+                    data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }">
+                <span class="p-icon-a-019" aria-hidden="true"></span>
+                <span>RFQ</span>
+            </button>
+                `);
+            }
+            slot.querySelector('button').addEventListener('click', function () {
+                prepareRfq(slot.dataset.bizId);
+            });
+        });
+
         $('.close-btn').on('click', function() {
             $('#doc-modal-1').modal('close');
         });
@@ -1954,10 +1973,56 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
 (function () {
     'use strict';
     document.addEventListener('DOMContentLoaded', function () {
-        var template = document.getElementById('site-account-template');
-        if (!template || document.getElementById('site-account-dialog')) return;
-        document.body.appendChild(template.content.cloneNode(true));
+        var config = document.getElementById('site-account-i18n');
+        var legacyTemplate = document.getElementById('site-account-template');
+        if ((!config && !legacyTemplate) || document.getElementById('site-account-dialog')) return;
+        if (config) {
+            document.body.insertAdjacentHTML('beforeend', `
+            <dialog id="site-account-dialog" class="site-account-dialog" aria-labelledby="site-account-title">
+                <button type="button" class="site-account-close" data-account-close aria-label="Close">×</button>
+                <span id="site-account-title">Login</span>
+                <form id="site-account-form">
+                    <label for="site-account-name">Email</label>
+                    <input id="site-account-name" name="account" type="text" autocomplete="username" maxlength="254" required>
+                    <label for="site-account-password">Password</label>
+                    <input id="site-account-password" name="password" type="password" autocomplete="current-password" maxlength="256" required>
+                    <button class="site-account-submit" type="submit">Login</button>
+                </form>
+                <p class="site-account-status" role="status" aria-live="polite"></p>
+            </dialog>
+            `);
+        } else {
+            document.body.appendChild(legacyTemplate.content.cloneNode(true));
+        }
         var dialog = document.getElementById('site-account-dialog');
+        var labels = config ? config.dataset : dialog.dataset;
+        if (config) {
+            dialog.querySelector('[data-account-close]').setAttribute('aria-label', labels.close);
+            dialog.querySelector('#site-account-title').textContent = labels.loginLabel;
+            dialog.querySelector('label[for="site-account-name"]').textContent = labels.email;
+            dialog.querySelector('label[for="site-account-password"]').textContent = labels.password;
+            dialog.querySelector('.site-account-submit').textContent = labels.loginLabel;
+        }
+        document.querySelectorAll('[data-header-account]').forEach(function (slot) {
+            if (config) {
+                slot.insertAdjacentHTML('beforeend', `
+            <span class="site-account-menu">
+                <button type="button" class="site-account-entry" data-account-entry
+                        aria-haspopup="dialog" aria-controls="site-account-dialog">
+                    <i class="am-icon-user" aria-hidden="true"></i>
+                    <span class="site-account-label">Sign in</span>
+                </button>
+                <span class="site-account-dropdown" hidden>
+                    <button type="button" data-account-logout>Logout</button>
+                </span>
+            </span>
+                `);
+                slot.querySelector('[data-account-logout]').textContent = labels.logout;
+            } else {
+                var legacyEntry = document.getElementById('site-account-entry-template');
+                if (legacyEntry) slot.appendChild(legacyEntry.content.cloneNode(true));
+            }
+        });
         var form = document.getElementById('site-account-form');
         var message = dialog.querySelector('.site-account-status');
         var user = null;
@@ -1971,7 +2036,7 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
             user = nextUser;
             form.hidden = !!user;
             document.querySelectorAll('[data-account-entry]').forEach(function (entry) {
-                var label = user ? user.name : dialog.dataset.loginLabel;
+                var label = user ? user.name : labels.loginLabel;
                 entry.querySelector('.site-account-label').textContent = label;
                 entry.title = label;
                 entry.setAttribute('aria-label', label);
@@ -2065,9 +2130,14 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
             event.preventDefault();
             if (busy || !form.reportValidity()) return;
             var account = form.elements.account.value.trim();
-            if (!account || !form.elements.password.value.trim()) return;
+            if (!/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i.test(account)) {
+                status((window.i18n || {}).ruleEmailFormat || 'Please enter a valid email address.');
+                form.elements.account.focus();
+                return;
+            }
+            if (!form.elements.password.value.trim()) return;
             if (!window.jQuery || typeof window.jQuery.md5 !== 'function') {
-                status(dialog.dataset.network);
+                status(labels.network);
                 return;
             }
             var password = window.jQuery.md5(form.elements.password.value).toLowerCase();
@@ -2079,7 +2149,7 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
                     form.reset();
                     close();
                 }).catch(function (error) {
-                    status(error.status === 401 ? dialog.dataset.rejected : dialog.dataset.network);
+                    status(error.status === 401 ? labels.rejected : labels.network);
                 }).finally(function () { setBusy(false); });
         });
         function logout() {
@@ -2092,7 +2162,7 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
                 closeMenus();
                 close();
                 if (lastTrigger) lastTrigger.focus();
-            }).catch(function () { open(); status(dialog.dataset.network); })
+            }).catch(function () { open(); status(labels.network); })
                 .finally(function () { setBusy(false); });
         }
         // 后续评论组件可打开同一登录框并监听 site-account-change，正文无需刷新。
@@ -2443,11 +2513,16 @@ function initializeRfqCountrySearch(container, trigger, panel, originalSelect) {
             if (focus) shareToggle.focus();
         }
         function fitOverlay(node) {
-            node.style.transform = '';
+            node.style.left = '';
+            node.style.right = '';
             var box = node.getBoundingClientRect();
-            var shift = box.right > window.innerWidth - 16 ? window.innerWidth - 16 - box.right : 0;
-            if (box.left + shift < 16) shift += 16 - box.left - shift;
-            if (shift) node.style.transform = 'translateX(' + shift + 'px)';
+            var rightEdge = document.documentElement.clientWidth - 16;
+            var shift = Math.max(16 - box.left, Math.min(0, rightEdge - box.right));
+            if (shift) {
+                // Update the layout position so the original box cannot cause horizontal overflow.
+                node.style.left = (node.offsetLeft + shift) + 'px';
+                node.style.right = 'auto';
+            }
         }
         function notify(message) {
             clearTimeout(toastTimer); toast.textContent = message; toast.hidden = false;

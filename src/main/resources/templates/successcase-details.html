@@ -1,11 +1,11 @@
 <!doctype html>
 <html class="no-js" th:lang="${currentLang != null ? currentLang:'en' }" th:with="templateType='success-detail'">
 
-<head>
+<head th:with="seoPageTitle=${#strings.isEmpty(successCase.seoTitle) ? successCase.title : successCase.seoTitle}">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title th:text="${successCase.title} + '-' + ${prodBrand.eName}"></title>
+    <title th:text="${seoPageTitle} + '-' + ${prodBrand.eName}"></title>
 
 
     <link rel="canonical" th:href="${websiteUrl}" />
@@ -19,7 +19,7 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" th:content="${currentLang} ?: 'en'"/>
-    <meta property="og:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
+    <meta property="og:title" th:attr="content=${seoPageTitle} + '-' + ${prodBrand.eName}" />
     <meta property="og:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta property="og:url" th:attr="content=${websiteUrl}" />
     <meta property="og:image" th:attr="content=${successCase.iconUrl}" />
@@ -31,7 +31,7 @@
 
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" th:attr="content=${successCase.title} + '-' + ${prodBrand.eName}" />
+    <meta name="twitter:title" th:attr="content=${seoPageTitle} + '-' + ${prodBrand.eName}" />
     <meta name="twitter:description" th:attr="content=${successCase.description} + '-' + ${prodBrand.eName}" />
     <meta name="twitter:site" th:attr="content='@' + ${prodBrand.eName}" />
     <meta name="twitter:creator" th:attr="content='@' + ${prodBrand.eName}" />
@@ -114,14 +114,17 @@
             </div>
             <div class="am-text-center am-padding-bottom-lg am-margin-lg" style="display:flex;flex-direction:column;align-items:center;text-align:center;font-weight: bold">
                 <div style="width: 100%; height: 1px;background-color: #DDDDDD"></div>
-                <span>Leave your contact information to receive the full technical white paper, equipment list, and energy efficiency report for this case.</span>
+                <span th:text="${advanced['leave.for.case']}">Leave your contact information to receive the full technical white paper, equipment list, and energy efficiency report for this case.</span>
 
                 <a title="Request Reference Materials"  class="rfq-trigger" data-trigger="modal-1" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0, }"  th:data-biz-id="'site-reference-'+${successCase.id}" >
-                    <span class="am-text-center am-margin-top" style="padding:0 10px;color: var(--theme-menu-font-color);background-color: var(--theme-wone);border: none;height:40px;border-radius: 10px;line-height:40px;display:inline-block;cursor: pointer">
+                    <span th:text="${advanced['reference.materials']}" class="am-text-center am-margin-top" style="padding:0 10px;color: var(--theme-menu-font-color);background-color: var(--theme-wone);border: none;height:40px;border-radius: 10px;line-height:40px;display:inline-block;cursor: pointer">
                         Request Reference Materials
                     </span>
                 </a>
             </div>
+
+            <th:block th:replace="section-blog-author :: blogAuthor(${successCase})"></th:block>
+
             <th:block th:replace="section-faq :: faqSection(${pageFaqList})"></th:block>
 
             <th:block th:replace="site-interaction :: comments('case', ${successCase.id}, ${successCase.title})"></th:block>

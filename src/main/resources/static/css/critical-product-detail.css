@@ -569,7 +569,7 @@ a:focus,a:active{outline:none;box-shadow:none}
 #editor table{width:100%;border-collapse:separate;border-spacing:0}
 #editor th,#editor td{padding:.7rem;line-height:1.6;vertical-align:top;border:1px solid #E6E6E6}
 .site-detail-toolbar{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;position:relative;font-size:14px}
-.solution-detail-meta.product-detail-toolbar,.product-detail-toolbar .site-detail-toolbar{justify-content:flex-end}
+@media(min-width:641px){.solution-detail-meta.product-detail-toolbar,.product-detail-toolbar .site-detail-toolbar{justify-content:flex-end}}
 .site-detail-toolbar button,.site-detail-toolbar .site-comments-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:7px 12px;border:1px solid #dcdfe6;border-radius:20px;background:#fff;color:#000;font:inherit;cursor:pointer;text-decoration:none}
 .site-detail-toolbar button:focus-visible,.site-comments-link:focus-visible,.site-share-menu a:focus-visible{outline:2px solid #000;outline-offset:3px}
 .site-share{position:relative}.site-share-menu{position:absolute;right:0;top:calc(100% + 7px);z-index:1000;display:grid;grid-template-columns:repeat(3,44px);gap:8px;width:max-content;max-width:calc(100vw - 32px);padding:12px;background:#fff;border:1px solid #dcdfe6;border-radius:16px;box-shadow:0 6px 22px #0002}

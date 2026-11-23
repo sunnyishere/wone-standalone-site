@@ -223,11 +223,12 @@
 
 
             <div class="am-margin-top-xl"
+                 th:with="keywordSuffix=${#strings.isEmpty(prod.shortKeywords) ? '' : ' - ' + prod.shortKeywords}"
                  th:if="${not #lists.isEmpty(relatedSolutions) or not #lists.isEmpty(relatedSuccessCases) or not #lists.isEmpty(relatedBlogs)}">
                 <th:block th:if="${not #lists.isEmpty(relatedSolutions)}"
-                          th:replace="section-related-cards :: relatedCards(${relatedSolutions}, 'Solutions for ' + ${prod.shortKeywords}, 'Solutions More', ${solutionsPagePath})"></th:block>
+                          th:replace="section-related-cards :: relatedCards(${relatedSolutions}, ${#strings.defaultString(advanced['solutions'], 'Solutions') + keywordSuffix}, 'Solutions More', ${solutionsPagePath})"></th:block>
                 <th:block th:if="${not #lists.isEmpty(relatedSuccessCases)}"
-                          th:replace="section-related-cards :: relatedCards(${relatedSuccessCases}, 'Reference Projects for ' + ${prod.shortKeywords}, 'Reference Projects More', ${referencesPagePath})"></th:block>
+                          th:replace="section-related-cards :: relatedCards(${relatedSuccessCases}, ${#strings.defaultString(advanced['case.studies'], 'Case Studies') + keywordSuffix}, 'Reference Projects More', ${referencesPagePath})"></th:block>
                 <th:block th:if="${not #lists.isEmpty(relatedBlogs)}"
                           th:replace="section-related-cards :: relatedCards(${relatedBlogs}, ${advanced['related']} + ' ' + ${advanced['blogs']}, 'Blogs More', ${blogsPagePath})"></th:block>
             </div>
