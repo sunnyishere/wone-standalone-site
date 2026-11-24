@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
 import java.time.Duration;
 import java.util.Collections;
@@ -26,22 +27,29 @@ public class RestTemplateConfig {
     @Autowired
     RestTemplateHeaderInterceptor restTemplateHeaderInterceptor;
 
+    @Resource
+    HttpClientProperties httpClientProperties;
+
 
     @Bean("realTimeRestTemplate")
     public RestTemplate realTimeRestTemplate(RestTemplateBuilder builder) {
-        return restTemplatePool(builder, 10);
+        return restTemplatePool(builder,
+                httpClientProperties.getRealtimeConnectTimeout(),
+                httpClientProperties.getRealtimeReadTimeout());
     }
 
     @Bean("jobRestTemplate")
     @Primary
     public RestTemplate jobRestTemplate(RestTemplateBuilder builder) {
-        return restTemplatePool(builder, 120);
+        return restTemplatePool(builder,
+                httpClientProperties.getJobConnectTimeout(),
+                httpClientProperties.getJobReadTimeout());
     }
 
-    private RestTemplate restTemplatePool(RestTemplateBuilder builder, int timeout) {
+    private RestTemplate restTemplatePool(RestTemplateBuilder builder, int connectTimeout, int readTimeout) {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(3);
-        connectionManager.setDefaultMaxPerRoute(3);
+        connectionManager.setMaxTotal(httpClientProperties.getPoolMaxTotal());
+        connectionManager.setDefaultMaxPerRoute(httpClientProperties.getPoolMaxPerRoute());
 
         try {
             TrustStrategy acceptingTrustStrategy = (x509Certificates, s) -> true;
@@ -58,20 +66,21 @@ public class RestTemplateConfig {
                     .setSSLSocketFactory(csf)
                     .setConnectionManager(connectionManager)
                     .setDefaultRequestConfig(RequestConfig.custom()
-                            .setConnectTimeout(timeout * 1000)
-                            .setSocketTimeout(timeout * 1000)
+                            .setConnectTimeout(connectTimeout * 1000)
+                            .setSocketTimeout(readTimeout * 1000)
+                            .setConnectionRequestTimeout(httpClientProperties.getConnectionRequestTimeout() * 1000)
                             .build())
                     .build();
 
             HttpComponentsClientHttpRequestFactory factory =
                     new HttpComponentsClientHttpRequestFactory(httpClient);
-            factory.setConnectTimeout(timeout * 1000);
-            factory.setReadTimeout(timeout * 1000);
+            factory.setConnectTimeout(connectTimeout * 1000);
+            factory.setReadTimeout(readTimeout * 1000);
 
             RestTemplate restTemplate = builder
                     .requestFactory(() -> factory)
-                    .setConnectTimeout(Duration.ofSeconds(timeout))
-                    .setReadTimeout(Duration.ofSeconds(timeout))
+                    .setConnectTimeout(Duration.ofSeconds(connectTimeout))
+                    .setReadTimeout(Duration.ofSeconds(readTimeout))
                     .build();
             restTemplate.setInterceptors(Collections.singletonList(restTemplateHeaderInterceptor));
 

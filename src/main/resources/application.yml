@@ -61,6 +61,19 @@ brand:
 legacy-redirect:
   enabled: true
 
+# RestTemplate HTTP 客户端参数（RestTemplateConfig 使用），超时单位秒
+# real-time：页面按需渲染路径；job：后台静态化任务
+# pool 上限不得小于 brand.wcm-api-concurrency，否则 wcm-api 限流会被连接池截断
+http-client:
+  realtime-connect-timeout: 5
+  realtime-read-timeout: 30
+  job-connect-timeout: 120
+  job-read-timeout: 120
+  connection-request-timeout: 5
+  pool-max-total: 5
+  pool-max-per-route: 5
+
+
 cdn:
   enabled: true
   prefix: "https://oss.iee-business.com"
