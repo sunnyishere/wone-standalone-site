@@ -202,64 +202,38 @@
 </div>
 
 
-<div class="am-container phone-container phone-clear-padding" style="padding: 0 30px 0 30px;background-color: #FFFFFF;">
-    <div class="am-container phone-title" style="padding: 30px 30px 0 30px;">
+<div class="am-container phone-container phone-clear-padding about-members" th:fragment="members">
+    <div class="am-container phone-title">
         <div class="am-text-center">
             <div class="am-u-sm-12">
                 <div class="am-text-lg am-text-bold" ><h2 class="inline-header"  th:text="${advanced['members']}"></h2></div>
             </div>
         </div>
     </div>
-    <ul class="am-avg-sm-2 am-avg-md-3 am-avg-lg-5 am-thumbnails am-padding">
-        <li class="dd-hover4" th:if="${not #lists.isEmpty(employee)}" th:each="pic : ${employee}">
-            <div class="am-padding am-margin-sm phone-clear-margin"
-                 style="background-color: #F9F9F9;border-radius: 12px;">
-                <div class="am-container">
-                    <a aria-hidden="false" th:aria-label="${pic.account}"
-                       th:title="${pic.account}"
-                       th:href="${not #strings.isEmpty(pic.profileUrl)} ? ${pic.profileUrl} : 'javascript:void(0);'">
-                        <div class="am-text-center am-text-xl" style="margin: 10px 0;">
-                            <div class="" style="width: 90px;height: 90px;margin: 0 auto">
-                                <img th:alt="${pic.account}" th:src="${pic.auHead}"
-                                     style="border: 1px solid #E6E6E6;width: 90px;height: 90px;border-radius: 50%;overflow: hidden;object-fit: cover;">
-                            </div>
-                            <div class="am-hide-sm-only">
-                                <span class="dd-clamp-text-1" th:text="${pic.account}"></span>
-                            </div>
-                            <div class="am-show-sm-only">
-                                <span class="dd-clamp-text-1 am-text-sm am-padding-top-xs" th:text="${pic.account}"></span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="am-text-center dd-clamp-text-1 am-text-sm"
-                     th:if="${not #strings.isEmpty(pic['positions'])}"
-                     th:text="${pic['positions']}"></div>
-                <div class="am-text-center dd-clamp-text-1" style="color: #6C6C6C" th:if="${not #strings.isEmpty(pic['profile'])}">
-                    <p th:text="${pic.profile}"></p>
-                </div>
-                <div class="am-text-center am-padding-top-xs">
-                    <button type="button" class="am-btn am-round" data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }"
-                            style="background-color: #FFFFFF;color: #FFFFFF;width: 80%;border: 1px solid var(--theme-wone);color: var(--theme-wone);height: 40px;"  th:text="${advanced['chat.now']}">
-                    </button>
-                </div>
-            </div>
-        </li>
-        <li class="dd-hover4" th:if="${#lists.isEmpty(employee)}"
-            th:each="i : ${#numbers.sequence(1, 1)}">
-            <div class="am-padding am-margin-sm phone-clear-margin"
-                 style="background-color: #F9F9F9;border-radius: 12px;">
-                <div class="am-container">
-                    <div class="am-text-center am-text-xl" style="margin: 10px 0;">
-                        <div class="" style="width: 90px;height: 90px;margin: 0 auto">
-                            <img alt="No Data" src="" style="border: 1px solid #E6E6E6;width: 90px;height: 90px;border-radius: 50%;overflow: hidden;object-fit: cover;background: #afb4b7;">
-                        </div>
-                        <span class=""></span>
-                    </div>
-                </div>
-            </div>
-        </li>
-    </ul>
+    <div class="about-members-carousel">
+        <ul id="about-members-track" class="about-members-track">
+            <li class="about-member-card" th:each="pic : ${employee}">
+                <a th:title="${pic.account}" target="_blank" rel="noopener"
+                   th:href="${pic.profileUrl}"
+                   th:remove="${#strings.isEmpty(pic.profileUrl)} ? tag : none">
+                    <img class="about-member-avatar" th:alt="${pic.account}" th:src="${pic.auHead}" width="90" height="90">
+                    <span class="about-member-name" th:text="${pic.account}"></span>
+                </a>
+                <div class="about-member-position" th:text="${pic['positions']}"></div>
+                <p class="about-member-profile" th:text="${pic.profile}"></p>
+                <button type="button" class="am-btn am-round about-member-chat"
+                        data-am-modal="{target: '#doc-modal-2', closeViaDimmer: 0, }"
+                        th:text="${advanced['chat.now']}"></button>
+            </li>
+            <li class="about-member-card" th:if="${#lists.isEmpty(employee)}">
+                <span class="about-member-avatar about-member-placeholder" aria-hidden="true"></span>
+            </li>
+        </ul>
+        <div class="about-members-controls" hidden>
+            <button type="button" aria-label="Previous team member" aria-controls="about-members-track"></button>
+            <button type="button" aria-label="Next team member" aria-controls="about-members-track"></button>
+        </div>
+    </div>
 </div>
 
 

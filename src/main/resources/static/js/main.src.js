@@ -1,3 +1,39 @@
+(function () {
+    var track = document.getElementById('about-members-track');
+    if (!track || track.children.length < 3) {
+        return;
+    }
+    var controls = track.nextElementSibling;
+    var previous = controls.children[0];
+    var next = controls.children[1];
+
+    function updateControls() {
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        var position = Math.abs(track.scrollLeft);
+        controls.hidden = maxScroll <= 1;
+        previous.disabled = position <= 1;
+        next.disabled = position >= maxScroll - 1;
+    }
+
+    function move(direction) {
+        var first = track.children[0].getBoundingClientRect();
+        var second = track.children[1].getBoundingClientRect();
+        var step = second.left - first.left;
+        var index = Math.round(track.scrollLeft / step);
+        track.scrollTo({ left: (index + direction) * step });
+    }
+
+    previous.addEventListener('click', function () { move(-1); });
+    next.addEventListener('click', function () { move(1); });
+    track.addEventListener('scroll', updateControls, { passive: true });
+    if (window.ResizeObserver) {
+        new ResizeObserver(updateControls).observe(track);
+    } else {
+        window.addEventListener('resize', updateControls);
+    }
+    updateControls();
+}());
+
 // main.js
 (function($) {
     // 图片懒加载初始化
