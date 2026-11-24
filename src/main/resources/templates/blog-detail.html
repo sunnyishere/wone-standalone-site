@@ -73,7 +73,8 @@
 </nav>
 <div class="" style="">
     <div class="am-container phone-container-top am-margin-bottom am-margin-top-sm">
-        <div class="am-u-md-8 am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
+        <div class="am-u-sm-12 am-padding-xl am-margin-bottom-xl phone-container-all"
+             th:classappend="${#lists.isEmpty(relatedBlogs)} ? 'am-u-md-12' : 'am-u-md-8'"
              style="background:#FFFFFF;">
             <div class="detail-page-heading">
                 <h1 class="am-text-bold" th:text="${blog.title}"></h1>
@@ -109,7 +110,8 @@
             <th:block th:replace="site-interaction :: comments('blog', ${blog.id}, ${blog.title})"></th:block>
         </div>
 
-        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin scroll-sidebar">
+        <div class="am-u-md-4 am-u-sm-12 am-margin-bottom-xl phone-clear-padding phone-clear-margin scroll-sidebar"
+             th:if="${not #lists.isEmpty(relatedBlogs)}">
 
             <div th:if="${not #lists.isEmpty(relatedBlogs)}" class="am-padding-bottom" style="background:#FFFFFF;">
                 <div class="am-text-bold am-padding" >

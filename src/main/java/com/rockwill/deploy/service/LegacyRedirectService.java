@@ -138,7 +138,7 @@ public class LegacyRedirectService {
     }
 
     private String schemePrefix(String host) {
-        return "http://" + host;
+        return "https://" + host;
     }
 
     /**
