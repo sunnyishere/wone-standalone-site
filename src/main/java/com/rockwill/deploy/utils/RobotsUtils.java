@@ -25,6 +25,7 @@ public class RobotsUtils {
             "Disallow: /?login*",
             "Disallow: /?password*",
             "Disallow: /search?",
+            "Disallow: /comments/list",
             ""
     );
 

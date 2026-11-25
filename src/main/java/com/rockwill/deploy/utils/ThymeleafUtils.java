@@ -23,6 +23,26 @@ public class ThymeleafUtils {
     private static final int MAX_CHARS = 96;
     private static final int MAX_WORDS = 8;
 
+    /** 卡片摘要截断上限，对齐 knowledge PublicServiceImpl.content 的 500 */
+    private static final int EXCERPT_MAX_LENGTH = 500;
+
+    /**
+     * 富文本转纯文本摘要：委托 {@link RichTextUtils#htmlToPlainText}（Jsoup 解析：解码 HTML 实体、
+     * 块级元素边界补空格、折叠空白），再截断 500。
+     * <p>用于相关博客等卡片摘要（如 blog-detail 的 relatedBlogs.content），截断上限对齐
+     * knowledge PublicServiceImpl.content。
+     */
+    public static String contentExcerpt(String html) {
+        if (html == null || html.isEmpty()) {
+            return "";
+        }
+        String text = RichTextUtils.htmlToPlainText(html);
+        if (text == null || text.isEmpty()) {
+            return "";
+        }
+        return text.length() > EXCERPT_MAX_LENGTH ? text.substring(0, EXCERPT_MAX_LENGTH) : text;
+    }
+
     /**
      * 增强的字符串规范化方法
      * 处理特殊字符：括号、点、波浪线等替换为下划线

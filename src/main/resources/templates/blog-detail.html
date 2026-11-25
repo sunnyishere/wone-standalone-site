@@ -146,7 +146,7 @@
                                                 Leakage
                                             </span>
                                             <div class="dd-clamp-text-2 am-padding-top-sm" style="color: #6C6C6C"
-                                                 th:text="${blog.content}">
+                                                 th:text="${#normalizer.contentExcerpt(blog.content)}">
                                             </div>
                                             </a>
                                             <div class="am-padding-top-xs am-cf am-text-sm">

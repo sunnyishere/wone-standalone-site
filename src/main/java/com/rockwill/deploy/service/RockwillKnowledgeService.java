@@ -292,6 +292,7 @@ public class RockwillKnowledgeService {
                     handleDateKey(model);
                     handleLibraryFileSize(model);
                     sanitizeRichText(model);
+                    fillRelatedBlogI18nTitle(model);
                     ArticleAboutUtils.fillAboutSchema(model, host);
                     upgradeOssAssetsToHttps(model);
                     if (model.containsKey("prodFaqList")) {
@@ -374,6 +375,31 @@ public class RockwillKnowledgeService {
         put("library", new String[]{"content", "name"});
     }};
     private static final String[] FAQ_LIST_KEYS = {"prodFaqList", "pageFaqList"};
+
+    /**
+     * 博客详情相关推荐卡片兜底：knowledge 推荐候选不下发 i18nTitle（仅种子博客有回填），
+     * 缺失时用 title 回填，避免 blog-detail 卡片渲染空白标题。
+     */
+    private void fillRelatedBlogI18nTitle(Map<String, Object> model) {
+        Object relatedObj = model.get("relatedBlogs");
+        if (!(relatedObj instanceof List)) {
+            return;
+        }
+        for (Object itemObj : (List<?>) relatedObj) {
+            if (!(itemObj instanceof Map)) {
+                continue;
+            }
+            @SuppressWarnings("unchecked")
+            Map<String, Object> item = (Map<String, Object>) itemObj;
+            Object i18nTitle = item.get("i18nTitle");
+            if (i18nTitle == null || StringUtils.isBlank(i18nTitle.toString())) {
+                Object title = item.get("title");
+                if (title != null && StringUtils.isNotBlank(title.toString())) {
+                    item.put("i18nTitle", title);
+                }
+            }
+        }
+    }
 
     /**
      * 定点清理富文本字段：剥离被粘贴的 HTML 文档骨架（{@code <!DOCTYPE>/<html>/<head>/<body>}），
